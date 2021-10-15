@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31727.386
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSGateway.Server", "Server\SMSGateway.Server.csproj", "{1D12E4E1-4EC2-4A04-B8DE-42F92E5420A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SMSGateway.Server", "Server\SMSGateway.Server.csproj", "{1D12E4E1-4EC2-4A04-B8DE-42F92E5420A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSGateway.Client", "Client\SMSGateway.Client.csproj", "{3F38EFD0-F8FE-4F14-90A3-8F21ACCC41A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SMSGateway.Client", "Client\SMSGateway.Client.csproj", "{3F38EFD0-F8FE-4F14-90A3-8F21ACCC41A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSGateway.Shared", "Shared\SMSGateway.Shared.csproj", "{1B13516F-DABF-4309-877A-9F7D71E5BE04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SMSGateway.Shared", "Shared\SMSGateway.Shared.csproj", "{1B13516F-DABF-4309-877A-9F7D71E5BE04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
