@@ -89,6 +89,7 @@ namespace SMSGateway.Server
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IContactService, ContactService>();
+            services.AddScoped<IGroupService, GroupService>();
             services.AddTransient<IMailService, SendMailService>();
 
             services.AddControllersWithViews();

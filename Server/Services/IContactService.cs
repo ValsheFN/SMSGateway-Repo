@@ -5,19 +5,20 @@ using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System.Threading.Tasks;
 using SMSGateway.Server.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SMSGateway.Server.Services
 {
     public interface IContactService
     {
         Task<OperationResponse<Contact>> CreateAsync(Contact model);
+       /* Task<UserManagerResponse> UpdateAsync(string referenceId, Contact model);*/
         List<Contact> GetAllFiltered(string userId, string referenceId, string FirstName, string LastName, string CreatedByUserId);
     }
 
     public class ContactService : IContactService
     {
         private readonly ApplicationDBContext _db;
-
         public ContactService(ApplicationDBContext db)
         {
             _db = db;
@@ -42,8 +43,8 @@ namespace SMSGateway.Server.Services
 
             return new OperationResponse<Contact>
             {
-                IsSuccess = true,
                 Message = "Contact created successfully!",
+                IsSuccess = true,
                 Data = model
             };
         }
@@ -52,5 +53,46 @@ namespace SMSGateway.Server.Services
         {
             return _db.Contact.Where(x => x.CreatedByUserId == userId).ToList();
         }
+
+        /*public async Task<UserManagerResponse> UpdateAsync(string referenceId, Contact model)
+        {
+            //Check if contact exist
+            var existingContact = _db.Contact.Find(referenceId);
+
+            if(existingContact == null)
+            {
+                return new UserManagerResponse
+                {
+                    Message = "Contact is not found",
+                    IsSuccess = true
+                };
+            }
+
+            var contact = new Contact
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                Notes = model.Notes
+            };
+
+            var result = await _db.Contact.AddAsync(referenceId, model);
+            if (result.Succeeded)
+            {
+                return new UserManagerResponse
+                {
+                    Message = "Contact has been updated",
+                    IsSuccess = true
+                };
+            }
+
+            return new UserManagerResponse
+            {
+                Message = "Contact is not updated",
+                IsSuccess = false,
+                Errors = result.Errors.Select(e => e.Description)
+            };
+        }*/
     }
 }
