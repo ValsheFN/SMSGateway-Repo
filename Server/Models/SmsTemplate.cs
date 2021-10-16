@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSharpVitamins;
 
 namespace SMSGateway.Server.Models
 {
@@ -12,7 +13,8 @@ namespace SMSGateway.Server.Models
     {
         public SmsTemplate()
         {
-            ReferenceId = Guid.NewGuid().ToString();
+            ShortGuid guid = Guid.NewGuid().ToString();
+            ReferenceId = guid;
         }
 
         public string ReferenceId { get; set; }

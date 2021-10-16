@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Net;
 using FluentEmail.Core;
 using Newtonsoft.Json.Linq;
+using System.Security.Policy;
 
 namespace SMSGateway.Server.Services
 {
@@ -196,9 +197,6 @@ namespace SMSGateway.Server.Services
                     IsSuccess = false
                 };
             }
-
-            /*byte[] decbuff = WebUtility.HtmlDecode(token);
-            var decodeToken = Encoding.UTF8.GetString(decbuff);*/
 
             var decodedToken = WebEncoders.Base64UrlDecode(token);
             string normalToken = Encoding.UTF8.GetString(decodedToken);

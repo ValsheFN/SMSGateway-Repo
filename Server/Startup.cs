@@ -69,6 +69,17 @@ namespace SMSGateway.Server
                 }
             );
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
+
             services.AddScoped(sp => new AuthOptions
             {
                 Audience = Configuration["AuthSettings:Audience"],
@@ -77,51 +88,17 @@ namespace SMSGateway.Server
             });
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IContactService, ContactService>();
             services.AddTransient<IMailService, SendMailService>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            services.AddVersionedApiExplorer(c =>
+            services.AddScoped(sp => new AuthOptions
             {
-                c.GroupNameFormat = "'v'VVV";
-                c.SubstituteApiVersionInUrl = true;
-                c.AssumeDefaultVersionWhenUnspecified = true;
-                c.DefaultApiVersion = new ApiVersion(1, 0);
-            });
-
-            services.AddApiVersioning(c =>
-            {
-                c.ReportApiVersions = true;
-                c.AssumeDefaultVersionWhenUnspecified = true;
-                c.DefaultApiVersion = new ApiVersion(1, 0);
-            });
-
-            services.AddSwaggerGen(c =>
-            {
-                c.EnableAnnotations();
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMS Gateway API", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please insert token",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    BearerFormat = "JWT",
-                    Scheme = "bearer"
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {{
-                    new OpenApiSecurityScheme
-                    {
-                        Reference=new OpenApiReference
-                        {
-                            Type=ReferenceType.SecurityScheme,
-                            Id="Bearer"
-                        }
-                    },
-                    new String[]{ }
-                }});
+                Audience = Configuration["AuthSettings:Audience"],
+                Issuer = Configuration["AuthSettings:Issuer"],
+                Key = Configuration["AuthSettings:Key"]
             });
         }
 
@@ -148,8 +125,6 @@ namespace SMSGateway.Server
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SMS Gateway API v1"));
 
             app.UseRouting();
 
