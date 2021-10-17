@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSGateway.Server.Models;
 using SMSGateway.Server.Services;
@@ -12,6 +13,7 @@ namespace SMSGateway.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ContactController : ControllerBase
     {
         private readonly IContactService _contactService;
@@ -24,7 +26,7 @@ namespace SMSGateway.Server.Controllers
         [HttpGet("FilteredContact")]
         public async Task<IActionResult> GetContactFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId)
         {
-            return Ok(_contactService.GetAllFiltered(userId, "", "", "", ""));
+            return Ok(_contactService.GetAllFiltered(userId, referenceId, firstName, lastName, createdByUserId));
         }
 
         [HttpPost("ContactCreation")]

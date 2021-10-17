@@ -89,6 +89,10 @@ namespace SMSGateway.Server
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IContactService, ContactService>();
+            services.AddScoped<IContactGroupService, ContactGroupService>();
+            services.AddScoped<ISmsTemplateService, SmsTemplateService>();
+            services.AddScoped<ITopUpService, TopUpService>();
+            services.AddScoped<ILogService, LogService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddTransient<IMailService, SendMailService>();
 

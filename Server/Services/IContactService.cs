@@ -6,6 +6,8 @@ using SMSGateway.Shared;
 using System.Threading.Tasks;
 using SMSGateway.Server.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using System.Data.Services.Client;
 
 namespace SMSGateway.Server.Services
 {
@@ -25,7 +27,17 @@ namespace SMSGateway.Server.Services
         }
 
         public async Task<OperationResponse<Contact>> CreateAsync(Contact model)
-        {
+{
+            var userPhoneNumber = _db.Contact.Where(x => x.PhoneNumber == model.PhoneNumber).ToList();
+            if(userPhoneNumber != null)
+            {
+                return new OperationResponse<Contact>
+                {
+                    Message = "Phoone number is already exists",
+                    IsSuccess = false
+
+                };
+            }
             //var userId = User.Identity.GetUserId();
             var contact = new Contact
             {
