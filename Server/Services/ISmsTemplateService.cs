@@ -45,7 +45,19 @@ namespace SMSGateway.Server.Services
 
         public List<SmsTemplate> GetAllFiltered(string smsTemplateName, string content)
         {
-            return _db.SmsTemplates.Where(x => x.SmsTemplateName == smsTemplateName).ToList();
+            var query = _db.SmsTemplates.ToList();
+
+            if(smsTemplateName != "" && smsTemplateName != null)
+            {
+                query = query.Where(x => x.SmsTemplateName == smsTemplateName).ToList();
+            }
+
+            if (content != "" && content != null)
+            {
+                query = query.Where(x => x.Content.Contains(content)).ToList();
+            }
+
+            return query;
         }
     }
 }

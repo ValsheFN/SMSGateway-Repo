@@ -13,7 +13,7 @@ namespace SMSGateway.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ContactController : ControllerBase
     {
         private readonly IContactService _contactService;
@@ -40,11 +40,8 @@ namespace SMSGateway.Server.Controllers
                 {
                     return Ok(result);
                 }
-
                 return BadRequest(result);
-
             }
-
             return BadRequest("Internal Server Error"); //400
         }
     }

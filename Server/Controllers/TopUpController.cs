@@ -13,7 +13,7 @@ namespace SMSGateway.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class TopUpController : ControllerBase
     {
         private readonly ITopUpService _topUpService;
@@ -29,17 +29,10 @@ namespace SMSGateway.Server.Controllers
                                           DateTime grantDateStart, DateTime grantDateEnd,
                                           string grantedBy)
         {
-            var result = _topUpService.GetAllFiltered(referenceId, requester, status,
+            return Ok(_topUpService.GetAllFiltered(referenceId, requester, status,
                                           requestDateStart, requestDateEnd,
                                           grantDateStart, grantDateEnd,
-                                          grantedBy);
-
-            if (result.IsSuccess)
-            {
-                return Ok(result); //200
-            }
-
-            return BadRequest(result);
+                                          grantedBy));
         }
 
         [HttpPost("CreateTopUp")]

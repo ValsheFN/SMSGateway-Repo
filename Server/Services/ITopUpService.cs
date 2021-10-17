@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic.CompilerServices;
+using Newtonsoft.Json.Linq;
 using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System;
@@ -56,15 +58,43 @@ namespace SMSGateway.Server.Services
                                           DateTime grantDateStart, DateTime grantDateEnd,
                                           string grantedBy)
         {
-            return _db.TopUps.Where(x => x.ReferenceId == referenceId
-                                && x.Requester == requester
-                                && x.Status == status
-                                && x.RequestDate >= requestDateStart
-                                && x.RequestDate <= requestDateEnd
-                                && x.GrantDate >= grantDateStart
-                                && x.GrantDate <= grantDateEnd
-                                && x.GrantedBy == grantedBy)
-                             .ToList();
+            var query = _db.TopUps.ToList();
+
+            if(referenceId != "" && referenceId != null)
+            {
+                query = query.Where(x => x.ReferenceId == referenceId).ToList();
+            }
+
+            if (requester != "" && requester != null)
+            {
+                query = query.Where(x => x.Requester == requester).ToList();
+            }
+
+            if (status != "" && status != null)
+            {
+                query = query.Where(x => x.Status == status).ToList();
+}
+            if (requestDateStart != DateTime.MinValue)
+            {
+                query = query.Where(x => x.RequestDate >= requestDateStart).ToList();
+            }
+
+            if (requestDateEnd != DateTime.MinValue)
+            {
+                query = query.Where(x => x.RequestDate <= requestDateEnd).ToList();
+            }
+
+            if (grantDateStart != DateTime.MinValue)
+            {
+                query = query.Where(x => x.GrantDate >= grantDateStart).ToList();
+            }
+
+            if (grantDateEnd != DateTime.MinValue)
+            {
+                query = query.Where(x => x.GrantDate <= grantDateEnd).ToList();
+            }
+
+            return query;
         }
 
         public async Task<OperationResponse<TopUp>> UpdateTopUp(string referenceId, string action)

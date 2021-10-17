@@ -15,7 +15,7 @@ namespace SMSGateway.Server.Services
     {
         Task<OperationResponse<Contact>> CreateAsync(Contact model);
        /* Task<UserManagerResponse> UpdateAsync(string referenceId, Contact model);*/
-        List<Contact> GetAllFiltered(string userId, string referenceId, string FirstName, string LastName, string CreatedByUserId);
+        List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId);
     }
 
     public class ContactService : IContactService
@@ -61,9 +61,35 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public List<Contact> GetAllFiltered(string userId, string referenceId, string FirstName, string LastName, string CreatedByUserId)
+        public List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId)
         {
-            return _db.Contact.Where(x => x.CreatedByUserId == userId).ToList();
+            var query = _db.Contact.ToList();
+
+            if (createdByUserId != "" && createdByUserId != null)
+            {
+                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
+            }
+
+            if (userId != "" && userId != null)
+            {
+                query = query.Where(x => x.Id == userId).ToList();
+            }
+
+            if (referenceId != "" && referenceId != null)
+            {
+                query = query.Where(x => x.ReferenceId == userId).ToList();
+            }
+
+            if (firstName != "" && firstName != null)
+            {
+                query = query.Where(x => x.FirstName == firstName).ToList();
+            }
+
+            if (lastName != "" && lastName != null)
+            {
+                query = query.Where(x => x.LastName == lastName).ToList();
+            }
+            return query;
         }
 
         /*public async Task<UserManagerResponse> UpdateAsync(string referenceId, Contact model)

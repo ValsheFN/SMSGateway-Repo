@@ -44,10 +44,24 @@ namespace SMSGateway.Server.Services
 
         public List<Group> GetAllFiltered(string referenceId, string groupName, string createdByUserId)
 {
-            return _db.Groups.Where(x => x.ReferenceId == referenceId)
-                             .Include(x => x.GroupName == groupName)
-                             .Include(x => x.CreatedByUserId == createdByUserId)
-                             .ToList();
+            var query = _db.Groups.ToList();
+
+            if (createdByUserId != "" && createdByUserId != null)
+            {
+                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
+            }
+
+            if(referenceId != "" && referenceId != null)
+            {
+                query = query.Where(x => x.ReferenceId == referenceId).ToList();
+            }
+
+            if (groupName != "" && groupName != null)
+            {
+                query = query.Where(x => x.GroupName == groupName).ToList();
+            }
+
+            return query;
         }
     }
 

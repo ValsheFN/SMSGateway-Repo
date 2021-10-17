@@ -12,7 +12,7 @@ namespace SMSGateway.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ContactGroupController : ControllerBase
     {
         private readonly IContactGroupService _contactGroupService;
@@ -23,19 +23,28 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpGet("GetContactGroup")]
-        public async Task<IActionResult> GetAllFiltered(string userId, string referenceId, string FirstName, string LastName, string CreatedByUserId)
+        public async Task<IActionResult> GetAllFiltered(string userId, string referenceId, string groupName,
+                                                        string firstName, string lastName, string phoneNumber,
+                                                        string createdByUserId)
         {
-            var result = _contactGroupService.GetAllFiltered(userId, referenceId, FirstName, LastName, CreatedByUserId);
-
-            if (result != null)
-            {
-                return Ok(result); //200
-            }
-
-            return BadRequest(result);
+            return Ok(_contactGroupService.GetAllFiltered(userId, referenceId, groupName, firstName, lastName, phoneNumber, createdByUserId));
         }
 
         [HttpPost("CreateContactGroup")]
         public async Task<IActionResult> CreateContactGroup([FromBody]ContactGroup model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _contactGroupService.CreateAsync(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+            return BadRequest("Internal Server Error"); //400
+        }
     }
 }

@@ -10,7 +10,9 @@ namespace SMSGateway.Server.Services
     public interface IContactGroupService
     {
         Task<OperationResponse<ContactGroup>> CreateAsync(ContactGroup model);
-        List<ContactGroup> GetAllFiltered(string userId, string referenceId, string FirstName, string LastName, string CreatedByUserId);
+        List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName,
+                                          string firstName, string lastName, string phoneNumber,
+                                          string createdByUserId);
     }
 
     public class ContactGroupService : IContactGroupService
@@ -67,13 +69,48 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public List<ContactGroup> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId)
+        public List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName, 
+                                                string firstName, string lastName, string phoneNumber,
+                                                string createdByUserId)
         {
-            return _db.ContactGroups.Where(x => x.CreatedByUserId == userId
-                                            && x.ReferenceId == referenceId
-                                            && x.FirstName == firstName
-                                            && x.LastName == lastName
-                                            && x.CreatedByUserId == createdByUserId).ToList();
+            var query = _db.ContactGroups.ToList();
+
+            if (createdByUserId != "" && createdByUserId != null)
+            {
+                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
+            }
+
+            if(userId != "" && userId != null)
+            {
+                query = query.Where(x => x.Id == userId).ToList();
+            }
+
+            if(referenceId != "" && referenceId != null)
+            {
+                query = query.Where(x => x.ReferenceId == userId).ToList();
+            }
+
+            if (groupName != "" && groupName != null)
+            {
+                query = query.Where(x => x.GroupName == groupName).ToList();
+            }
+
+            if (firstName != "" && firstName != null)
+            {
+                query = query.Where(x => x.FirstName == firstName).ToList();
+            }
+
+            if (lastName != "" && lastName != null)
+            {
+                query = query.Where(x => x.LastName == lastName).ToList();
+            }
+
+            if (phoneNumber != "" && phoneNumber != null)
+            {
+                query = query.Where(x => x.PhoneNumber == phoneNumber).ToList();
+            }
+
+            return query;
         }
     }
 }

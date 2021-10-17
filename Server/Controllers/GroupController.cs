@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SMSGateway.Server.Models;
 using SMSGateway.Server.Services;
 using System;
@@ -10,7 +11,7 @@ namespace SMSGateway.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class GroupController : ControllerBase
     {
         private readonly IGroupService _groupService;

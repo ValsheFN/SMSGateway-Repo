@@ -46,12 +46,29 @@ namespace SMSGateway.Server.Services
 
         public List<Log> GetAllFiltered(string from, string sendTo, string messages, DateTime timeStart, DateTime timeEnd)
         {
-            return _db.Logs.Where(x => x.From == from
-                                && x.SendTo == sendTo
-                                && x.Messages.Contains(messages)
-                                && x.TimeSent >= timeStart
-                                && x.TimeSent <= timeEnd)
-                             .ToList();
+            var query = _db.Logs.ToList();
+
+            if(from != "" && from != null)
+            {
+                query = query.Where(x => x.From == from).ToList();
+            }
+
+            if (from != "" && from != null)
+            {
+                query = query.Where(x => x.From == from).ToList();
+            }
+
+            if (from != "" && from != null)
+            {
+                query = query.Where(x => x.From == from).ToList();
+            }
+
+            if (from != "" && from != null)
+            {
+                query = query.Where(x => x.From == from).ToList();
+            }
+
+            return query;
         }
     }
 }
