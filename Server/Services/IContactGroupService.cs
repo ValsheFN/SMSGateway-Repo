@@ -1,4 +1,5 @@
-﻿using SMSGateway.Server.Models;
+﻿using SMSGateway.Server.Infrastructure;
+using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace SMSGateway.Server.Services
     public interface IContactGroupService
     {
         Task<OperationResponse<ContactGroup>> CreateAsync(ContactGroup model);
+        Task<OperationResponse<ContactGroup>> UpdateAsync(ContactGroup model);
+        Task<OperationResponse<ContactGroup>> RemoveAsync(ContactGroup model);
         List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName,
                                           string firstName, string lastName, string phoneNumber,
                                           string createdByUserId);
@@ -18,10 +21,12 @@ namespace SMSGateway.Server.Services
     public class ContactGroupService : IContactGroupService
     {
         private readonly ApplicationDBContext _db;
+        private readonly IdentityOption _identity;
 
-        public ContactGroupService(ApplicationDBContext db)
+        public ContactGroupService(ApplicationDBContext db, IdentityOption identity)
         {
             _db = db;
+            _identity = identity;
         }
         public async Task<OperationResponse<ContactGroup>> CreateAsync(ContactGroup model)
         {
@@ -66,6 +71,65 @@ namespace SMSGateway.Server.Services
                 Message = "Contact created successfully!",
                 IsSuccess = true,
                 Data = model
+            };
+        }
+
+        public async Task<OperationResponse<ContactGroup>> UpdateAsync(ContactGroup model)
+        {
+            var oldContactGroup = _db.ContactGroups.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+
+            if (oldContactGroup == null)
+            {
+                return new OperationResponse<ContactGroup>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Contact group not found"
+                };
+            }
+
+            var newContactGroup = new ContactGroup
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                GroupName = model.GroupName,
+                PhoneNumber = model.PhoneNumber
+            };
+
+            await _db.ContactGroups.AddAsync(newContactGroup);
+            await _db.SaveChangesAsync(_identity.UserId);
+
+            model.Id = newContactGroup.Id;
+
+            return new OperationResponse<ContactGroup>
+            {
+                Message = "Contact group updated successfully!",
+                IsSuccess = true,
+                Data = model
+            };
+        }
+
+        public async Task<OperationResponse<ContactGroup>> RemoveAsync(ContactGroup model)
+        {
+            var contactGroup = _db.ContactGroups.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+
+            if (contactGroup == null)
+            {
+                return new OperationResponse<ContactGroup>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Contact Group not found"
+                };
+            }
+
+            _db.ContactGroups.Remove(contactGroup);
+            await _db.SaveChangesAsync(_identity.UserId);
+
+            return new OperationResponse<ContactGroup>
+            {
+                IsSuccess = true,
+                Message = "Contact Group has been deleted successfully"
             };
         }
 

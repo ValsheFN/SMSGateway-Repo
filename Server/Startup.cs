@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ using SMSGateway.Server.Models;
 using SMSGateway.Server.Services;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 
 namespace SMSGateway.Server
@@ -94,6 +96,30 @@ namespace SMSGateway.Server
             services.AddScoped<ITopUpService, TopUpService>();
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IGroupService, GroupService>();
+            services.AddHttpContextAccessor();
+
+            services.AddScoped(sp => 
+            {
+                var httpContext = sp.GetService<IHttpContextAccessor>().HttpContext;
+                var identityOptions = new IdentityOption();
+
+                if (httpContext.User.Identity.IsAuthenticated)
+                {
+                    string id = httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    string userName = httpContext.User.FindFirst(ClaimTypes.Name).Value;
+                    string email = httpContext.User.FindFirst(ClaimTypes.Email).Value;
+                    string role = httpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+                    identityOptions.UserId = id;
+                    identityOptions.UserName = userName;
+                    identityOptions.Email = email;
+                    identityOptions.Role = role;
+
+                }
+
+                return identityOptions;
+            });
+
             services.AddTransient<IMailService, SendMailService>();
 
             services.AddControllersWithViews();

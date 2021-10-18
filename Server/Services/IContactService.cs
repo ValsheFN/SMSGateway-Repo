@@ -14,16 +14,27 @@ namespace SMSGateway.Server.Services
     public interface IContactService
     {
         Task<OperationResponse<Contact>> CreateAsync(Contact model);
-       /* Task<UserManagerResponse> UpdateAsync(string referenceId, Contact model);*/
+        Task<OperationResponse<Contact>> UpdateAsync(Contact model);
+        Task<OperationResponse<Contact>> RemoveAsync(Contact model);
         List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId);
+
+        Task CommitChangesAsync(string userId);
     }
 
     public class ContactService : IContactService
     {
         private readonly ApplicationDBContext _db;
-        public ContactService(ApplicationDBContext db)
+        private readonly IdentityOption _identity;
+
+        public ContactService(ApplicationDBContext db, IdentityOption identity)
         {
             _db = db;
+            _identity = identity;
+        }
+
+        public async Task CommitChangesAsync(string userId)
+        {
+            await _db.SaveChangesAsync(userId);
         }
 
         public async Task<OperationResponse<Contact>> CreateAsync(Contact model)
@@ -49,7 +60,7 @@ namespace SMSGateway.Server.Services
             };
 
             await _db.Contact.AddAsync(contact);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(_identity.UserId);
 
             model.Id = contact.Id;
 
@@ -58,6 +69,66 @@ namespace SMSGateway.Server.Services
                 Message = "Contact created successfully!",
                 IsSuccess = true,
                 Data = model
+            };
+        }
+
+        public async Task<OperationResponse<Contact>> UpdateAsync(Contact model)
+        {
+            var oldContact = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+
+            if(oldContact == null)
+            {
+                return new OperationResponse<Contact>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Contact not found"
+                };
+            }
+
+            var newContact = new Contact
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                Notes = model.Notes
+            };
+
+            await _db.Contact.AddAsync(newContact);
+            await _db.SaveChangesAsync(_identity.UserId);
+
+            model.Id = newContact.Id;
+
+            return new OperationResponse<Contact>
+            {
+                Message = "Contact updated successfully!",
+                IsSuccess = true,
+                Data = model
+            };
+        }
+
+        public async Task<OperationResponse<Contact>> RemoveAsync(Contact model)
+        {
+            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+
+            if (contact == null)
+            {
+                return new OperationResponse<Contact>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Contact not found"
+                };
+            }
+
+            _db.Contact.Remove(contact);
+            await _db.SaveChangesAsync(_identity.UserId);
+
+            return new OperationResponse<Contact>
+            {
+                IsSuccess = true,
+                Message = "Contact has been deleted successfully"
             };
         }
 
@@ -91,46 +162,5 @@ namespace SMSGateway.Server.Services
             }
             return query;
         }
-
-        /*public async Task<UserManagerResponse> UpdateAsync(string referenceId, Contact model)
-        {
-            //Check if contact exist
-            var existingContact = _db.Contact.Find(referenceId);
-
-            if(existingContact == null)
-            {
-                return new UserManagerResponse
-                {
-                    Message = "Contact is not found",
-                    IsSuccess = true
-                };
-            }
-
-            var contact = new Contact
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                Notes = model.Notes
-            };
-
-            var result = await _db.Contact.AddAsync(referenceId, model);
-            if (result.Succeeded)
-            {
-                return new UserManagerResponse
-                {
-                    Message = "Contact has been updated",
-                    IsSuccess = true
-                };
-            }
-
-            return new UserManagerResponse
-            {
-                Message = "Contact is not updated",
-                IsSuccess = false,
-                Errors = result.Errors.Select(e => e.Description)
-            };
-        }*/
     }
 }

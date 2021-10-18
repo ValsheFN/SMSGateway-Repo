@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SMSGateway.Server.Models
@@ -76,6 +77,46 @@ namespace SMSGateway.Server.Models
             base.OnModelCreating(builder);
         }
 
+        private string _userId = null;
+
+        public async Task SaveChangesAsync(string userId)
+        {
+            _userId = userId;
+            await SaveChangesAsync();
+        }
+
+        public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            foreach(var item in ChangeTracker.Entries())
+            {
+                if(item.Entity is UserRecord)
+                {
+                    var userRecord = (UserRecord)item.Entity;
+
+                    switch (item.State)
+                    {
+                        case EntityState.Detached:
+                            break;
+                        case EntityState.Unchanged:
+                            break;
+                        case EntityState.Deleted:
+                            break;
+                        case EntityState.Modified:
+                            userRecord.UpdateDate = DateTime.Now;
+                            userRecord.UpdatedByUserId = _userId;
+                            break;
+                        case EntityState.Added:
+                            userRecord.CreationDate = DateTime.Now;
+                            userRecord.CreatedByUserId = _userId;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
+        }
     }
 
     

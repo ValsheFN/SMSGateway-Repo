@@ -1,4 +1,5 @@
-﻿using SMSGateway.Server.Models;
+﻿using SMSGateway.Server.Infrastructure;
+using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
@@ -10,16 +11,20 @@ namespace SMSGateway.Server.Services
     public interface ISmsTemplateService
     {
         Task<OperationResponse<SmsTemplate>> CreateAsync(SmsTemplate model);
+        Task<OperationResponse<SmsTemplate>> UpdateAsync(SmsTemplate model);
+        Task<OperationResponse<SmsTemplate>> RemoveAsync(SmsTemplate model);
         List<SmsTemplate> GetAllFiltered(string smsTemplateName, string content);
     }
 
     public class SmsTemplateService : ISmsTemplateService
     {
         private readonly ApplicationDBContext _db;
+        private readonly IdentityOption _identity;
 
-        public SmsTemplateService(ApplicationDBContext db)
+        public SmsTemplateService(ApplicationDBContext db, IdentityOption identity)
         {
             _db = db;
+            _identity = identity;
         }
 
         public async Task<OperationResponse<SmsTemplate>> CreateAsync(SmsTemplate model)
@@ -40,6 +45,63 @@ namespace SMSGateway.Server.Services
                 Message = "Contact created successfully!",
                 IsSuccess = true,
                 Data = model
+            };
+        }
+
+        public async Task<OperationResponse<SmsTemplate>> UpdateAsync(SmsTemplate model)
+        {
+            var oldTemplate = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+
+            if (oldTemplate == null)
+            {
+                return new OperationResponse<SmsTemplate>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Group not found"
+                };
+            }
+
+            var newTemplate = new SmsTemplate
+            {
+                SmsTemplateName = model.SmsTemplateName,
+                Content = model.Content
+            };
+
+            await _db.SmsTemplates.AddAsync(newTemplate);
+            await _db.SaveChangesAsync(_identity.UserId);
+
+            model.Id = newTemplate.Id;
+
+            return new OperationResponse<SmsTemplate>
+            {
+                Message = "Template updated successfully!",
+                IsSuccess = true,
+                Data = model
+            };
+        }
+
+        public async Task<OperationResponse<SmsTemplate>> RemoveAsync(SmsTemplate model)
+        {
+            var template = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+
+            if (template == null)
+            {
+                return new OperationResponse<SmsTemplate>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Template not found"
+                };
+            }
+
+            _db.SmsTemplates.Remove(template);
+            await _db.SaveChangesAsync(_identity.UserId);
+
+            return new OperationResponse<SmsTemplate>
+            {
+                IsSuccess = true,
+                Message = "Template has been deleted successfully"
             };
         }
 
