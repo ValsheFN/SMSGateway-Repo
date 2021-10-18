@@ -26,27 +26,8 @@ namespace SMSGateway.Client
             builder.Services.AddMudServices();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddAuthorizationCore();
+            builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
             await builder.Build().RunAsync();
         }
     }
-
-    /*public class AuthorizationMessageHandler : DelegatingHandler
-    {
-        private readonly ILocalStorageService _storage;
-
-        public AuthorizationMessageHandler(ILocalStorageService storage)
-        {
-            _storage = storage;
-        }
-        protected async override Task<HttpResponseMessage> SendAsync(HttpResponseMessage request, CancellationToken cancellationToken)
-        {
-            if(await _storage.ContainKeyAsync("access_token"))
-            {
-                var token = await _storage.GetItemAsStringAsync("access_token");
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            return await base.SendAsync(request, cancellationToken);
-        }
-    }*/
 }

@@ -45,5 +45,37 @@ namespace SMSGateway.Server.Controllers
 
             return BadRequest("Some properties are not valid"); //400
         }
+
+        [HttpPut("UpdateSmsTemplate")]
+        public async Task<IActionResult> UpdateAsync([FromBody] SmsTemplate model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _smsTemplateService.UpdateAsync(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            return BadRequest("Internal Server Error"); //400
+        }
+
+        [HttpDelete("RemoveSmsTemplate")]
+        public async Task<IActionResult> RemoveAsync([FromBody] SmsTemplate model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _smsTemplateService.RemoveAsync(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            return BadRequest("Internal Server Error"); //400
+        }
     }
 }

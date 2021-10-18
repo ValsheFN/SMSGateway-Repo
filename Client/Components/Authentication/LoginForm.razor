@@ -1,0 +1,27 @@
+﻿@namespace SMSGateway.Client.Components
+
+<EditForm Model="_model" OnValidSubmit="LoginUserAsync">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Welcome to Sms Gateway</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+
+        <MudCardContent>
+            <MudTextField Label="Email" HelperText="Required" @bind-Value="@_model.Email"/>
+            <MudTextField InputType = "InputType.Password" Label="Password" HelperText="Required" @bind-Value="@_model.Password"/>
+        </MudCardContent>
+
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" Class="ml-1">Register</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" Class="ml-1">Forgot Password</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+
+}

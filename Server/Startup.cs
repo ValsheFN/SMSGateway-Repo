@@ -106,15 +106,10 @@ namespace SMSGateway.Server
                 if (httpContext.User.Identity.IsAuthenticated)
                 {
                     string id = httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    string userName = httpContext.User.FindFirst(ClaimTypes.Name).Value;
-                    string email = httpContext.User.FindFirst(ClaimTypes.Email).Value;
                     string role = httpContext.User.FindFirst(ClaimTypes.Role).Value;
 
                     identityOptions.UserId = id;
-                    identityOptions.UserName = userName;
-                    identityOptions.Email = email;
                     identityOptions.Role = role;
-
                 }
 
                 return identityOptions;

@@ -40,11 +40,11 @@ namespace SMSGateway.Server.Services
         public async Task<OperationResponse<Contact>> CreateAsync(Contact model)
 {
             var userPhoneNumber = _db.Contact.Where(x => x.PhoneNumber == model.PhoneNumber).ToList();
-            if(userPhoneNumber != null)
+            if(userPhoneNumber.Count != 0)
             {
                 return new OperationResponse<Contact>
                 {
-                    Message = "Phoone number is already exists",
+                    Message = "Phone number is already exists",
                     IsSuccess = false
 
                 };
@@ -134,11 +134,13 @@ namespace SMSGateway.Server.Services
 
         public List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId)
         {
+            var createdBy = _identity.UserId;
+
             var query = _db.Contact.ToList();
 
-            if (createdByUserId != "" && createdByUserId != null)
+            if (createdBy != "" && createdBy != null)
             {
-                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
+                query = query.Where(x => x.CreatedByUserId == createdBy).ToList();
             }
 
             if (userId != "" && userId != null)
@@ -148,7 +150,7 @@ namespace SMSGateway.Server.Services
 
             if (referenceId != "" && referenceId != null)
             {
-                query = query.Where(x => x.ReferenceId == userId).ToList();
+                query = query.Where(x => x.ReferenceId == referenceId).ToList();
             }
 
             if (firstName != "" && firstName != null)

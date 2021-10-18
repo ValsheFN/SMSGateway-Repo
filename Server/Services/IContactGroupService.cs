@@ -137,6 +137,8 @@ namespace SMSGateway.Server.Services
                                                 string firstName, string lastName, string phoneNumber,
                                                 string createdByUserId)
         {
+            var createdBy = _identity.UserId;
+
             var query = _db.ContactGroups.ToList();
 
             if (createdByUserId != "" && createdByUserId != null)

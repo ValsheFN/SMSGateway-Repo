@@ -54,7 +54,7 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpGet("UpdateTopUp")]
-        public async Task<IActionResult> UpdateTopUp(string referenceId, string action)
+        public async Task<IActionResult> UpdateAsync(string referenceId, string action)
         {
             if (string.IsNullOrWhiteSpace(referenceId) || string.IsNullOrWhiteSpace(action))
             {

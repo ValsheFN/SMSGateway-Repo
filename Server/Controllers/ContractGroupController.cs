@@ -31,7 +31,7 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpPost("CreateContactGroup")]
-        public async Task<IActionResult> CreateContactGroup([FromBody]ContactGroup model)
+        public async Task<IActionResult> CreateAsync([FromBody]ContactGroup model)
         {
             if (ModelState.IsValid)
             {
@@ -42,6 +42,38 @@ namespace SMSGateway.Server.Controllers
                     return Ok(result);
                 }
 
+                return BadRequest(result);
+            }
+            return BadRequest("Internal Server Error"); //400
+        }
+
+        [HttpPut("UpdateContactGroup")]
+        public async Task<IActionResult> UpdateAsync([FromBody] ContactGroup model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _contactGroupService.UpdateAsync(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            return BadRequest("Internal Server Error"); //400
+        }
+
+        [HttpDelete("RemoveContactGroup")]
+        public async Task<IActionResult> RemoveAsync([FromBody] ContactGroup model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _contactGroupService.RemoveAsync(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
                 return BadRequest(result);
             }
             return BadRequest("Internal Server Error"); //400

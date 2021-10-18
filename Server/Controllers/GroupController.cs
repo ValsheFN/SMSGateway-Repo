@@ -21,18 +21,50 @@ namespace SMSGateway.Server.Controllers
             _groupService = groupService;
         }
 
-        [HttpGet("FilteredGroup")]
+        [HttpGet("GetGroup")]
         public async Task<IActionResult> GetGroupFiltered(string referenceId, string groupName, string createdByUserId)
         {
             return Ok(_groupService.GetAllFiltered(referenceId, groupName, createdByUserId));
         }
 
-        [HttpPost("GroupCreation")]
+        [HttpPost("CreateGroup")]
         public async Task<IActionResult> PostGroup([FromBody] Group model)
         {
             if (ModelState.IsValid)
             {
                 var result = await _groupService.CreateAsync(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            return BadRequest("Internal Server Error"); //400
+        }
+
+        [HttpPut("UpdateGroup")]
+        public async Task<IActionResult> UpdateAsync([FromBody] Group model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _groupService.UpdateAsync(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            return BadRequest("Internal Server Error"); //400
+        }
+
+        [HttpDelete("RemoveContactGroup")]
+        public async Task<IActionResult> RemoveContactGroup([FromBody] Group model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _groupService.RemoveAsync(model);
 
                 if (result.IsSuccess)
                 {
