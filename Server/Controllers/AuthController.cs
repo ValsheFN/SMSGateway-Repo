@@ -57,8 +57,8 @@ namespace SMSGateway.Server.Controllers
 
                 if (result.IsSuccess)
                 {
-                    await _mailService.SendEmailAsync(model.Email, "New Login",
-                        "Hi, new login to your account noticed.");
+                   /* await _mailService.SendEmailAsync(model.Email, "New Login",
+                        "Hi, new login to your account noticed.");*/
                     return Ok(result); //200
                 }
 

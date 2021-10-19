@@ -142,7 +142,7 @@ namespace SMSGateway.Server.Services
             {
                 return new UserManagerResponse
                 {
-                    Message = "There is no user with that email address",
+                    Message = "Email or password is invalid",
                     IsSuccess = false
                 };
             }
@@ -153,7 +153,7 @@ namespace SMSGateway.Server.Services
             {
                 return new UserManagerResponse
                 {
-                    Message = "Invalid password",
+                    Message = "Email or password is invalid",
                     IsSuccess = false
                 };
             }

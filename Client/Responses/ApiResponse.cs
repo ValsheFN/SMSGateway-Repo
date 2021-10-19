@@ -4,13 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMSGateway.Shared
+namespace SMSGateway.Client.Responses
 {
-    public class UserManagerResponse
+    public class ApiResponse
     {
         public string Message { get; set; }
         public bool IsSuccess { get; set; }
-        public IEnumerable<string> Errors { get; set; }
-        public DateTime ExpiryDate { get; set; }
     }
+
+    public class ApiResponse<T> : ApiResponse
+    {
+        public T Value { get; set; }
+    }
+
 }
