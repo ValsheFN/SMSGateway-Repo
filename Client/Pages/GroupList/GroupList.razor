@@ -1,0 +1,77 @@
+﻿@page "/group"
+
+@using SMSGateway.Server.Models
+@inject MudBlazor.ISnackbar Snackbar
+@using System.Net.Http.Json
+@inject HttpClient httpClient
+@attribute [Authorize]
+
+<MudPaper Height="100%" Width="100%">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudTable Items="@ListOfGroups">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Group List</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudFab aria-label="Create new group" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Reference Id</MudTh>
+                <MudTh>Group Name</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd DataLabel="firstName">@context.GroupName</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab aria-label="Edit group" @onclick="@(()=>Edit(context.ReferenceId))" Color="Color.Primary"
+                            Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab aria-label="Delete group" @onclick="@(()=>Delete(context.ReferenceId))" Color="Color.Secondary"
+                            Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+            </PagerContent>
+        </MudTable>
+    </MudContainer>
+</MudPaper>
+
+@code {
+
+    private string searchString = "";
+
+    public class GroupModel
+    {
+        public string ReferenceId { get; set; }
+        public string GroupName { get; set; }
+    }
+
+    private IEnumerable<GroupModel> ListOfGroups = new List<GroupModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListOfGroups = await httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
+    }
+
+    private void Create()
+    {
+        Snackbar.Add("Add button clicked", Severity.Success);
+    }
+
+    private void Save()
+    {
+        //var response = httpClient.PostAsJsonAsync<ContactGroupModel>("api/contactgroup/PostContactGroup");
+        Snackbar.Add("Contact group record saved", Severity.Success);
+    }
+
+    private void Edit(string referenceId)
+    {
+        Snackbar.Add("Contact group record saved", Severity.Success);
+    }
+
+    private void Delete(string referenceId)
+    {
+        Snackbar.Add("Contact group deleted", Severity.Success);
+    }
+}

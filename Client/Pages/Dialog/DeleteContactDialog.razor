@@ -1,0 +1,48 @@
+﻿@using SMSGateway.Client.Models
+
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+            Delete contact?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField ReadOnly="true" Value="@contact.ReferenceId" Label="Reference Id"/>
+        <MudTextField Value="@contact.FirstName" Label="First Name" ReadOnly="true" />
+        <MudTextField Value="@contact.LastName" Label="Last Name" ReadOnly="true" />
+        <MudTextField Value="@contact.Email" Label="Email" ReadOnly="true" />
+        <MudTextField Value="@contact.PhoneNumber" Label="Phone Number" ReadOnly="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteContact">Delete Contact</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialogProvider MaxWidth="MaxWidth.ExtraLarge"
+                   DisableBackdropClick="false"
+                   NoHeader="false"
+                   Position="DialogPosition.Center" />
+<MudSnackbarProvider />
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public ContactModel contact { get; set; } = new ContactModel();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void DeleteContact()
+    {
+        var response = _httpClient.DeleteAsync("/api/contact/RemoveContact/" + contact.ReferenceId);
+        Snackbar.Add("Contact Deleted", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(contact.FirstName + " " + contact.LastName));
+    }
+}

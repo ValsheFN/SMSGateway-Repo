@@ -198,10 +198,10 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            var decodedToken = WebEncoders.Base64UrlDecode(token);
-            string normalToken = Encoding.UTF8.GetString(decodedToken);
+            /*var decodedToken = WebEncoders.Base64UrlDecode(token);
+            string normalToken = Encoding.UTF8.GetString(decodedToken);*/
 
-            var result = await _userManager.ConfirmEmailAsync(user, normalToken);
+            var result = await _userManager.ConfirmEmailAsync(user, token);
 
             if (result.Succeeded)
             {
@@ -235,14 +235,14 @@ namespace SMSGateway.Server.Services
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var encodedToken = Encoding.UTF8.GetBytes(token);
-            var validToken = WebEncoders.Base64UrlEncode(encodedToken);
+            /*var encodedToken = Encoding.UTF8.GetBytes(token);
+            var validToken = WebEncoders.Base64UrlEncode(encodedToken);*/
 
-            string url = $"{_configuration["AppUrl"]}/ResetPassword?email={email}&token={validToken}";
+            string url = $"{_configuration["AppUrl"]}/ResetPassword?email={email}&token={token}";
 
             await _mailService.SendEmailAsync(email, "Reset Password",
                                                 "<h1> Follow the instruction to reset your password </h1>" +
-                                                $"<p>To reset your password <a href='{url}'>Click here</a></p>");
+                                                $"To reset your password, click here : {url}");
 
             return new UserManagerResponse
             {
@@ -261,13 +261,13 @@ namespace SMSGateway.Server.Services
                 {
                     Message = "No user associated with email",
                     IsSuccess = false
-};
-}
+                };
+            }
 
-            var decodedToken = WebEncoders.Base64UrlDecode(model.Token);
-            string normalToken = Encoding.UTF8.GetString(decodedToken);
+            /*var decodedToken = WebEncoders.Base64UrlDecode(model.Token);
+            string normalToken = Encoding.UTF8.GetString(decodedToken);*/
 
-            var result = await _userManager.ResetPasswordAsync(user, normalToken, model.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
 
             if (result.Succeeded)
             {

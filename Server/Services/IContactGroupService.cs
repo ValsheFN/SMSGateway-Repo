@@ -12,7 +12,7 @@ namespace SMSGateway.Server.Services
     {
         Task<OperationResponse<ContactGroup>> CreateAsync(ContactGroup model);
         Task<OperationResponse<ContactGroup>> UpdateAsync(ContactGroup model);
-        Task<OperationResponse<ContactGroup>> RemoveAsync(ContactGroup model);
+        Task<OperationResponse<ContactGroup>> RemoveAsync(string referenceId);
         List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName,
                                           string firstName, string lastName, string phoneNumber,
                                           string createdByUserId);
@@ -109,9 +109,9 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public async Task<OperationResponse<ContactGroup>> RemoveAsync(ContactGroup model)
+        public async Task<OperationResponse<ContactGroup>> RemoveAsync(string referenceId)
         {
-            var contactGroup = _db.ContactGroups.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var contactGroup = _db.ContactGroups.SingleOrDefault(x => x.ReferenceId == referenceId);
 
             if (contactGroup == null)
             {

@@ -15,7 +15,7 @@ namespace SMSGateway.Server.Services
     {
         Task<OperationResponse<Group>> CreateAsync(Group model);
         Task<OperationResponse<Group>> UpdateAsync(Group model);
-        Task<OperationResponse<Group>> RemoveAsync(Group model);
+        Task<OperationResponse<Group>> RemoveAsync(string referenceId);
         List<Group> GetAllFiltered(string referenceId, string groupName, string createdByUserId);
     }
 
@@ -80,9 +80,9 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public async Task<OperationResponse<Group>> RemoveAsync(Group model)
+        public async Task<OperationResponse<Group>> RemoveAsync(string referenceId)
         {
-            var group = _db.Groups.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var group = _db.Groups.SingleOrDefault(x => x.ReferenceId == referenceId);
 
             if (group == null)
             {

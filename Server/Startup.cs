@@ -116,6 +116,7 @@ namespace SMSGateway.Server
             });
 
             services.AddTransient<IMailService, SendMailService>();
+            services.AddHttpContextAccessor();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

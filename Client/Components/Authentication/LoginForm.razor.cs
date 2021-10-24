@@ -1,12 +1,12 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using SMSGateway.Client.Responses;
 using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -44,6 +44,7 @@ namespace SMSGateway.Client.Components
                 await Storage.SetItemAsync<DateTime>("expiry_date", result.ExpiryDate);
 
                 await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Message);
 
                 Navigation.NavigateTo("/");
             }

@@ -1,17 +1,24 @@
 ﻿@*//<MudPaper Width="250px" Class="d-inline-flex py-3" Square="true">*@
+
+@inject ILanguageContainerService language
+@attribute [Authorize]
+
 <MudNavMenu Class="mud-width-full">
     <MudText Typo="Typo.h6" Class="px-4">Material</MudText>
     <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Icons</MudText>
     <MudDivider Class="my-2" />
-    <MudNavLink Href="/dashboard" Icon="@Icons.Filled.Dashboard" IconColor="Color.Info">Dashboard</MudNavLink>
-    <MudNavLink Href="/servers" Icon="@Icons.Filled.Message" IconColor="Color.Inherit">SMS</MudNavLink>
-    <MudNavGroup Title="Contacts" Icon="@Icons.Filled.Contacts" Expanded="true" IconColor="Color.Primary">
-        <MudNavLink Href="/contact" Icon="@Icons.Filled.ContactPage" IconColor="Color.Dark">Contact</MudNavLink>
-        <MudNavLink Href="/group" Icon="@Icons.Filled.Group" IconColor="Color.Dark">Group</MudNavLink>
-        <MudNavLink Href="/contactGroup" Icon="@Icons.Filled.ContactPhone" IconColor="Color.Dark">Contact Group</MudNavLink>
+    <MudNavLink Href="/" Icon="@Icons.Filled.Dashboard" IconColor="Color.Info">@language.Keys["Dashboard"]</MudNavLink>
+    <MudNavLink Href="/sms" Icon="@Icons.Filled.Message" IconColor="Color.Inherit">@language.Keys["Sms"]</MudNavLink>
+    <MudNavGroup Title=@language.Keys["Contacts"] Icon="@Icons.Filled.Contacts" Expanded="false" IconColor="Color.Primary">
+        <MudNavLink Href="/contact" Icon="@Icons.Filled.ContactPage" IconColor="Color.Dark">@language.Keys["Contact"]</MudNavLink>
+        <MudNavLink Href="/group" Icon="@Icons.Filled.Group" IconColor="Color.Dark">@language.Keys["Group"]</MudNavLink>
+        <MudNavLink Href="/contactGroup" Icon="@Icons.Filled.ContactPhone" IconColor="Color.Dark">@language.Keys["ContactGroup"]</MudNavLink>
     </MudNavGroup>
-    <MudNavLink Href="/smsTemplate" Icon="@Icons.Filled.Sms" IconColor="Color.Secondary">Sms Template</MudNavLink>
-    <MudNavLink Href="/topUp" Icon="@Icons.Filled.Money" IconColor="Color.Surface">Top Up</MudNavLink>
-    <MudNavLink Href="/log" Icon="@Icons.Filled.Book" IconColor="Color.Tertiary">Log</MudNavLink>
+    <MudNavLink Href="/smsTemplate" Icon="@Icons.Filled.Sms" IconColor="Color.Secondary">@language.Keys["SmsTemplate"]</MudNavLink>
+    <MudNavLink Href="/topUp" Icon="@Icons.Filled.Money" IconColor="Color.Surface">@language.Keys["TopUp"]</MudNavLink>
+    <MudNavLink Href="/log" Icon="@Icons.Filled.Book" IconColor="Color.Tertiary">@language.Keys["Log"]</MudNavLink>
 </MudNavMenu>
-@*//</MudPaper>*@
+
+@code {
+
+}

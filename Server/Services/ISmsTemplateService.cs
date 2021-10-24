@@ -12,7 +12,7 @@ namespace SMSGateway.Server.Services
     {
         Task<OperationResponse<SmsTemplate>> CreateAsync(SmsTemplate model);
         Task<OperationResponse<SmsTemplate>> UpdateAsync(SmsTemplate model);
-        Task<OperationResponse<SmsTemplate>> RemoveAsync(SmsTemplate model);
+        Task<OperationResponse<SmsTemplate>> RemoveAsync(string referenceId);
         List<SmsTemplate> GetAllFiltered(string smsTemplateName, string content);
     }
 
@@ -81,9 +81,9 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public async Task<OperationResponse<SmsTemplate>> RemoveAsync(SmsTemplate model)
+        public async Task<OperationResponse<SmsTemplate>> RemoveAsync(string referenceId)
         {
-            var template = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var template = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == referenceId);
 
             if (template == null)
             {

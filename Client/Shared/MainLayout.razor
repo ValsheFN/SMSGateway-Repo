@@ -1,24 +1,38 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+@inject ILanguageContainerService language
+@inject Blazored.LocalStorage.ILocalStorageService Storage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@attribute [Authorize]
 
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">SMS Gateway</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudMenu Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
+            <MudMenuItem @onclick='()=>language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"))'>EN</MudMenuItem>
+            <MudMenuItem @onclick='()=>language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"))'>CN</MudMenuItem>
+        </MudMenu>
+        <MudMenu Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
+            <MudMenuItem>Profile</MudMenuItem>
+            <MudMenuItem OnClick="LogOutAsync">Logout</MudMenuItem>
+        </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
-        @*Body*@
+        @Body
     </MudMainContent>
 </MudLayout>
 
 <MudThemeProvider />
-<MudDialogProvider />
+<MudDialogProvider MaxWidth="MaxWidth.ExtraLarge"
+                   DisableBackdropClick="false"
+                   NoHeader="false"
+                   Position="DialogPosition.Center"/>
 <MudSnackbarProvider />
 
 @code
@@ -29,8 +43,15 @@
     {
         _drawerOpen = !_drawerOpen;
     }
-}
 
-<MudThemeProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+    private async Task LogOutAsync()
+    {
+
+        await Storage.RemoveItemAsync("access_token");
+        await Storage.RemoveItemAsync("expiry_date");
+
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        //_client.DefaultRequestHeaders.Authorization = null;
+        Navigation.NavigateTo("/login");
+    }
+}

@@ -1,0 +1,99 @@
+﻿@page "/contactgroup"
+
+@using SMSGateway.Server.Models
+@using System.Net.Http.Json
+@inject MudBlazor.ISnackbar Snackbar
+@inject HttpClient httpClient
+
+<MudPaper Height="100%" Width="100%">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudTable Items="@ListOfContactGroups">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Contact Group List</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudFab aria-label="Create new contact group" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Reference Id</MudTh>
+                <MudTh>Group Name</MudTh>
+                <MudTh>First Name</MudTh>
+                <MudTh>Last Name</MudTh>
+                <MudTh>Phone Number</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd DataLabel="groupName">@context.GroupName</MudTd>
+                <MudTd DataLabel="firstName">@context.FirstName</MudTd>
+                <MudTd DataLabel="lastName">@context.LastName</MudTd>
+                <MudTd DataLabel="phoneNumber">@context.PhoneNumber</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab aria-label="Edit contact group" @onclick="@(()=>Edit(context.ReferenceId))" Color="Color.Primary"
+                            Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab aria-label="Delete contact group" @onclick="@(()=>Delete(context.ReferenceId))" Color="Color.Secondary"
+                            Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+            </PagerContent>
+        </MudTable>
+    </MudContainer>
+</MudPaper>
+
+@code {
+
+    private string searchString = "";
+
+    public class ContactGroupModel
+    {
+        public string ReferenceId { get; set; }
+        public string GroupName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string PhoneNumber { get; set; }
+    }
+
+    private IEnumerable<ContactGroupModel> ListOfContactGroups = new List<ContactGroupModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListOfContactGroups = await httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
+    }
+
+    private bool Search(ContactGroupModel contactGroup)
+    {
+        if (contactGroup.GroupName != null && contactGroup.FirstName != null && contactGroup.LastName != null && contactGroup.PhoneNumber != null
+        && contactGroup.GroupName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+        || contactGroup.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+        || contactGroup.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+        || contactGroup.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void Create()
+    {
+        Snackbar.Add("Add button clicked", Severity.Success);
+    }
+
+    private void Save()
+    {
+        //var response = httpClient.PostAsJsonAsync<ContactGroupModel>("api/contactgroup/PostContactGroup");
+        Snackbar.Add("Contact group record saved", Severity.Success);
+    }
+
+    private void Edit(string referenceId)
+    {
+        Snackbar.Add("Contact group record saved", Severity.Success);
+    }
+
+            private void Delete(string referenceId)
+            {
+                Snackbar.Add("Contact group deleted", Severity.Success);
+            }
+        }

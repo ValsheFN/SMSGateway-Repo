@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMSGateway.Client.Responses
+namespace SMSGateway.Shared.Responses
 {
     public class ApiResponse
     {

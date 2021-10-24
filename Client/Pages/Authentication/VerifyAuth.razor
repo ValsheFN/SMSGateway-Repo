@@ -1,0 +1,43 @@
+﻿@page "/verifyauth"
+<h3>VerifyAuth</h3>
+
+@if (isAuthenticated)
+{
+    <h4>@userName is authenticated </h4>
+    <ul>
+        <li>Access to Super User Role : @isSuperUser</li>
+        <li>Access to Admin Role : @isAdmin</li>
+        <li>Access to User Role : @isUser</li>
+    </ul>
+}
+else
+{
+    <h4>The user is not authenticated</h4>
+}
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    private bool isAuthenticated = false;
+    private string userName;
+    private bool isSuperUser = false;
+    private bool isAdmin = false;
+    private bool isUser = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            isAuthenticated = true;
+
+            userName = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Name).Value;
+
+            isSuperUser = authState.User.IsInRole("Super User");
+            isAdmin = authState.User.IsInRole("Admin");
+            isUser = authState.User.IsInRole("User");
+        }
+    }
+}

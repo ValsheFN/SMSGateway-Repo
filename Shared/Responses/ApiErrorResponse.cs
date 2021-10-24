@@ -1,4 +1,4 @@
-﻿namespace SMSGateway.Client.Responses
+﻿namespace SMSGateway.Shared.Responses
 {
     public class ApiErrorResponse
     {

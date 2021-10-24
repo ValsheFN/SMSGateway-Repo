@@ -1,9 +1,8 @@
 ﻿@namespace SMSGateway.Client.Components
 
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider authStateProvider
 
-<EditForm Model="_model" OnValidSubmit="LoginUserAsync">
+<EditForm Model="_model" OnValidSubmit="RegisterUserAsync">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <MudCard>
         <MudCardHeader>
@@ -15,6 +14,7 @@
         <MudCardContent>
             <MudTextField Label="Email" HelperText="Required" @bind-Value="@_model.Email" />
             <MudTextField InputType="@PasswordInput" Label="Password" HelperText="Required" @bind-Value="@_model.Password" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+            <MudTextField InputType="@PasswordInput" Label="Confirm Password" HelperText="Required" @bind-Value="@_model.ConfirmPassword" Adornment="Adornment.End" />
 
             <ValidationSummary />
             @if (!string.IsNullOrWhiteSpace(_errorMessage))
@@ -24,27 +24,25 @@
                 </MudItem>
             }
 
-        </MudCardContent>
+            </MudCardContent>
 
         <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="_isBusy">Login</MudButton>
-            <MudButton @onclick="NavigateToRegisterComponent" Variant="Variant.Outlined" Color="Color.Success" Class="ml-1" Disabled="_isBusy">Register</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="_isBusy">Sign Up</MudButton>
+            <MudButton @onclick="NavigateToLoginComponent" Variant="Variant.Outlined" Color="Color.Success" Class="ml-1" Disabled="_isBusy">Login</MudButton>
             <MudButton @onclick="NavigateToForgotPasswordComponent" Variant="Variant.Outlined" Color="Color.Error" Class="ml-1" Disabled="_isBusy">Forgot Password</MudButton>
         </MudCardActions>
     </MudCard>
 </EditForm>
 
 @code {
-
-    private void NavigateToRegisterComponent() { NavigationManager.NavigateTo("/register"); }
+    private void NavigateToLoginComponent() { NavigationManager.NavigateTo("/login"); }
     private void NavigateToForgotPasswordComponent() { NavigationManager.NavigateTo("/forgotPassword"); }
 
     string Password { get; set; } = "";
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
     bool PasswordVisibility;
     InputType PasswordInput = InputType.Password;
-
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
     void TogglePasswordVisibility()
     {
@@ -60,15 +58,5 @@
             PasswordInputIcon = Icons.Material.Filled.Visibility;
             PasswordInput = InputType.Text;
         }
-    }
-
-    protected async override Task OnInitializedAsync()
-    {
-        var authState = await authStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity.IsAuthenticated)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-
     }
 }

@@ -1,0 +1,79 @@
+﻿@page "/contact"
+
+@using SMSGateway.Client.Models
+@using System.Net.Http.Json
+
+@using System.Security.Claims
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager _navigation
+@inject MudBlazor.ISnackbar _snackbar
+@inject HttpClient _httpClient
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject IDialogService DialogService
+
+@attribute [Authorize]
+
+<MudPaper Height="100%" Width="100%">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudTable Items="@ListOfContacts" Filter="new Func<ContactModel, bool>(Search)">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Contact List</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudFab aria-label="Create new contact" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Reference Id</MudTh>
+                <MudTh><MudTableSortLabel SortLabel="firstName" T="ContactModel">First Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="lastName" T="ContactModel">Last Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="email" T="ContactModel">Email</MudTableSortLabel></MudTh>
+                <MudTh>Phone Number</MudTh>
+                <MudTh>Notes</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd DataLabel="firstName">@context.FirstName</MudTd>
+                <MudTd DataLabel="lastName">@context.LastName</MudTd>
+                <MudTd DataLabel="email">@context.Email</MudTd>
+                <MudTd DataLabel="phoneNumber">@context.PhoneNumber</MudTd>
+                <MudTd DataLabel="notes">@context.Notes</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab aria-label="Edit contact" @onclick="@((e)=>Edit(@context))" Color="Color.Primary"
+                            Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab aria-label="Delete contact" @onclick="@((e)=>Delete(@context))" Color="Color.Secondary"
+                            Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+            </PagerContent>
+        </MudTable>
+    </MudContainer>
+</MudPaper>
+
+@code {
+    private string searchString = "";
+
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+
+    private IEnumerable<ContactModel> ListOfContacts = new List<ContactModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated != true)
+        {
+            _navigation.NavigateTo("/login");
+        }
+        else
+        {
+            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
+        }
+    }
+
+    private bool Search(ContactModel model)
+    {
+        return true;
+    }
+}

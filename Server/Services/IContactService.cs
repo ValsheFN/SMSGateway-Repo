@@ -15,9 +15,8 @@ namespace SMSGateway.Server.Services
     {
         Task<OperationResponse<Contact>> CreateAsync(Contact model);
         Task<OperationResponse<Contact>> UpdateAsync(Contact model);
-        Task<OperationResponse<Contact>> RemoveAsync(Contact model);
+        Task<OperationResponse<Contact>> RemoveAsync(string referenceId);
         List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId);
-
         Task CommitChangesAsync(string userId);
     }
 
@@ -74,9 +73,9 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<Contact>> UpdateAsync(Contact model)
         {
-            var oldContact = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
 
-            if(oldContact == null)
+            if(contact == null)
             {
                 return new OperationResponse<Contact>
                 {
@@ -86,19 +85,13 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            var newContact = new Contact
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                Notes = model.Notes
-            };
+            contact.FirstName = model.FirstName;
+            contact.LastName = model.LastName;
+            contact.Email = model.Email;
+            contact.PhoneNumber = model.PhoneNumber;
+            contact.Notes = model.Notes;
 
-            await _db.Contact.AddAsync(newContact);
             await _db.SaveChangesAsync(_identity.UserId);
-
-            model.Id = newContact.Id;
 
             return new OperationResponse<Contact>
             {
@@ -108,9 +101,9 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public async Task<OperationResponse<Contact>> RemoveAsync(Contact model)
+        public async Task<OperationResponse<Contact>> RemoveAsync(string referenceId)
         {
-            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == referenceId);
 
             if (contact == null)
             {
@@ -134,13 +127,11 @@ namespace SMSGateway.Server.Services
 
         public List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId)
         {
-            var createdBy = _identity.UserId;
-
             var query = _db.Contact.ToList();
 
-            if (createdBy != "" && createdBy != null)
+            if (createdByUserId != "" && createdByUserId != null)
             {
-                query = query.Where(x => x.CreatedByUserId == createdBy).ToList();
+                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
             }
 
             if (userId != "" && userId != null)

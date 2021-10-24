@@ -1,0 +1,21 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService Storage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+@using System.Security.Claims
+
+<AuthorizeView>
+    <Authorized>
+        @*<MudMenu Icon="Icons.Filled.Person" Label="Offset Bottom" Color="Color.Primary" Direction="Direction.Bottom" OffsetY="true">
+            <MudMenuItem>Welcome @context.User.FindFirst(ClaimTypes.Name).Value</MudMenuItem>
+            <MudMenuItem OnClick="LogOutAsync">Logout</MudMenuItem>
+        </MudMenu>*@
+    </Authorized>
+    <NotAuthorized>
+        <MudIconButton Icon="@Icons.Filled.Login" Color="Color.Secondary" OnClick='() => Navigation.NavigateTo("/login")' />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    
+}

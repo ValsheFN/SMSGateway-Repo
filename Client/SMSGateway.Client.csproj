@@ -6,14 +6,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\en-US.yml" />
+    <None Remove="Resources\zh-CN.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\en-US.yml" />
+    <EmbeddedResource Include="Resources\zh-CN.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="5.2.0" />
     <PackageReference Include="Blazored.FluentValidation" Version="2.0.1" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
+    <PackageReference Include="Google.Cloud.Translation.V2" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="MudBlazor" Version="5.1.5" />
+    <PackageReference Include="RestSharp" Version="106.12.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.13.1" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
   </ItemGroup>
