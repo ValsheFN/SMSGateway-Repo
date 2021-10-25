@@ -128,7 +128,7 @@ namespace SMSGateway.Server.Services
 
                 var result = await _userManager.UpdateAsync(userData);
 
-                topUpData.Status = "Success",
+                topUpData.Status = "Success";
 
                 _db.TopUps.Update(topUpData);
                 await _db.SaveChangesAsync();
@@ -142,7 +142,7 @@ namespace SMSGateway.Server.Services
             }
             else
             {
-                topUpData.Status = "Rejected",
+                topUpData.Status = "Rejected";
                 _db.TopUps.Update(topUpData);
                 await _db.SaveChangesAsync();
 

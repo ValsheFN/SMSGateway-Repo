@@ -62,7 +62,7 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            group.GroupName = model.GroupName
+            group.GroupName = model.GroupName;
 
             await _db.Groups.AddAsync(group);
             await _db.SaveChangesAsync(_identity.UserId);
