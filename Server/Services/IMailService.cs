@@ -12,7 +12,7 @@ namespace SMSGateway.Server.Services
 {
     public interface IMailService
     {
-        Task SendEmailAsync(string toEmail, string subject, string content);
+        Task<string> SendEmailAsync(string From, string SendTo, string Subject, string Content);
     }
 
     public class SendMailService : IMailService
@@ -24,7 +24,7 @@ namespace SMSGateway.Server.Services
             _configuration = configuration;
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string content)
+        public async Task<string> SendEmailAsync(string SendTo, string From ,string Subject, string Content)
         {
             //Grid Mail Service
             /*var apiKey = _configuration["SendGridAPIKey"];
@@ -45,12 +45,18 @@ namespace SMSGateway.Server.Services
 
             Email.DefaultSender = sender;
             var email = Email
-                .From(_configuration["ConfirmationEmailAddress"])
-                .To(toEmail)
-                .Subject(subject)
-                .Body(content);
+                .From(_configuration["ConfirmationEmailAddress"],From)
+                .To(SendTo)
+                .Subject(Subject)
+                .Body(Content);
 
             var response = await email.SendAsync();
+            if (response.Successful)
+            {
+                return "Success";
+            }
+
+            return response.ErrorMessages[0];
         }
     }
 }

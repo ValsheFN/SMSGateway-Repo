@@ -1,0 +1,42 @@
+﻿@using SMSGateway.Client.Models
+
+@inject IDialogService DialogService
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
+            Create contact
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@contactGroup.FirstName" Label="First Name" Required="true" RequiredError="First name is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@contactGroup.LastName" Label="Last Name" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@contactGroup.GroupName" Label="Group Name" Required="true" RequiredError="Group Name is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@contactGroup.PhoneNumber" Label="Phone Number" Required="true" RequiredError="Phone Number is required!" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="@((e)=>CreateContactGroup(contactGroup) )">Create Contact</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public ContactGroupModel contactGroup { get; set; } = new ContactGroupModel();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void CreateContactGroup(ContactGroupModel model)
+    {
+        var response = _httpClient.PostAsJsonAsync("/api/contactGroup/CreateContactGroup/", model);
+        Snackbar.Add("Contact Created", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(model.GroupName));
+    }
+}

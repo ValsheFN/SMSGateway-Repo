@@ -1,9 +1,11 @@
 ﻿@page "/group"
 
-@using SMSGateway.Server.Models
-@inject MudBlazor.ISnackbar Snackbar
+@using SMSGateway.Client.Models
+@using SMSGateway.Client.Pages.Dialog
 @using System.Net.Http.Json
+@inject MudBlazor.ISnackbar Snackbar
 @inject HttpClient httpClient
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 <MudPaper Height="100%" Width="100%">
@@ -41,12 +43,6 @@
 
     private string searchString = "";
 
-    public class GroupModel
-    {
-        public string ReferenceId { get; set; }
-        public string GroupName { get; set; }
-    }
-
     private IEnumerable<GroupModel> ListOfGroups = new List<GroupModel>();
 
     protected override async Task OnInitializedAsync()
@@ -54,9 +50,11 @@
         ListOfGroups = await httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
     }
 
-    private void Create()
+    private async void Create()
     {
-        Snackbar.Add("Add button clicked", Severity.Success);
+        var dialog = DialogService.Show<AddGroupDialog>("Add Group");
+        var result = await dialog.Result;
+        StateHasChanged();
     }
 
     private void Save()

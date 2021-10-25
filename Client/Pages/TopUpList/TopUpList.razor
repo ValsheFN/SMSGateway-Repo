@@ -1,6 +1,6 @@
 ﻿@page "/topup"
 
-@using SMSGateway.Server.Models
+@using SMSGateway.Client.Models
 @inject MudBlazor.ISnackbar Snackbar
 @using System.Net.Http.Json
 @inject HttpClient httpClient
@@ -55,17 +55,6 @@
 @code {
 
     private string searchString = "";
-
-    public class TopUpModel
-    {
-        public string ReferenceId { get; set; }
-        public decimal TopUpValue { get; set; }
-        public string Requester { get; set; }
-        public string Status { get; set; }
-        public DateTime RequestDate { get; set; }
-        public DateTime GrantDate { get; set; }
-        public string GrantedBy { get; set; }
-    }
 
     private IEnumerable<TopUpModel> ListOfTopUps = new List<TopUpModel>();
 

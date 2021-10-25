@@ -115,8 +115,9 @@ namespace SMSGateway.Server.Services
 
                 string url = $"{_configuration["AppUrl"]}/api/auth/confirmemail?userId={ApplicationUser.Id}&token={validEmailToken}";
 
+                var From = _configuration["EmailFrom"];
                 //Send email confirmation
-                await _mailService.SendEmailAsync(model.Email, "Confirm your email", "<h1>Welcome to SMS Gateway</h1>" +
+                await _mailService.SendEmailAsync(model.Email, From, "Confirm your email", "<h1>Welcome to SMS Gateway</h1>" +
                     $"<p>Please confirm your email by <a href='{url}'>Clicking here</a></p>");
 
                 return new UserManagerResponse
@@ -240,7 +241,9 @@ namespace SMSGateway.Server.Services
 
             string url = $"{_configuration["AppUrl"]}/ResetPassword?email={email}&token={token}";
 
-            await _mailService.SendEmailAsync(email, "Reset Password",
+            var From = _configuration["EmailFrom"];
+
+            await _mailService.SendEmailAsync(email, From, "Reset Password",
                                                 "<h1> Follow the instruction to reset your password </h1>" +
                                                 $"To reset your password, click here : {url}");
 

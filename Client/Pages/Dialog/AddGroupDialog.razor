@@ -1,0 +1,39 @@
+﻿@using SMSGateway.Client.Models
+
+@inject IDialogService DialogService
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
+            Create group
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@group.GroupName" Label="Group Name" Required="true" RequiredError="Group name is required!" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="@((e)=>CreateGroup(group) )">Create Group</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public GroupModel group { get; set; } = new GroupModel();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void CreateGroup(GroupModel model)
+    {
+        var response = _httpClient.PostAsJsonAsync("/api/group/CreateGroup/", model);
+        Snackbar.Add("Contact Created", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(model.GroupName));
+    }
+}

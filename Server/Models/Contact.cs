@@ -21,6 +21,7 @@ namespace SMSGateway.Server.Models
         [Required]
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        [EmailAddress]
         public string Email { get; set; }
         [Required]
         public string PhoneNumber { get; set; }

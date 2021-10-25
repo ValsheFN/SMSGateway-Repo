@@ -4,9 +4,10 @@
 @using System.Net.Http.Json
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.Extensions.Configuration
 @inject AuthenticationStateProvider _authenticationStateProvider
-@inject MudBlazor.ISnackbar Snackbar
-@inject HttpClient httpClient
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
 
 
 <MudPaper Height="100%" Width="100%">
@@ -17,9 +18,9 @@
                     <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">SMS</MudText>
                 </MudPaper>
                 <MudForm>
-                    <MudTextField Lines="6" Variant="Variant.Outlined" T="string" Label="Messages" Required="true" RequiredError="Messages is required!" />
-                    <MudTextField Variant="Variant.Outlined" T="string" Label="Phone Number" />
-                    <MudTextField Variant="Variant.Outlined" T="string" Label="Group"/>
+                    <MudTextField Lines="6" @bind-Value="@smsConfig.Subject" Variant="Variant.Outlined" T="string" Label="Phone Number" Required="true" RequiredError="Phone Number is required!" />
+                    <MudTextField Lines="6" @bind-Value="@smsConfig.Content" Variant="Variant.Outlined" T="string" Label="Messages" Required="true" RequiredError="Messages is required!" />
+                    <MudTextField Variant="Variant.Outlined" T="string" Label="Group" />
                     @*<div class="d-flex">
 
                             <MudRadioGroup T="string" Required="true" RequiredError="Account type is required!">
@@ -32,12 +33,68 @@
         </MudCard>
 
         <MudPaper Class="pa-4 justify-center my-4 mud-text-align-center">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary">Send</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mx-2">Reset</MudButton>
-            <MudButton Variant="Variant.Filled">Cancel</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" OnClick="@((e)=>SendSms(@smsConfig))">Send</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mx-2">Clear</MudButton>
         </MudPaper>
     </MudContainer>
 </MudPaper>
 
 @code {
+
+    private IConfiguration _configuration;
+    public SmsModel smsConfig { get; set; } = new();
+
+    public async Task SendSms(SmsModel model)
+    {
+        //Check error
+        if (string.IsNullOrWhiteSpace(model.Subject))
+        {
+            Snackbar.Add("Phone Number is required!", Severity.Error);
+        }
+
+        else if (string.IsNullOrWhiteSpace(model.Content))
+        {
+            Snackbar.Add("Message is required!", Severity.Error);
+        }
+        //End of check error
+
+        else
+        {
+            var _model = new SmsModel();
+
+            @*_model.From = _configuration["ConfirmationEmailAddress"];
+                _model.SendTo = _configuration["SmsEagleEmailAddress"];*@
+            _model.From = "Sms Gateway";
+            _model.SendTo = "myspace_fn@yahoo.com";
+            _model.Subject = model.Subject;
+            _model.Content = model.Content;
+
+            var response = await _httpClient.PostAsJsonAsync("/api/mail", _model);
+
+            if (response.IsSuccessStatusCode == true)
+            {
+                Snackbar.Add("SMS Sent", Severity.Success);
+                smsConfig.SendTo = "";
+                smsConfig.Content = "";
+                StateHasChanged();
+            }
+            else
+            {
+                Snackbar.Add("SMS failed to be sent", Severity.Error);
+                smsConfig.SendTo = "";
+                smsConfig.Content = "";
+                StateHasChanged();
+            }
+        }
+
+    }
+
+    private void Clear()
+    {
+        smsConfig.SendTo = "";
+        smsConfig.Content = "";
+        StateHasChanged();
+    }
+
+
 }
