@@ -50,9 +50,9 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<Group>> UpdateAsync(Group model)
         {
-            var oldGroup = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var group = _db.Groups.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
 
-            if (oldGroup == null)
+            if (group == null)
             {
                 return new OperationResponse<Group>
                 {
@@ -62,21 +62,16 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            var newGroup = new Group
-            {
-                GroupName = model.GroupName
-            };
+            group.GroupName = model.GroupName
 
-            await _db.Groups.AddAsync(newGroup);
+            await _db.Groups.AddAsync(group);
             await _db.SaveChangesAsync(_identity.UserId);
-
-            model.Id = newGroup.Id;
 
             return new OperationResponse<Group>
             {
                 Message = "Group updated successfully!",
                 IsSuccess = true,
-                Data = model
+                Data = group
             };
         }
 

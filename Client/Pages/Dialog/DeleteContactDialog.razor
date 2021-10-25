@@ -11,23 +11,17 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField ReadOnly="true" Value="@contact.ReferenceId" Label="Reference Id"/>
-        <MudTextField Value="@contact.FirstName" Label="First Name" ReadOnly="true" />
-        <MudTextField Value="@contact.LastName" Label="Last Name" ReadOnly="true" />
-        <MudTextField Value="@contact.Email" Label="Email" ReadOnly="true" />
-        <MudTextField Value="@contact.PhoneNumber" Label="Phone Number" ReadOnly="true" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" Value="@contact.ReferenceId" Label="Reference Id"/>
+        <MudTextField Variant="Variant.Outlined" Value="@contact.FirstName" Label="First Name" ReadOnly="true" />
+        <MudTextField Variant="Variant.Outlined" Value="@contact.LastName" Label="Last Name" ReadOnly="true" />
+        <MudTextField Variant="Variant.Outlined" Value="@contact.Email" Label="Email" ReadOnly="true" />
+        <MudTextField Variant="Variant.Outlined" Value="@contact.PhoneNumber" Label="Phone Number" ReadOnly="true" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
         <MudButton Color="Color.Error" OnClick="DeleteContact">Delete Contact</MudButton>
     </DialogActions>
 </MudDialog>
-
-<MudDialogProvider MaxWidth="MaxWidth.ExtraLarge"
-                   DisableBackdropClick="false"
-                   NoHeader="false"
-                   Position="DialogPosition.Center" />
-<MudSnackbarProvider />
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }

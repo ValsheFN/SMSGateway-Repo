@@ -105,7 +105,7 @@ namespace SMSGateway.Server.Services
             {
                 return new OperationResponse<TopUp>
                 {
-                    Message = "No such reference Id found",
+                    Message = "Top up data is not found",
                     IsSuccess = false
                 };
             }
@@ -124,56 +124,33 @@ namespace SMSGateway.Server.Services
 
                 var totalCreditValue = topUpData.TopUpValue + userData.CreditValue;
 
-                var userDataUpdated = new ApplicationUser
-                {
-                    Id = userData.Id,
-                    UserName = userData.UserName,
-                    Email = userData.Email,
-                    CreditValue = totalCreditValue
-                };
+                userData.CreditValue = totalCreditValue;
 
-                var result = await _userManager.UpdateAsync(userDataUpdated);
+                var result = await _userManager.UpdateAsync(userData);
 
-                var topUp = new TopUp
-                {
-                    ReferenceId = topUpData.ReferenceId,
-                    TopUpValue = topUpData.TopUpValue,
-                    Status = "Success",
-                    Requester = topUpData.Requester,
-                    RequestDate = topUpData.RequestDate
-                };
+                topUpData.Status = "Success",
 
-
-                await _db.TopUps.AddAsync(topUp);
+                _db.TopUps.Update(topUpData);
                 await _db.SaveChangesAsync();
 
                 return new OperationResponse<TopUp>
                 {
                     Message = "Top up granted successfully!",
                     IsSuccess = true,
-                    Data = topUp
+                    Data = topUpData
                 };
             }
             else
             {
-                var topUp = new TopUp
-                {
-                    ReferenceId = topUpData.ReferenceId,
-                    TopUpValue = topUpData.TopUpValue,
-                    Status = "Rejected",
-                    Requester = topUpData.Requester,
-                    RequestDate = topUpData.RequestDate
-                };
-
-
-                await _db.TopUps.AddAsync(topUp);
+                topUpData.Status = "Rejected",
+                _db.TopUps.Update(topUpData);
                 await _db.SaveChangesAsync();
 
                 return new OperationResponse<TopUp>
                 {
                     Message = "Top up rejected successfully!",
                     IsSuccess = true,
-                    Data = topUp
+                    Data = topUpData
                 };
             }
 

@@ -50,9 +50,9 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<SmsTemplate>> UpdateAsync(SmsTemplate model)
         {
-            var oldTemplate = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var smsTemplate = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
 
-            if (oldTemplate == null)
+            if (smsTemplate == null)
             {
                 return new OperationResponse<SmsTemplate>
                 {
@@ -62,22 +62,17 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            var newTemplate = new SmsTemplate
-            {
-                SmsTemplateName = model.SmsTemplateName,
-                Content = model.Content
-            };
+            smsTemplate.SmsTemplateName = model.SmsTemplateName;
+            smsTemplate.Content = model.Content;
 
-            await _db.SmsTemplates.AddAsync(newTemplate);
+            _db.SmsTemplates.Update(smsTemplate);
             await _db.SaveChangesAsync(_identity.UserId);
-
-            model.Id = newTemplate.Id;
 
             return new OperationResponse<SmsTemplate>
             {
                 Message = "Template updated successfully!",
                 IsSuccess = true,
-                Data = model
+                Data = smsTemplate
             };
         }
 

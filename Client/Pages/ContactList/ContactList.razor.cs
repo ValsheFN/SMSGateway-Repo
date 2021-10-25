@@ -32,8 +32,8 @@ namespace SMSGateway.Client.Pages.ContactList
         }
 
         private async Task Delete(ContactModel contact)
-{
-            var parameters = new DialogParameters { ["Contact"] = contact };
+        {
+            var parameters = new DialogParameters { ["Contact"] = contact};
 
             var dialog = DialogService.Show<DeleteContactDialog>("Delete Contact", parameters);
             var result = await dialog.Result;
@@ -42,7 +42,7 @@ namespace SMSGateway.Client.Pages.ContactList
 
         private async Task Edit(ContactModel contact)
         {
-            var parameters = new DialogParameters { ["Contact"] = contact };
+            var parameters = new DialogParameters { ["Contact"] = contact};
 
             var dialog = DialogService.Show<EditContactDialog>("Edit Contact", parameters);
             var result = await dialog.Result;
