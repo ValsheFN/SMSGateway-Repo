@@ -12,8 +12,8 @@
         <MudText Typo="Typo.h5" Class="ml-3">SMS Gateway</MudText>
         <MudSpacer />
         <MudMenu Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
-            <MudMenuItem @onclick='()=>language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"))'>EN</MudMenuItem>
-            <MudMenuItem @onclick='()=>language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"))'>CN</MudMenuItem>
+            <MudMenuItem @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"))'>EN</MudMenuItem>
+            <MudMenuItem @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"))'>CN</MudMenuItem>
         </MudMenu>
         <MudMenu Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
             <MudMenuItem>Profile</MudMenuItem>
@@ -43,6 +43,16 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (!authState.User.Identity.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+
+        }
     }
 
     private async Task LogOutAsync()

@@ -2,6 +2,7 @@
 
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
+@inject NavigationManager _navigation
 
 <MudDialog>
     <TitleContent>
@@ -11,15 +12,15 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Variant="Variant.Outlined" ReadOnly="true" Value="@contact.ReferenceId" Label="Reference Id"/>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" Value="@contact.ReferenceId" Label="Reference Id" />
         <MudTextField Variant="Variant.Outlined" Value="@contact.FirstName" Label="First Name" ReadOnly="true" />
         <MudTextField Variant="Variant.Outlined" Value="@contact.LastName" Label="Last Name" ReadOnly="true" />
         <MudTextField Variant="Variant.Outlined" Value="@contact.Email" Label="Email" ReadOnly="true" />
         <MudTextField Variant="Variant.Outlined" Value="@contact.PhoneNumber" Label="Phone Number" ReadOnly="true" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" OnClick="DeleteContact">Delete Contact</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeleteContact">Delete Contact</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -36,6 +37,10 @@
     private void DeleteContact()
     {
         var response = _httpClient.DeleteAsync("/api/contact/RemoveContact/" + contact.ReferenceId);
+
+        StateHasChanged();
+        _navigation.NavigateTo("/contact");
+
         Snackbar.Add("Contact Deleted", Severity.Success);
         MudDialog.Close(DialogResult.Ok(contact.FirstName + " " + contact.LastName));
     }

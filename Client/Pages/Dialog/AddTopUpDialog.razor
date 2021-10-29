@@ -1,0 +1,32 @@
+﻿@using SMSGateway.Client.Models
+
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject IDialogService DialogService
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
+            Request top up
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@topUp.TopUpValue" Label="Top Up Value" Required="true" RequiredError="Top up value is required!" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(topUp.TopUpValue) )">Request Top Up</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public TopUpModel topUp { get; set; } = new TopUpModel();
+
+
+}

@@ -1,16 +1,18 @@
 ﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SMSGateway.Client.Models;
 using SMSGateway.Client.Pages.Dialog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace SMSGateway.Client.Pages.ContactList
+namespace SMSGateway.Client.Pages.TopUpList
 {
-    public partial class ContactList
+    public partial class TopUpList
     {
-
         [Inject]
         public ILocalStorageService Storage { get; set; }
         [Inject]
@@ -18,25 +20,25 @@ namespace SMSGateway.Client.Pages.ContactList
 
         private async void Create()
         {
-            var dialog = DialogService.Show<AddContactDialog>("Add Contact");
+            var dialog = DialogService.Show<AddTopUpDialog>("Add Top Up");
             var result = await dialog.Result;
             StateHasChanged();
         }
 
-        private async Task Delete(ContactModel contact)
+        private async Task Approve(TopUpModel topUp)
         {
-            var parameters = new DialogParameters { ["Contact"] = contact};
+            var parameters = new DialogParameters { ["Top Up"] = topUp };
 
-            var dialog = DialogService.Show<DeleteContactDialog>("Delete Contact", parameters);
+            var dialog = DialogService.Show<DeleteGroupDialog>("Delete Group", parameters);
             var result = await dialog.Result;
             StateHasChanged();
         }
 
-        private async Task Edit(ContactModel contact)
+        private async Task Reject(TopUpModel topUp)
         {
-            var parameters = new DialogParameters { ["Contact"] = contact};
+            var parameters = new DialogParameters { ["Top Up"] = topUp };
 
-            var dialog = DialogService.Show<EditContactDialog>("Edit Contact", parameters);
+            var dialog = DialogService.Show<EditGroupDialog>("Edit Group", parameters);
             var result = await dialog.Result;
             StateHasChanged();
         }

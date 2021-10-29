@@ -1,9 +1,14 @@
 ﻿@page "/topup"
 
 @using SMSGateway.Client.Models
-@inject MudBlazor.ISnackbar Snackbar
 @using System.Net.Http.Json
-@inject HttpClient httpClient
+@using System.Security.Claims
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager _navigation
+@inject MudBlazor.ISnackbar _snackbar
+@inject HttpClient _httpClient
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 <AuthorizeView Roles="Super User">
@@ -27,6 +32,7 @@
                 <MudTh>Top Up Value</MudTh>
                 <MudTh>Status</MudTh>
                 <MudTh>Request Date</MudTh>
+                <MudTh>Granted Date</MudTh>
                 <MudTh>Granted By</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
@@ -39,9 +45,9 @@
                 <MudTd DataLabel="grantDate">@context.GrantDate</MudTd>
                 <MudTd DataLabel="grantedBy">@context.GrantedBy</MudTd>
                 <MudTd DataLabel="">
-                    <MudFab aria-label="Approve top up" @onclick="@(()=>Approve(context.ReferenceId))" Color="Color.Primary"
+                    <MudFab aria-label="Approve top up" @onclick="@(()=>Approve(@context))" Color="Color.Primary"
                             Icon="@Icons.Material.Filled.Approval" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab aria-label="Reject top up" @onclick="@(()=>Reject(context.ReferenceId))" Color="Color.Secondary"
+                    <MudFab aria-label="Reject top up" @onclick="@(()=>Reject(@context))" Color="Color.Secondary"
                             Icon="@Icons.Material.Filled.Block" Size="Size.Small" IconSize="Size.Small" />
                 </MudTd>
             </RowTemplate>
@@ -60,27 +66,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListOfTopUps = await httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
-    }
-
-    private void Create()
-    {
-        Snackbar.Add("Add button clicked", Severity.Success);
-    }
-
-    private void Save()
-    {
-        //var response = httpClient.PostAsJsonAsync<ContactGroupModel>("api/contactgroup/PostContactGroup");
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-    private void Approve(string referenceId)
-    {
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-    private void Reject(string referenceId)
-    {
-        Snackbar.Add("Contact group deleted", Severity.Success);
+        ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
     }
 }

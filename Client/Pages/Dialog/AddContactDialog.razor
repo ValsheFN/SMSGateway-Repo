@@ -3,6 +3,7 @@
 @inject IDialogService DialogService
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
+@inject NavigationManager _navigation
 
 <MudDialog>
     <TitleContent>
@@ -19,8 +20,8 @@
         <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.Notes" Label="Notes" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" OnClick="@((e)=>CreateContact(@contact) )">Create Contact</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateContact(@contact) )">Create Contact</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -37,6 +38,10 @@
     private void CreateContact(ContactModel model)
     {
         var response = _httpClient.PostAsJsonAsync("/api/contact/CreateContact/", model);
+
+        StateHasChanged();
+        _navigation.NavigateTo("/contact");
+
         Snackbar.Add("Contact Created", Severity.Success);
         MudDialog.Close(DialogResult.Ok(model.FirstName + " " + model.LastName));
     }

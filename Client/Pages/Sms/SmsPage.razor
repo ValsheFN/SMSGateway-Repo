@@ -18,16 +18,39 @@
                     <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">SMS</MudText>
                 </MudPaper>
                 <MudForm>
-                    <MudTextField Lines="6" @bind-Value="@smsConfig.Subject" Variant="Variant.Outlined" T="string" Label="Phone Number" Required="true" RequiredError="Phone Number is required!" />
-                    <MudTextField Lines="6" @bind-Value="@smsConfig.Content" Variant="Variant.Outlined" T="string" Label="Messages" Required="true" RequiredError="Messages is required!" />
-                    <MudTextField Variant="Variant.Outlined" T="string" Label="Group" />
-                    @*<div class="d-flex">
-
-                            <MudRadioGroup T="string" Required="true" RequiredError="Account type is required!">
-                                <MudRadio Option="@("Personal")">Personal</MudRadio>
-                                <MudRadio Option="@("Professional")">Professional</MudRadio>
-                            </MudRadioGroup>
-                        </div>*@
+                    <MudGrid>
+                        <MudItem xs="12" md="12">
+                            <MudSelect Label="Contacts" HelperText="Select contacts"
+                                       MultiSelection="true" OffsetY="true" DelimitedStringSeparator="^" SelectAll="true" SelectAllText="Select all contacts"
+                                       @bind-Value="contactValue" @bind-SelectedValues="contactOptions" AdornmentIcon="@Icons.Material.Filled.Search">
+                                @foreach (var contact in contactList)
+                                {
+                                    <MudSelectItem Value="@contact.PhoneNumber">@contact.FirstName @contact.LastName (@contact.PhoneNumber)</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" md="12">
+                            <MudSelect Label="Contact Groups" HelperText="Select contact groups"
+                                       MultiSelection="true" OffsetY="true" DelimitedStringSeparator="^" SelectAll="true" SelectAllText="Select all contact groups"
+                                       @bind-Value="groupValue" @bind-SelectedValues="groupOptions" AdornmentIcon="@Icons.Material.Filled.Search">
+                                @foreach (var group in groupList)
+                                {
+                                    <MudSelectItem Value="@group.ReferenceId">@group.GroupName</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" md="12">
+                            <MudSelect Label="Template" @onchange="SetContent" @bind-Value="templateValue" HelperText="Select template"
+                                       OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
+                                @foreach (var item in templateList)
+                                {
+                                    <MudSelectItem Value="item.ReferenceId">@item.SmsTemplateName</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudTextField Lines="6" @bind-Value="@smsConfig.Subject" Variant="Variant.Outlined" T="string" Label="Phone Numbers" />
+                        <MudTextField Lines="6" @bind-Value="@smsConfig.Content" Variant="Variant.Outlined" T="string" Label="Messages" />
+                    </MudGrid>
                 </MudForm>
             </MudCardContent>
         </MudCard>
@@ -44,15 +67,34 @@
     private IConfiguration _configuration;
     public SmsModel smsConfig { get; set; } = new();
 
+    private string contactValue { get; set; } = "";
+    private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
+
+    private string groupValue { get; set; } = "";
+    private HashSet<string> groupOptions { get; set; } = new HashSet<string>() { };
+
+    private string templateValue { get; set; } = "";
+
+    private IEnumerable<ContactModel> contactList = new List<ContactModel>();
+    private IEnumerable<GroupModel> groupList = new List<GroupModel>();
+    private IEnumerable<SmsTemplateModel> templateList = new List<SmsTemplateModel>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        contactList = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
+        groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
+        templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+    }
+
     public async Task SendSms(SmsModel model)
     {
         //Check error
-        if (string.IsNullOrWhiteSpace(model.Subject))
+        if (string.IsNullOrWhiteSpace(model.Subject) && string.IsNullOrWhiteSpace(contactValue) && string.IsNullOrWhiteSpace(groupValue))
         {
-            Snackbar.Add("Phone Number is required!", Severity.Error);
+            Snackbar.Add("Recipient is required!", Severity.Error);
         }
 
-        else if (string.IsNullOrWhiteSpace(model.Content))
+        else if (string.IsNullOrWhiteSpace(model.Content) && string.IsNullOrWhiteSpace(templateValue))
         {
             Snackbar.Add("Message is required!", Severity.Error);
         }
@@ -89,12 +131,24 @@
 
     }
 
-    private void Clear()
+    private async void SetContent(ChangeEventArgs e)
     {
-        smsConfig.SendTo = "";
-        smsConfig.Content = "";
-        StateHasChanged();
+        if (string.IsNullOrWhiteSpace(e.Value.ToString()))
+        {
+            var referenceId = e.Value.ToString();
+            var templateContent = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate?referenceId" + referenceId);
+            smsConfig.Content = templateContent.Select(x => x.Content).ToString();
+            StateHasChanged();
+        }
+
     }
 
-
+    private void Clear()
+    {
+        smsConfig.Subject = "";
+        smsConfig.Content = "";
+        groupValue = "";
+        contactValue = "";
+        StateHasChanged();
+    }
 }

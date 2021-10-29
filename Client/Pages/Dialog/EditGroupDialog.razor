@@ -1,6 +1,5 @@
 ﻿@using SMSGateway.Client.Models
 
-@inject IDialogService DialogService
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
@@ -8,16 +7,17 @@
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
-            Create group
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Update group
         </MudText>
     </TitleContent>
     <DialogContent>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@group.ReferenceId" Label="Reference Id" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@group.GroupName" Label="Group Name" Required="true" RequiredError="Group name is required!" />
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(group) )">Create Group</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>UpdateGroup(@group) )">Update Group</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -31,14 +31,14 @@
         MudDialog.Cancel();
     }
 
-    private void CreateGroup(GroupModel model)
+    private void UpdateGroup(GroupModel model)
     {
-        var response = _httpClient.PostAsJsonAsync("/api/group/CreateGroup/", model);
+        var response = _httpClient.PutAsJsonAsync("/api/contact/UpdateGroup/", model);
 
         StateHasChanged();
         _navigation.NavigateTo("/group");
 
-        Snackbar.Add("Group Created", Severity.Success);
+        Snackbar.Add("Group Updated", Severity.Success);
         MudDialog.Close(DialogResult.Ok(model.GroupName));
     }
 }

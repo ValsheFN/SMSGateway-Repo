@@ -23,7 +23,5 @@ namespace SMSGateway.Server
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
-        
     }
 }

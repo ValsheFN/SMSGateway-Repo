@@ -1,6 +1,5 @@
 ﻿@using SMSGateway.Client.Models
 
-@inject IDialogService DialogService
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
@@ -8,16 +7,17 @@
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
-            Create group
+            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+            Delete group?
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Variant="Variant.Outlined" @bind-Value="@group.GroupName" Label="Group Name" Required="true" RequiredError="Group name is required!" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" Value="@group.ReferenceId" Label="Reference Id" />
+        <MudTextField Variant="Variant.Outlined" Value="@group.GroupName" Label="Group Name" ReadOnly="true" />
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(group) )">Create Group</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="DeleteGroup">Delete Group</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -31,14 +31,14 @@
         MudDialog.Cancel();
     }
 
-    private void CreateGroup(GroupModel model)
+    private void DeleteGroup()
     {
-        var response = _httpClient.PostAsJsonAsync("/api/group/CreateGroup/", model);
+        var response = _httpClient.DeleteAsync("/api/group/RemoveGroup/" + group.ReferenceId);
 
         StateHasChanged();
         _navigation.NavigateTo("/group");
 
-        Snackbar.Add("Group Created", Severity.Success);
-        MudDialog.Close(DialogResult.Ok(model.GroupName));
+        Snackbar.Add("Group Deleted", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(group.GroupName));
     }
 }

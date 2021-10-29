@@ -1,0 +1,45 @@
+﻿@using SMSGateway.Client.Models
+
+@inject IDialogService DialogService
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
+            Create sms template
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@template.SmsTemplateName" Label="Sms Template Name" Required="true" RequiredError="Sms template name is required!" />
+        <MudTextField Lines="6" Variant="Variant.Outlined" @bind-Value="@template.Content" Label="Sms Content" Required="true" RequiredError="Sms content is required!" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(@template) )">Create Group</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public SmsTemplateModel template { get; set; } = new SmsTemplateModel();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void CreateGroup(SmsTemplateModel model)
+    {
+        var response = _httpClient.PostAsJsonAsync("/api/smsTemplate/CreateSmsTemplate/", model);
+
+        StateHasChanged();
+        _navigation.NavigateTo("/smsTemplate");
+
+        Snackbar.Add("Sms template created", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(model.SmsTemplateName));
+    }
+}

@@ -2,25 +2,26 @@
 
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
+@inject NavigationManager _navigation
 
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
-            Update Contact
+            Update contact
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contact.ReferenceId" Label="Reference Id"/>
-        <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.FirstName" Label="First Name" Required="true" RequiredError="First name is required!"/>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contact.ReferenceId" Label="Reference Id" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.FirstName" Label="First Name" Required="true" RequiredError="First name is required!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.LastName" Label="Last Name" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.Email" Label="Email" />
-        <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.PhoneNumber" Label="Phone Number" Required="true" RequiredError="Phone Number is required!"/>
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.PhoneNumber" Label="Phone Number" Required="true" RequiredError="Phone Number is required!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@contact.Notes" Label="Notes" />
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" OnClick="@((e)=>UpdateContact(@contact) )">Update Contact</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>UpdateContact(@contact) )">Update Contact</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -37,6 +38,10 @@
     private void UpdateContact(ContactModel model)
     {
         var response = _httpClient.PutAsJsonAsync("/api/contact/UpdateContact/", model);
+
+        StateHasChanged();
+        _navigation.NavigateTo("/contactdialog");
+
         Snackbar.Add("Contact Updated", Severity.Success);
         MudDialog.Close(DialogResult.Ok(model.FirstName + " " + model.LastName));
     }

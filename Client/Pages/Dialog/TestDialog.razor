@@ -1,0 +1,55 @@
+﻿@page "/testing"
+
+@using SMSGateway.Client.Models
+@inject HttpClient _httpClient
+@inject MudBlazor.ISnackbar _snackbar
+
+<MudPaper Height="100%" Width="100%">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4">
+                <MudSelect Label="Select template" @bind-Value="enumValue" HelperText="Template"
+                           OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
+                    @foreach (var item in templateList)
+                    {
+                        <MudSelectItem Value="item.ReferenceId">@item.SmsTemplateName</MudSelectItem>
+                    }
+                    
+                </MudSelect>
+            </MudItem>
+            <MudItem>
+                <MudTextField Lines="6" @bind-Value="@content" Variant="Variant.Outlined" T="string" Label="Messages" Required="true" RequiredError="Messages is required!" />
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</MudPaper>
+
+@code {
+    //private Drink enumValue { get; set; }
+    //public enum Drink { Tee, SparklingWater, SoftDrink, Cider, Beer, Wine, Moonshine }
+
+    private IEnumerable<SmsTemplateModel> templateList = new List<SmsTemplateModel>();
+    private IEnumerable<SmsTemplateModel> contentList = new List<SmsTemplateModel>();
+    private string enumValue { get; set; }
+    private string content { get; set; }
+    //private string[] template;
+
+    protected async override Task OnInitializedAsync()
+    {
+        templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+    }
+
+    private async void GetMessages(string referenceId)
+    {
+        _snackbar.Add("Triggered getMessages", Severity.Info);
+        if (string.IsNullOrWhiteSpace(referenceId))
+        {
+            _snackbar.Add("ReferenceId is not null", Severity.Info);
+            var contentList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate?referenceId=" + enumValue);
+            content = contentList.Select(x => x.Content).ToString();
+            _snackbar.Add(content, Severity.Info);
+        }
+
+    }
+
+}

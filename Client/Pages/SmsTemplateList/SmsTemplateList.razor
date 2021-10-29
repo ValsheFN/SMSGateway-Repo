@@ -1,9 +1,14 @@
 ﻿@page "/smstemplate"
 
-@using SMSGateway.Server.Models
-@inject MudBlazor.ISnackbar Snackbar
+@using SMSGateway.Client.Models
 @using System.Net.Http.Json
-@inject HttpClient httpClient
+@using System.Security.Claims
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager _navigation
+@inject MudBlazor.ISnackbar _snackbar
+@inject HttpClient _httpClient
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject IDialogService DialogService
 @attribute [Authorize]
 
 <MudPaper Height="100%" Width="100%">
@@ -26,9 +31,9 @@
                 <MudTd DataLabel="requester">@context.SmsTemplateName</MudTd>
                 <MudTd DataLabel="topUpValue">@context.Content</MudTd>
                 <MudTd DataLabel="">
-                    <MudFab aria-label="Edit sms template" @onclick="@(()=>Edit(context.ReferenceId))" Color="Color.Primary"
+                    <MudFab aria-label="Edit sms template" @onclick="@(()=>Edit(@context))" Color="Color.Primary"
                             Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab aria-label="Delete sms template" @onclick="@(()=>Delete(context.ReferenceId))" Color="Color.Secondary"
+                    <MudFab aria-label="Delete sms template" @onclick="@(()=>Delete(@context))" Color="Color.Secondary"
                             Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
                 </MudTd>
             </RowTemplate>
@@ -43,38 +48,12 @@
 
     private string searchString = "";
 
-    public class SmsTemplateModel
-    {
-        public string ReferenceId { get; set; }
-        public string SmsTemplateName { set; get; }
-        public string Content { set; get; }
-    }
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
 
     private IEnumerable<SmsTemplateModel> TemplateList = new List<SmsTemplateModel>();
 
     protected override async Task OnInitializedAsync()
     {
-        TemplateList = await httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/topup/GetTopup");
-    }
-
-    private void Create()
-    {
-        Snackbar.Add("Add button clicked", Severity.Success);
-    }
-
-    private void Save()
-    {
-        //var response = httpClient.PostAsJsonAsync<ContactGroupModel>("api/contactgroup/PostContactGroup");
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-    private void Edit(string referenceId)
-    {
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-    private void Delete(string referenceId)
-    {
-        Snackbar.Add("Contact group deleted", Severity.Success);
+        TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
     }
 }

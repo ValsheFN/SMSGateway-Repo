@@ -23,9 +23,9 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpGet("GetSmsTemplate")]
-        public async Task<IActionResult> GetAllFiltered(string smsTemplateName, string content)
+        public async Task<IActionResult> GetAllFiltered(string referenceId, string smsTemplateName, string content)
         {
-            return Ok(_smsTemplateService.GetAllFiltered(smsTemplateName, content));
+            return Ok(_smsTemplateService.GetAllFiltered(referenceId, smsTemplateName, content));
         }
 
         [HttpPost("CreateSmsTemplate")]

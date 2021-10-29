@@ -59,7 +59,7 @@ namespace SMSGateway.Server.Controllers
             return BadRequest("Internal Server Error"); //400
         }
 
-        [HttpDelete("RemoveContactGroup/{referenceId}")]
+        [HttpDelete("RemoveGroup/{referenceId}")]
         public async Task<IActionResult> RemoveContactGroup(string referenceId)
         {
             if (ModelState.IsValid)

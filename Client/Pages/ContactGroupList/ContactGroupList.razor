@@ -1,9 +1,16 @@
 ﻿@page "/contactgroup"
 
-@using SMSGateway.Server.Models
+@using SMSGateway.Client.Models
 @using System.Net.Http.Json
-@inject MudBlazor.ISnackbar Snackbar
-@inject HttpClient httpClient
+@using System.Security.Claims
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager _navigation
+@inject MudBlazor.ISnackbar _snackbar
+@inject HttpClient _httpClient
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject IDialogService DialogService
+
+@attribute [Authorize]
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
@@ -29,9 +36,9 @@
                 <MudTd DataLabel="lastName">@context.LastName</MudTd>
                 <MudTd DataLabel="phoneNumber">@context.PhoneNumber</MudTd>
                 <MudTd DataLabel="">
-                    <MudFab aria-label="Edit contact group" @onclick="@(()=>Edit(context.ReferenceId))" Color="Color.Primary"
+                    <MudFab aria-label="Edit contact group" @onclick="@(()=>Edit(@context))" Color="Color.Primary"
                             Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab aria-label="Delete contact group" @onclick="@(()=>Delete(context.ReferenceId))" Color="Color.Secondary"
+                    <MudFab aria-label="Delete contact group" @onclick="@(()=>Delete(@context))" Color="Color.Secondary"
                             Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
                 </MudTd>
             </RowTemplate>
@@ -46,20 +53,11 @@
 
     private string searchString = "";
 
-    public class ContactGroupModel
-    {
-        public string ReferenceId { get; set; }
-        public string GroupName { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PhoneNumber { get; set; }
-    }
-
     private IEnumerable<ContactGroupModel> ListOfContactGroups = new List<ContactGroupModel>();
 
     protected override async Task OnInitializedAsync()
     {
-        ListOfContactGroups = await httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
+        ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
     }
 
     private bool Search(ContactGroupModel contactGroup)
@@ -75,25 +73,4 @@
 
         return false;
     }
-
-    private void Create()
-    {
-        Snackbar.Add("Add button clicked", Severity.Success);
-    }
-
-    private void Save()
-    {
-        //var response = httpClient.PostAsJsonAsync<ContactGroupModel>("api/contactgroup/PostContactGroup");
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-    private void Edit(string referenceId)
-    {
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-            private void Delete(string referenceId)
-            {
-                Snackbar.Add("Contact group deleted", Severity.Success);
-            }
-        }
+}

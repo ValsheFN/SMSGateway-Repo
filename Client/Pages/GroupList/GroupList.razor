@@ -1,10 +1,13 @@
 ﻿@page "/group"
 
 @using SMSGateway.Client.Models
-@using SMSGateway.Client.Pages.Dialog
 @using System.Net.Http.Json
-@inject MudBlazor.ISnackbar Snackbar
-@inject HttpClient httpClient
+@using System.Security.Claims
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager _navigation
+@inject MudBlazor.ISnackbar _snackbar
+@inject HttpClient _httpClient
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
 @inject IDialogService DialogService
 @attribute [Authorize]
 
@@ -26,9 +29,9 @@
                 <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
                 <MudTd DataLabel="firstName">@context.GroupName</MudTd>
                 <MudTd DataLabel="">
-                    <MudFab aria-label="Edit group" @onclick="@(()=>Edit(context.ReferenceId))" Color="Color.Primary"
+                    <MudFab aria-label="Edit group" @onclick="@(()=>Edit(@context))" Color="Color.Primary"
                             Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab aria-label="Delete group" @onclick="@(()=>Delete(context.ReferenceId))" Color="Color.Secondary"
+                    <MudFab aria-label="Delete group" @onclick="@(()=>Delete(@context))" Color="Color.Secondary"
                             Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
                 </MudTd>
             </RowTemplate>
@@ -43,33 +46,20 @@
 
     private string searchString = "";
 
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+
     private IEnumerable<GroupModel> ListOfGroups = new List<GroupModel>();
 
     protected override async Task OnInitializedAsync()
     {
-        ListOfGroups = await httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
-    }
-
-    private async void Create()
-    {
-        var dialog = DialogService.Show<AddGroupDialog>("Add Group");
-        var result = await dialog.Result;
-        StateHasChanged();
-    }
-
-    private void Save()
-    {
-        //var response = httpClient.PostAsJsonAsync<ContactGroupModel>("api/contactgroup/PostContactGroup");
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-    private void Edit(string referenceId)
-    {
-        Snackbar.Add("Contact group record saved", Severity.Success);
-    }
-
-    private void Delete(string referenceId)
-    {
-        Snackbar.Add("Contact group deleted", Severity.Success);
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated != true)
+        {
+            _navigation.NavigateTo("/login");
+        }
+        else
+        {
+            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
+        }
     }
 }

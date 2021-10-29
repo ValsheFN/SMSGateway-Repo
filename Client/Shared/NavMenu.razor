@@ -4,8 +4,8 @@
 @attribute [Authorize]
 
 <MudNavMenu Class="mud-width-full">
-    <MudText Typo="Typo.h6" Class="px-4">Material</MudText>
-    <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Icons</MudText>
+    <MudText Typo="Typo.h6" Class="px-4"></MudText>
+    <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary"></MudText>
     <MudDivider Class="my-2" />
     <MudNavLink Href="/" Icon="@Icons.Filled.Dashboard" IconColor="Color.Info">@language.Keys["Dashboard"]</MudNavLink>
     <MudNavLink Href="/sms" Icon="@Icons.Filled.Message" IconColor="Color.Inherit">@language.Keys["Sms"]</MudNavLink>
@@ -18,7 +18,3 @@
     <MudNavLink Href="/topUp" Icon="@Icons.Filled.Money" IconColor="Color.Surface">@language.Keys["TopUp"]</MudNavLink>
     <MudNavLink Href="/log" Icon="@Icons.Filled.Book" IconColor="Color.Tertiary">@language.Keys["Log"]</MudNavLink>
 </MudNavMenu>
-
-@code {
-
-}

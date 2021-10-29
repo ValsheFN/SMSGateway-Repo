@@ -1,0 +1,45 @@
+﻿@using SMSGateway.Client.Models
+
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Update sms template
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@template.ReferenceId" Label="Reference id" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@template.SmsTemplateName" Label="Sms template name" RequiredError="Sms template name is required!" />
+        <MudTextField Lines="6" Variant="Variant.Outlined" @bind-Value="@template.Content" Label="Sms Content" Required="true" RequiredError="Sms content is required!" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>UpdateTemplate(@template) )">Update Sms Template</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public SmsTemplateModel template { get; set; } = new SmsTemplateModel();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void UpdateTemplate(SmsTemplateModel model)
+    {
+        var response = _httpClient.PutAsJsonAsync("/api/smsTemplate/UpdateSmsTemplate/", model);
+
+        StateHasChanged();
+        _navigation.NavigateTo("/smsTemplate");
+
+        Snackbar.Add("Group Updated", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(model.SmsTemplateName));
+    }
+}
