@@ -16,7 +16,7 @@ namespace SMSGateway.Server.Services
         Task<OperationResponse<Contact>> CreateAsync(Contact model);
         Task<OperationResponse<Contact>> UpdateAsync(Contact model);
         Task<OperationResponse<Contact>> RemoveAsync(string referenceId);
-        List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId);
+        List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId, string contactGroupId);
         Task CommitChangesAsync(string userId);
     }
 
@@ -125,7 +125,7 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId)
+        public List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId, string contactGroupId)
         {
             var query = _db.Contact.ToList();
 
@@ -153,6 +153,12 @@ namespace SMSGateway.Server.Services
             {
                 query = query.Where(x => x.LastName == lastName).ToList();
             }
+
+            if (contactGroupId != "" && contactGroupId != null)
+            {
+                query = query.Where(x => x.CreatedByUserId == contactGroupId).ToList();
+            }
+
             return query;
         }
     }

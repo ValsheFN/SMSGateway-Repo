@@ -7,7 +7,8 @@
 @using Microsoft.Extensions.Configuration
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject HttpClient _httpClient
-@inject ISnackbar Snackbar
+@inject IConfiguration _configuration
+@inject ISnackbar _snackbar
 
 
 <MudPaper Height="100%" Width="100%">
@@ -48,7 +49,7 @@
                                 }
                             </MudSelect>
                         </MudItem>
-                        <MudTextField Lines="6" @bind-Value="@smsConfig.Subject" Variant="Variant.Outlined" T="string" Label="Phone Numbers" />
+                        <MudTextField Lines="6" @bind-Value="@smsConfig.SendTo" Variant="Variant.Outlined" T="string" Label="Phone Numbers" />
                         <MudTextField Lines="6" @bind-Value="@smsConfig.Content" Variant="Variant.Outlined" T="string" Label="Messages" />
                     </MudGrid>
                 </MudForm>
@@ -56,7 +57,7 @@
         </MudCard>
 
         <MudPaper Class="pa-4 justify-center my-4 mud-text-align-center">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" OnClick="@((e)=>SendSms(@smsConfig))">Send</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mx-2" OnClick="@(()=>SendSms(smsConfig))">Send</MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mx-2">Clear</MudButton>
         </MudPaper>
     </MudContainer>
@@ -64,7 +65,7 @@
 
 @code {
 
-    private IConfiguration _configuration;
+    //private IConfiguration _configuration;
     public SmsModel smsConfig { get; set; } = new();
 
     private string contactValue { get; set; } = "";
@@ -84,71 +85,5 @@
         contactList = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
         groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
         templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
-    }
-
-    public async Task SendSms(SmsModel model)
-    {
-        //Check error
-        if (string.IsNullOrWhiteSpace(model.Subject) && string.IsNullOrWhiteSpace(contactValue) && string.IsNullOrWhiteSpace(groupValue))
-        {
-            Snackbar.Add("Recipient is required!", Severity.Error);
-        }
-
-        else if (string.IsNullOrWhiteSpace(model.Content) && string.IsNullOrWhiteSpace(templateValue))
-        {
-            Snackbar.Add("Message is required!", Severity.Error);
-        }
-        //End of check error
-
-        else
-        {
-            var _model = new SmsModel();
-
-            @*_model.From = _configuration["ConfirmationEmailAddress"];
-                _model.SendTo = _configuration["SmsEagleEmailAddress"];*@
-            _model.From = "Sms Gateway";
-            _model.SendTo = "myspace_fn@yahoo.com";
-            _model.Subject = model.Subject;
-            _model.Content = model.Content;
-
-            var response = await _httpClient.PostAsJsonAsync("/api/mail", _model);
-
-            if (response.IsSuccessStatusCode == true)
-            {
-                Snackbar.Add("SMS Sent", Severity.Success);
-                smsConfig.SendTo = "";
-                smsConfig.Content = "";
-                StateHasChanged();
-            }
-            else
-            {
-                Snackbar.Add("SMS failed to be sent", Severity.Error);
-                smsConfig.SendTo = "";
-                smsConfig.Content = "";
-                StateHasChanged();
-            }
-        }
-
-    }
-
-    private async void SetContent(ChangeEventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(e.Value.ToString()))
-        {
-            var referenceId = e.Value.ToString();
-            var templateContent = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate?referenceId" + referenceId);
-            smsConfig.Content = templateContent.Select(x => x.Content).ToString();
-            StateHasChanged();
-        }
-
-    }
-
-    private void Clear()
-    {
-        smsConfig.Subject = "";
-        smsConfig.Content = "";
-        groupValue = "";
-        contactValue = "";
-        StateHasChanged();
     }
 }

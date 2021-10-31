@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpVitamins.ShortGuid" Version="2.0.0" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="5.4.0" />
     <PackageReference Include="FluentEmail.Core" Version="3.0.0" />
     <PackageReference Include="FluentEmail.Smtp" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />

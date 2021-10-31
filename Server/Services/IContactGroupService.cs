@@ -1,4 +1,5 @@
-﻿using SMSGateway.Server.Infrastructure;
+﻿using EFCore.BulkExtensions;
+using SMSGateway.Server.Infrastructure;
 using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System;
@@ -11,6 +12,7 @@ namespace SMSGateway.Server.Services
     public interface IContactGroupService
     {
         Task<OperationResponse<ContactGroup>> CreateAsync(ContactGroup model);
+        Task<OperationResponse<ContactGroup>> ImportAsync(List<ContactGroup> model);
         Task<OperationResponse<ContactGroup>> UpdateAsync(ContactGroup model);
         Task<OperationResponse<ContactGroup>> RemoveAsync(string referenceId);
         List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName,
@@ -70,9 +72,21 @@ namespace SMSGateway.Server.Services
 
             return new OperationResponse<ContactGroup>
             {
-                Message = "Contact created successfully!",
+                Message = "Contact group created successfully!",
                 IsSuccess = true,
                 Data = model
+            };
+        }
+
+        public async Task<OperationResponse<ContactGroup>> ImportAsync(List<ContactGroup> model)
+        {
+            _db.ContactGroups.AddRange(model);
+            await _db.SaveChangesAsync();
+
+            return new OperationResponse<ContactGroup>
+            {
+                Message = "Contact group imported successfully!",
+                IsSuccess = true,
             };
         }
 

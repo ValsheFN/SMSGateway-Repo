@@ -57,13 +57,14 @@
     private string contactValue { get; set; } = "";
     private string groupValue { get; set; } = "";
 
-    private HashSet<string> contactOptions { get; set; } = new HashSet<string>() {};
+    private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
 
 
     protected async override void OnInitialized()
     {
         groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
         ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
+        ListOfContacts = ListOfContacts.Where(x => x.ContactGroupId == 0);
     }
 
     private void Cancel()

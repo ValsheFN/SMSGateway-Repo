@@ -10,9 +10,14 @@
     </MudMainContent>
 </MudLayout>
 
-<MudThemeProvider />
+<MudThemeProvider Theme="PurpleTheme" />
 
-
-@code {
-
+@code{
+    MudTheme PurpleTheme = new MudTheme()
+    {
+        Palette = new Palette()
+        {
+            Background = "#673AB7"
+        }
+    };
 }

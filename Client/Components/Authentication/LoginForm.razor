@@ -37,7 +37,7 @@
 
 @code {
 
-    [CascadingParameter] Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
     private void NavigateToRegisterComponent() { NavigationManager.NavigateTo("/register"); }
     private void NavigateToForgotPasswordComponent() { NavigationManager.NavigateTo("/forgotPassword"); }
@@ -66,11 +66,12 @@
 
     protected async override Task OnInitializedAsync()
     {
-        @*var authState = await authenticationStateTask;
-        var user = authState.User;
-        if (user.Identity.IsAuthenticated)
+        var authState = await AuthenticationStateTask;
+
+        if (authState?.User?.Identity is not null || authState.User.Identity.IsAuthenticated)
         {
-            NavigationManager.NavigateTo("/");
-        }*@
+            Navigation.NavigateTo("/", true);
+        }
+        StateHasChanged();
     }
 }

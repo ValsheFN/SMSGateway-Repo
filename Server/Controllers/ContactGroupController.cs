@@ -47,6 +47,20 @@ namespace SMSGateway.Server.Controllers
             return BadRequest("Internal Server Error"); //400
         }
 
+        [HttpPost("ImportContactGroup")]
+        public async Task<IActionResult> ImportAsync([FromBody] List<ContactGroup> model)
+        {
+            var result = await _contactGroupService.ImportAsync(model);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
         [HttpPut("UpdateContactGroup")]
         public async Task<IActionResult> UpdateAsync([FromBody] ContactGroup model)
         {

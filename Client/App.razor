@@ -5,14 +5,14 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    
+                    <RedirectToLogin></RedirectToLogin>
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>
         <NotFound>
             <CascadingAuthenticationState>
-                <LayoutView Layout="@typeof(MainLayout)">
-                    <p>Sorry, there's nothing at this address.</p>
+                <LayoutView Layout="@typeof(NotFoundPage)">
+                        
                 </LayoutView>
             </CascadingAuthenticationState>
         </NotFound>

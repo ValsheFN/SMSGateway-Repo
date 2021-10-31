@@ -27,20 +27,22 @@ namespace SMSGateway.Client.Pages.TopUpList
 
         private async Task Approve(TopUpModel topUp)
         {
-            var parameters = new DialogParameters { ["Top Up"] = topUp };
+            /*var parameters = new DialogParameters { ["Top Up"] = topUp };
 
             var dialog = DialogService.Show<DeleteGroupDialog>("Delete Group", parameters);
             var result = await dialog.Result;
-            StateHasChanged();
+            StateHasChanged();*/
+            _navigation.NavigateTo("/topUp");
         }
 
         private async Task Reject(TopUpModel topUp)
         {
-            var parameters = new DialogParameters { ["Top Up"] = topUp };
+            /*var parameters = new DialogParameters { ["Top Up"] = topUp };
 
             var dialog = DialogService.Show<EditGroupDialog>("Edit Group", parameters);
             var result = await dialog.Result;
-            StateHasChanged();
+            StateHasChanged();*/
+            _navigation.NavigateTo("/topup");
         }
     }
 }
