@@ -1,6 +1,5 @@
 ﻿@using SMSGateway.Client.Models
 
-@inject IDialogService DialogService
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
@@ -10,44 +9,45 @@
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
-            Create group
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Update role
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Variant="Variant.Outlined" @bind-Value="@group.GroupName" Label="Group Name" Required="true" RequiredError="Group name is required!" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@role.Id" Label="Id" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@role.Name" Label="Role Name" RequiredError="Role name is required!" />
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(group) )">Create Group</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>UpdateRole(@role) )">Update Role</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    [Parameter] public GroupModel group { get; set; } = new GroupModel();
+    [Parameter] public RoleModel role { get; set; } = new RoleModel();
 
     private void Cancel()
     {
         MudDialog.Cancel();
     }
 
-    private async void CreateGroup(GroupModel model)
+    private async void UpdateRole(RoleModel model)
     {
-        var response = await _httpClient.PostAsJsonAsync("/api/group/CreateGroup/", model);
+        var response = await _httpClient.PutAsJsonAsync<RoleModel>("/api/role", model);
 
         var responseBody = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<OperationResponse<GroupModel>>(responseBody);
+        var result = JsonConvert.DeserializeObject<OperationResponse<RoleModel>>(responseBody);
 
         if (result.IsSuccess)
         {
-            MudDialog.Close(DialogResult.Ok(model.GroupName));
+            MudDialog.Close(DialogResult.Ok(model.Name));
             Snackbar.Add(result.Message, Severity.Success);
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(model.GroupName));
+            MudDialog.Close(DialogResult.Ok(model.Name));
             Snackbar.Add(result.Message, Severity.Error);
         }
     }

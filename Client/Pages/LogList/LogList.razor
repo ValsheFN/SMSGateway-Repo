@@ -2,22 +2,22 @@
 
 @using SMSGateway.Server.Models
 @using System.Net.Http.Json
-@inject HttpClient httpClient
+@inject HttpClient _httpClient
 @attribute [Authorize]
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@Logs">
+        <MudTable Items="@Logs" Filter="new Func<LogModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Log</MudText>
                 <MudSpacer />
                 <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>From</MudTh>
-                <MudTh>Group Name</MudTh>
-                <MudTh>Messages</MudTh>
-                <MudTh>Time Sent</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.From)" T="LogModel">From</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.SendTo)" T="LogModel">Send To</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.Messages)" T="LogModel">Messages</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.TimeSent)" T="LogModel">Time Sent</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="from">@context.From</MudTd>
@@ -26,7 +26,7 @@
                 <MudTd DataLabel="timeSent">@context.TimeSent</MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
             </PagerContent>
         </MudTable>
     </MudContainer>
@@ -46,8 +46,28 @@
 
     private IEnumerable<LogModel> Logs = new List<LogModel>();
 
+    private bool Search(LogModel model) => SearchFunc(model, searchString);
+
     protected override async Task OnInitializedAsync()
     {
-        Logs = await httpClient.GetFromJsonAsync<List<LogModel>>("/api/log/GetLog");
+        Logs = await _httpClient.GetFromJsonAsync<List<LogModel>>("/api/log/GetLog");
+    }
+
+
+    private bool SearchFunc(LogModel model, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (model.From.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.SendTo.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.Messages.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ((model.TimeSent.ToString()).Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{model.From} {model.SendTo} {model.Messages} {model.TimeSent}".Contains(searchString))
+            return true;
+        return false;
     }
 }

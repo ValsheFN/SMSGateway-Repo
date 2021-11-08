@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSGateway.Server.Models;
 using SMSGateway.Server.Services;
+using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,12 @@ namespace SMSGateway.Server.Controllers
                 return BadRequest(result);
             }
 
-            return BadRequest("Some properties are not valid"); //400
+            return BadRequest(
+            new OperationResponse<Role>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
     }
 }

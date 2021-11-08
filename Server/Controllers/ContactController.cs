@@ -41,7 +41,12 @@ namespace SMSGateway.Server.Controllers
                 }
                 return BadRequest(result);
             }
-            return BadRequest("Internal Server Error"); //400
+            return BadRequest(
+            new OperationResponse<Contact>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
 
         [HttpPut("UpdateContact")]
@@ -57,7 +62,12 @@ namespace SMSGateway.Server.Controllers
                 }
                 return BadRequest(result);
             }
-            return BadRequest("Internal Server Error"); //400
+            return BadRequest(
+            new OperationResponse<Contact>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
 
         [HttpDelete("RemoveContact/{referenceId}")]
@@ -73,7 +83,12 @@ namespace SMSGateway.Server.Controllers
                 }
                 return BadRequest(result);
             }
-            return BadRequest("Internal Server Error"); //400
+            return BadRequest(
+            new OperationResponse<Contact>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
     }
 }

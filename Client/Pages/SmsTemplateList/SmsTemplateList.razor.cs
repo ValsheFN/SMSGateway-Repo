@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using SMSGateway.Client.Models;
 using SMSGateway.Client.Pages.Dialog;
+using System.Collections.Generic;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SMSGateway.Client.Pages.SmsTemplateList
@@ -19,6 +21,7 @@ namespace SMSGateway.Client.Pages.SmsTemplateList
         {
             var dialog = DialogService.Show<AddSmsTemplateDialog>("Add Sms Template");
             var result = await dialog.Result;
+            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
             StateHasChanged();
         }
 
@@ -28,6 +31,7 @@ namespace SMSGateway.Client.Pages.SmsTemplateList
 
             var dialog = DialogService.Show<DeleteSmsTemplateDialog>("Delete Sms Template", parameters);
             var result = await dialog.Result;
+            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
             StateHasChanged();
         }
 
@@ -37,6 +41,7 @@ namespace SMSGateway.Client.Pages.SmsTemplateList
 
             var dialog = DialogService.Show<EditSmsTemplateDialog>("Edit Sms Template", parameters);
             var result = await dialog.Result;
+            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
             StateHasChanged();
         }
     }

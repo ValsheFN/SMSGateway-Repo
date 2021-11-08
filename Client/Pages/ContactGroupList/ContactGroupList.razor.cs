@@ -19,35 +19,27 @@ namespace SMSGateway.Client.Pages.ContactGroupList
 
         private async void Create()
         {
-            //Check if group exist
-            var groups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
-            if(groups.Count == 0)
-            {
-                _snackbar.Add("No group found. Please create group", Severity.Error);
-            }
-            else
-            {
-                var dialog = DialogService.Show<AddContactGroupDialog>("Add Contacts to a Group");
-                var result = await dialog.Result;
-                StateHasChanged();
-            } 
+            var dialog = DialogService.Show<AddContactGroupDialog>("Add Contact Group");
+            var result = await dialog.Result;
+            ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
+            StateHasChanged();
         }
 
         private async Task Delete(ContactGroupModel contactGroup)
         {
-            /*var parameters = new DialogParameters { ["ContactGroup"] = contactGroup };
+            var parameters = new DialogParameters { ["ContactGroup"] = contactGroup };
 
             var dialog = DialogService.Show<DeleteContactDialog>("Delete Contact", parameters);
-            var result = await dialog.Result;*/
+            var result = await dialog.Result;
             StateHasChanged();
         }
 
         private async Task Edit(ContactGroupModel contactGroup)
         {
-            /*var parameters = new DialogParameters { ["ContactGroup"] = contactGroup };
+            var parameters = new DialogParameters { ["ContactGroup"] = contactGroup };
 
             var dialog = DialogService.Show<EditContactDialog>("Edit Contact", parameters);
-            var result = await dialog.Result;*/
+            var result = await dialog.Result;
             StateHasChanged();
         }
     }

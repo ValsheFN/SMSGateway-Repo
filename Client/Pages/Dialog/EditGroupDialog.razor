@@ -4,6 +4,8 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
 
+@using Newtonsoft.Json
+
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
@@ -31,14 +33,21 @@
         MudDialog.Cancel();
     }
 
-    private void UpdateGroup(GroupModel model)
+    private async void UpdateGroup(GroupModel model)
     {
-        var response = _httpClient.PutAsJsonAsync("/api/contact/UpdateGroup/", model);
+        var response = await _httpClient.PutAsJsonAsync("/api/group/UpdateGroup", model);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<GroupModel>>(responseBody);
 
-        StateHasChanged();
-        _navigation.NavigateTo("/group");
-
-        Snackbar.Add("Group Updated", Severity.Success);
-        MudDialog.Close(DialogResult.Ok(model.GroupName));
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Error);
+        }
     }
 }

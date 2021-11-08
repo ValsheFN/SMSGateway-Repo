@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSGateway.Server.Models;
 using SMSGateway.Server.Services;
+using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,12 @@ namespace SMSGateway.Server.Controllers
 
                 return BadRequest(result);
             }
-            return BadRequest("Internal Server Error"); //400
+            return BadRequest(
+            new OperationResponse<ContactGroup>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
 
         [HttpPost("ImportContactGroup")]
@@ -74,7 +80,12 @@ namespace SMSGateway.Server.Controllers
                 }
                 return BadRequest(result);
             }
-            return BadRequest("Internal Server Error"); //400
+            return BadRequest(
+            new OperationResponse<ContactGroup>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
 
         [HttpDelete("RemoveContactGroup/{referenceId}")]
@@ -90,7 +101,12 @@ namespace SMSGateway.Server.Controllers
                 }
                 return BadRequest(result);
             }
-            return BadRequest("Internal Server Error"); //400
+            return BadRequest(
+            new OperationResponse<ContactGroup>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
     }
 }

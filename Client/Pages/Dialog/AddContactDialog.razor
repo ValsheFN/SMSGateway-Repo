@@ -5,6 +5,8 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
 
+@using Newtonsoft.Json
+
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
@@ -35,14 +37,22 @@
         MudDialog.Cancel();
     }
 
-    private void CreateContact(ContactModel model)
+    private async void CreateContact(ContactModel model)
     {
-        var response = _httpClient.PostAsJsonAsync("/api/contact/CreateContact/", model);
+        var response = await _httpClient.PostAsJsonAsync("/api/contact/CreateContact/", model);
 
-        StateHasChanged();
-        _navigation.NavigateTo("/contact");
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<ContactModel>>(responseBody);
 
-        Snackbar.Add("Contact Created", Severity.Success);
-        MudDialog.Close(DialogResult.Ok(model.FirstName + " " + model.LastName));
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(model.PhoneNumber));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(model.PhoneNumber));
+            Snackbar.Add(result.Message, Severity.Error);
+        }
     }
 }

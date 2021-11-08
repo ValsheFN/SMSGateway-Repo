@@ -4,6 +4,8 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
 
+@using Newtonsoft.Json
+
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
@@ -34,14 +36,21 @@
         MudDialog.Cancel();
     }
 
-    private void DeleteContact()
+    private async void DeleteContact()
     {
-        var response = _httpClient.DeleteAsync("/api/contact/RemoveContact/" + contact.ReferenceId);
+        var response = await _httpClient.DeleteAsync("/api/contact/RemoveContact/" + contact.ReferenceId);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<ContactModel>>(responseBody);
 
-        StateHasChanged();
-        _navigation.NavigateTo("/contact");
-
-        Snackbar.Add("Contact Deleted", Severity.Success);
-        MudDialog.Close(DialogResult.Ok(contact.FirstName + " " + contact.LastName));
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Error);
+        }
     }
 }

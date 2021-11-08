@@ -122,9 +122,9 @@ namespace SMSGateway.Server.Services
                     };
                 }
 
-                var totalCreditValue = topUpData.TopUpValue + userData.CreditValue;
+                var totalCreditValue = (topUpData.TopUpValue/userData.CostPerSms) + userData.SmsCredit;
 
-                userData.CreditValue = totalCreditValue;
+                userData.SmsCredit = Convert.ToInt32(totalCreditValue);
 
                 var result = await _userManager.UpdateAsync(userData);
 

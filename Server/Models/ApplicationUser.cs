@@ -28,7 +28,8 @@ namespace SMSGateway.Server.Models
         }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal CreditValue { get; set; } = 0;
+        public decimal CostPerSms { get; set; } = 500;
+        public int SmsCredit { get; set; } = 0;
 
         //Relationships
         public virtual List<Contact> CreatedContact { get; set; }

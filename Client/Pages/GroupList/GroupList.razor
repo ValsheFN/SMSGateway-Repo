@@ -13,7 +13,7 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@ListOfGroups">
+        <MudTable Items="@ListOfGroups" Filter="new Func<GroupModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Group List</MudText>
                 <MudSpacer />
@@ -22,7 +22,7 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Reference Id</MudTh>
-                <MudTh>Group Name</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<GroupModel, object>(x=>x.GroupName)" T="GroupModel">Group Name</MudTableSortLabel></MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -36,7 +36,7 @@
                 </MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
             </PagerContent>
         </MudTable>
     </MudContainer>
@@ -50,6 +50,8 @@
 
     private IEnumerable<GroupModel> ListOfGroups = new List<GroupModel>();
 
+    private bool Search(GroupModel model) => SearchFunc(model, searchString);
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
@@ -61,5 +63,18 @@
         {
             ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
         }
+    }
+
+    private bool SearchFunc(GroupModel model, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (model.ReferenceId.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.GroupName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{model.ReferenceId} {model.GroupName}".Contains(searchString))
+            return true;
+        return false;
     }
 }

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using SMSGateway.Client.Models;
 using SMSGateway.Client.Pages.Dialog;
+using System.Collections.Generic;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SMSGateway.Client.Pages.GroupList
@@ -19,6 +21,7 @@ namespace SMSGateway.Client.Pages.GroupList
         {
             var dialog = DialogService.Show<AddGroupDialog>("Add Group");
             var result = await dialog.Result;
+            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
             StateHasChanged();
         }
 
@@ -28,6 +31,7 @@ namespace SMSGateway.Client.Pages.GroupList
 
             var dialog = DialogService.Show<DeleteGroupDialog>("Delete Group", parameters);
             var result = await dialog.Result;
+            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
             StateHasChanged();
         }
 
@@ -37,6 +41,7 @@ namespace SMSGateway.Client.Pages.GroupList
 
             var dialog = DialogService.Show<EditGroupDialog>("Edit Group", parameters);
             var result = await dialog.Result;
+            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
             StateHasChanged();
         }
     }

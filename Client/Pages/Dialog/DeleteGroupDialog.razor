@@ -4,6 +4,8 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
 
+@using Newtonsoft.Json
+
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
@@ -31,14 +33,21 @@
         MudDialog.Cancel();
     }
 
-    private void DeleteGroup()
+    private async void DeleteGroup()
     {
-        var response = _httpClient.DeleteAsync("/api/group/RemoveGroup/" + group.ReferenceId);
+        var response = await _httpClient.DeleteAsync("/api/group/RemoveGroup/" + group.ReferenceId);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<GroupModel>>(responseBody);
 
-        StateHasChanged();
-        _navigation.NavigateTo("/group");
-
-        Snackbar.Add("Group Deleted", Severity.Success);
-        MudDialog.Close(DialogResult.Ok(group.GroupName));
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Error);
+        }
     }
 }

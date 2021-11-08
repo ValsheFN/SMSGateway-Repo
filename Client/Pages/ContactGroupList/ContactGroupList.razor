@@ -14,7 +14,7 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@ListOfContactGroups">
+        <MudTable Items="@ListOfContactGroups" Filter="new Func<ContactGroupModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Contact Group List</MudText>
                 <MudSpacer />
@@ -23,9 +23,9 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Reference Id</MudTh>
-                <MudTh>Group Name</MudTh>
-                <MudTh>First Name</MudTh>
-                <MudTh>Last Name</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<ContactGroupModel, object>(x=>x.GroupName)" T="ContactGroupModel">Group Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<ContactGroupModel, object>(x=>x.FirstName)" T="ContactGroupModel">First Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<ContactGroupModel, object>(x=>x.LastName)" T="ContactGroupModel">Last Name</MudTableSortLabel></MudTh>
                 <MudTh>Phone Number</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
@@ -43,7 +43,7 @@
                 </MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
             </PagerContent>
         </MudTable>
     </MudContainer>
@@ -55,22 +55,30 @@
 
     private IEnumerable<ContactGroupModel> ListOfContactGroups = new List<ContactGroupModel>();
 
+    private bool Search(ContactGroupModel model) => SearchFunc(model, searchString);
+
     protected override async Task OnInitializedAsync()
     {
         ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
     }
 
-    private bool Search(ContactGroupModel contactGroup)
+    private bool SearchFunc(ContactGroupModel model, string searchString)
     {
-        if (contactGroup.GroupName != null && contactGroup.FirstName != null && contactGroup.LastName != null && contactGroup.PhoneNumber != null
-        && contactGroup.GroupName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        || contactGroup.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        || contactGroup.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        || contactGroup.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-        {
+        if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        }
-
+        if (model.ReferenceId.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.GroupName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+            return true;
+        if ($"{model.ReferenceId} {model.FirstName} {model.LastName} {model.PhoneNumber} {model.GroupName}".Contains(searchString))
+            return true;
         return false;
     }
 }

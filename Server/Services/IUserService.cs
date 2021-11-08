@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SMSGateway.Server.Infrastructure;
 using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System;
-using System.Web;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -15,10 +13,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Net;
-using FluentEmail.Core;
-using Newtonsoft.Json.Linq;
-using System.Security.Policy;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Principal;
 
 namespace SMSGateway.Server.Services
 {
@@ -29,21 +26,31 @@ namespace SMSGateway.Server.Services
         Task<UserManagerResponse> ConfirmEmailAsync(string userId, string token);
         Task<UserManagerResponse> ForgetPasswordAsync(string email);
         Task<UserManagerResponse> ResetPasswordAsync(ResetPasswordViewModel model);
+        List<User> ListUsers();
     }
 
     public class UserService : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDBContext _db;
+        private readonly IdentityOption _identity;
         private readonly IConfiguration _configuration;
-        public readonly AuthOptions _authOptions;
+        private readonly AuthOptions _authOptions;
         private readonly IMailService _mailService;
 
         public UserService(UserManager<ApplicationUser> userManager,
+                            RoleManager<IdentityRole> roleManager,
+                            ApplicationDBContext db,
+                            IdentityOption identity,
                             IConfiguration configuration,
                             AuthOptions authOptions,
                             IMailService mailService)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
+            _db = db;
+            _identity = identity;
             _configuration = configuration;
             _authOptions = authOptions;
             _mailService = mailService;
@@ -286,6 +293,80 @@ namespace SMSGateway.Server.Services
                 Message = "Failed to reset password",
                 IsSuccess = false,
                 Errors = result.Errors.Select(e => e.Description)
+            };
+        }
+
+        public List<User> ListUsers()
+        {
+
+            var users = (from user in _db.Users
+                                join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
+                                join role in _db.Roles on userRoles.RoleId equals role.Id
+                                select new User { 
+                                    Id = user.Id, 
+                                    Email = user.Email,
+                                    UserName = user.UserName,
+                                    RoleId = role.Id,
+                                    RoleName = role.Name 
+                                })
+                        .ToListAsync();
+            return users.Result;
+        }
+
+        public async Task<OperationResponse<User>> UpdateUser(User model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Id))
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "User Id cannot be null",
+                    IsSuccess = false
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "Email cannot be null",
+                    IsSuccess = false
+                };
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "Email or password is invalid",
+                    IsSuccess = false
+                };
+            }
+
+            user.UserName = model.UserName;
+            user.CostPerSms = model.CostPerSms;
+
+            try
+            {
+                await _db.SaveChangesAsync(_identity.UserId);
+            }
+            catch (Exception e)
+            {
+                return new OperationResponse<User>
+                {
+                    IsSuccess = true,
+                    Message = e.Message
+                };
+            }
+
+
+            
+
+            return new OperationResponse<User>
+            {
+                IsSuccess = true,
+                Message = "User is updated successfully"
             };
         }
     }

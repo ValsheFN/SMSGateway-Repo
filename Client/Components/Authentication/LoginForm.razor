@@ -28,9 +28,13 @@
         </MudCardContent>
 
         <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" Disabled="_isBusy">Login</MudButton>
-            <MudButton @onclick="NavigateToRegisterComponent" Variant="Variant.Outlined" Color="Color.Success" Class="ml-1" Disabled="_isBusy">Sign Up</MudButton>
-            <MudButton @onclick="NavigateToForgotPasswordComponent" Variant="Variant.Outlined" Color="Color.Error" Class="ml-1" Disabled="_isBusy">Forgot Password</MudButton>
+            <MudButton FullWidth="true" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_isBusy">Login</MudButton>
+        </MudCardActions>
+        <MudCardActions>
+            <MudButton FullWidth="true" @onclick="NavigateToRegisterComponent" Variant="Variant.Outlined" Color="Color.Success" Disabled="_isBusy">Sign Up</MudButton>
+        </MudCardActions>
+        <MudCardActions>
+            <MudButton FullWidth="true" @onclick="NavigateToForgotPasswordComponent" Variant="Variant.Outlined" Color="Color.Error" Disabled="_isBusy">Forgot Password</MudButton>
         </MudCardActions>
     </MudCard>
 </EditForm>
@@ -64,7 +68,7 @@
         }
     }
 
-    protected async override Task OnInitializedAsync()
+    private async Task checkLogin()
     {
         var authState = await AuthenticationStateTask;
 
@@ -72,6 +76,10 @@
         {
             Navigation.NavigateTo("/", true);
         }
-        StateHasChanged();
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await checkLogin();
     }
 }

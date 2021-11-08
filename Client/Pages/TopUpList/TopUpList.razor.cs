@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http.Json;
 
 namespace SMSGateway.Client.Pages.TopUpList
 {
@@ -22,6 +23,7 @@ namespace SMSGateway.Client.Pages.TopUpList
         {
             var dialog = DialogService.Show<AddTopUpDialog>("Add Top Up");
             var result = await dialog.Result;
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
             StateHasChanged();
         }
 

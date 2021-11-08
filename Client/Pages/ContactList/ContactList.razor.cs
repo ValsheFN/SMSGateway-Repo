@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using SMSGateway.Client.Models;
 using SMSGateway.Client.Pages.Dialog;
+using System.Collections.Generic;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SMSGateway.Client.Pages.ContactList
@@ -20,6 +22,7 @@ namespace SMSGateway.Client.Pages.ContactList
         {
             var dialog = DialogService.Show<AddContactDialog>("Add Contact");
             var result = await dialog.Result;
+            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             StateHasChanged();
         }
 
@@ -29,6 +32,7 @@ namespace SMSGateway.Client.Pages.ContactList
 
             var dialog = DialogService.Show<DeleteContactDialog>("Delete Contact", parameters);
             var result = await dialog.Result;
+            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             StateHasChanged();
         }
 
@@ -38,6 +42,7 @@ namespace SMSGateway.Client.Pages.ContactList
 
             var dialog = DialogService.Show<EditContactDialog>("Edit Contact", parameters);
             var result = await dialog.Result;
+            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             StateHasChanged();
         }
     }

@@ -50,7 +50,12 @@ namespace SMSGateway.Server.Controllers
                 return BadRequest(result);
             }
 
-            return BadRequest("Some properties are not valid"); //400
+            return BadRequest(
+            new OperationResponse<TopUp>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
 
         [HttpGet("UpdateTopUp")]
@@ -68,7 +73,12 @@ namespace SMSGateway.Server.Controllers
                 return Ok(result); //200
             }
 
-            return BadRequest(result);
+            return BadRequest(
+            new OperationResponse<TopUp>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
         }
     }
 }

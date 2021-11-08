@@ -19,7 +19,7 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@ListOfTopUps">
+        <MudTable Items="@ListOfTopUps" Filter="new Func<TopUpModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Top Up</MudText>
                 <MudSpacer />
@@ -28,11 +28,11 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Reference Id</MudTh>
-                <MudTh>Requester</MudTh>
-                <MudTh>Top Up Value</MudTh>
-                <MudTh>Status</MudTh>
-                <MudTh>Request Date</MudTh>
-                <MudTh>Granted Date</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.Requester)" T="TopUpModel">Requester</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.TopUpValue)" T="TopUpModel">Top Up Value</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.Status)" T="TopUpModel">Status</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.RequestDate)" T="TopUpModel">Request Date</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.GrantDate)" T="TopUpModel">Granted Date</MudTableSortLabel></MudTh>
                 <MudTh>Granted By</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
@@ -52,7 +52,7 @@
                 </MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
             </PagerContent>
         </MudTable>
     </MudContainer>
@@ -64,8 +64,31 @@
 
     private IEnumerable<TopUpModel> ListOfTopUps = new List<TopUpModel>();
 
+    private bool Search(TopUpModel model) => SearchFunc(model, searchString);
+
     protected override async Task OnInitializedAsync()
     {
         ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
+    }
+
+    private bool SearchFunc(TopUpModel model, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (model.ReferenceId.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.Requester.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ((model.TopUpValue.ToString()).Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.Status.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ((model.RequestDate.ToString()).Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ((model.GrantDate.ToString()).Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{model.ReferenceId} {model.Requester} {model.TopUpValue} {model.Status} {model.RequestDate} {model.GrantDate}".Contains(searchString))
+            return true;
+        return false;
     }
 }

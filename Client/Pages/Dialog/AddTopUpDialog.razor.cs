@@ -9,6 +9,8 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
+using Newtonsoft.Json;
+using SMSGateway.Shared;
 
 namespace SMSGateway.Client.Pages.Dialog
 {
@@ -19,7 +21,7 @@ namespace SMSGateway.Client.Pages.Dialog
             MudDialog.Cancel();
         }
 
-        private void CreateGroup(decimal topUpValue)
+        private async void CreateGroup(decimal topUpValue)
         {
             if(topUpValue <= 0)
             {
@@ -36,13 +38,20 @@ namespace SMSGateway.Client.Pages.Dialog
                     Requester = ""
                 };
 
-                var response = _httpClient.PostAsJsonAsync("/api/topUp/CreateTopUp/", topUp);
+                var response = await _httpClient.PostAsJsonAsync("/api/topUp/CreateTopUp/", topUp);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<OperationResponse<TopUpModel>>(responseBody);
 
-                StateHasChanged();
-                _navigation.NavigateTo("/topUp");
-
-                Snackbar.Add("Top Up Requested", Severity.Success);
-                MudDialog.Close(DialogResult.Ok(topUp.ReferenceId));
+                if (result.IsSuccess)
+                {
+                    MudDialog.Close(DialogResult.Ok(""));
+                    Snackbar.Add(result.Message, Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(""));
+                    Snackbar.Add(result.Message, Severity.Error);
+                }
             }
         }
     }

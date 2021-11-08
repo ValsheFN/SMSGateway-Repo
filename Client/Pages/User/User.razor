@@ -1,4 +1,4 @@
-﻿@page "/smstemplate"
+﻿@page "/user"
 
 @using SMSGateway.Client.Models
 @using System.Net.Http.Json
@@ -13,23 +13,27 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@TemplateList" Filter="new Func<SmsTemplateModel, bool>(Search)" SortLabel="SortBy">
+        <MudTable Items="@UserList" Filter="new Func<UserModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
-                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">SMS Template List</MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">User List</MudText>
                 <MudSpacer />
                 <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudFab aria-label="Create new sms template" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Reference Id</MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<SmsTemplateModel, object>(x=>x.SmsTemplateName)" T="SmsTemplateModel">Template Name</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<SmsTemplateModel, object>(x=>x.Content)" T="SmsTemplateModel">Content</MudTableSortLabel></MudTh>
+                <MudTh>Id</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UserModel, object>(x=>x.UserName)" T="UserModel">User Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UserModel, object>(x=>x.Email)" T="UserModel">Email</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UserModel, object>(x=>x.SmsCredit)" T="UserModel">SMS Credit</MudTableSortLabel></MudTh>
+                <MudTh>Cost Per SMS</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
-                <MudTd DataLabel="requester">@context.SmsTemplateName</MudTd>
-                <MudTd DataLabel="topUpValue">@context.Content</MudTd>
+                <MudTd DataLabel="referenceId">@context.Id</MudTd>
+                <MudTd DataLabel="requester">@context.UserName</MudTd>
+                <MudTd DataLabel="requester">@context.Email</MudTd>
+                <MudTd DataLabel="requester">@context.SmsCredit</MudTd>
+                <MudTd DataLabel="requester">@context.CostPerSms</MudTd>
                 <MudTd DataLabel="">
                     <MudFab aria-label="Edit sms template" @onclick="@(()=>Edit(@context))" Color="Color.Primary"
                             Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
@@ -48,28 +52,26 @@
 
     private string searchString = "";
 
-    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
-
-    private IEnumerable<SmsTemplateModel> TemplateList = new List<SmsTemplateModel>();
-
-    private bool Search(SmsTemplateModel model) => SearchFunc(model, searchString);
-
-    protected override async Task OnInitializedAsync()
+    private bool Search(UserModel model)
     {
-        TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+        return true;
     }
 
-    private bool SearchFunc(SmsTemplateModel model, string searchString)
+    private bool SearchFunc(UserModel model, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (model.ReferenceId.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (model.Id.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (model.SmsTemplateName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (model.UserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (model.Content.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (model.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{model.ReferenceId} {model.SmsTemplateName} {model.Content}".Contains(searchString))
+        if ((model.SmsCredit.ToString()).Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ((model.CostPerSms.ToString()).Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{model.Id} {model.UserName} {model.Email} {model.SmsCredit} {model.CostPerSms}".Contains(searchString))
             return true;
         return false;
     }

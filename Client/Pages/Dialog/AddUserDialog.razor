@@ -1,0 +1,58 @@
+﻿@using SMSGateway.Client.Models
+
+@inject IDialogService DialogService
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+
+@using Newtonsoft.Json
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
+            Create sms template
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.UserName" Label="User Name" Required="true" RequiredError="User Name is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.Email" Label="User Name" Required="true" RequiredError="Email is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.Password" Label="Password" Required="true" RequiredError="Password is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.ConfirmPassword" Label="Confirm Password" Required="true" RequiredError="Please confirm your password!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.CostPerSms" Label="Cost per SMS" Required="true" RequiredError="Cost per SMS value is required!" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(@user) )">Create user</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public UserModel user { get; set; } = new UserModel();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async void CreateGroup(UserModel model)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/auth/register", model);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<RoleModel>>(responseBody);
+
+        if (result.IsSuccess)
+        {
+            response = await _httpClient.PutAsJsonAsync("api/user", model);
+            MudDialog.Close(DialogResult.Ok(model.UserName));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(model.UserName));
+            Snackbar.Add(result.Message, Severity.Error);
+        }
+    }
+}

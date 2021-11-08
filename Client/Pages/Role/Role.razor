@@ -1,0 +1,67 @@
+﻿@page "/role"
+
+@using SMSGateway.Client.Models
+@using System.Net.Http.Json
+@using System.Security.Claims
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject NavigationManager _navigation
+@inject MudBlazor.ISnackbar _snackbar
+@inject HttpClient _httpClient
+@inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
+@inject IDialogService DialogService
+@attribute [Authorize]
+
+<MudPaper Height="100%" Width="100%">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudTable Items="@ListOfRole" Filter="new Func<RoleModel, bool>(Search)" SortLabel="SortBy">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Role</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudFab aria-label="Create new role" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<RoleModel, object>(x=>x.FirstName)" T="RoleModel">Role Name</MudTableSortLabel></MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="referenceId">@context.Id</MudTd>
+                <MudTd DataLabel="requester">@context.Name</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab aria-label="Edit sms template" @onclick="@(()=>Edit(@context))" Color="Color.Primary"
+                            Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab aria-label="Delete sms template" @onclick="@(()=>Delete(@context))" Color="Color.Secondary"
+                            Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+            </PagerContent>
+        </MudTable>
+    </MudContainer>
+</MudPaper>
+
+@code {
+    private string searchString = "";
+
+    private bool Search(RoleModel model) => SearchFunc(model, searchString);
+
+    private bool Search(Role model)
+    {
+        return true;
+    }
+
+    private bool SearchFunc(RoleModel model, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (model.Id.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{model.Id} {model.Name}".Contains(searchString))
+            return true;
+        return false;
+    }
+}

@@ -17,4 +17,8 @@
     <MudNavLink Href="/smsTemplate" Icon="@Icons.Filled.Sms" IconColor="Color.Secondary">@language.Keys["SmsTemplate"]</MudNavLink>
     <MudNavLink Href="/topUp" Icon="@Icons.Filled.Money" IconColor="Color.Surface">@language.Keys["TopUp"]</MudNavLink>
     <MudNavLink Href="/log" Icon="@Icons.Filled.Book" IconColor="Color.Tertiary">@language.Keys["Log"]</MudNavLink>
+    <MudNavGroup Title=@language.Keys["Admin"] Icon="@Icons.Filled.AdminPanelSettings" Expanded="false" IconColor="Color.Primary">
+        <MudNavLink Href="/role" Icon="@Icons.Filled.VerifiedUser" IconColor="Color.Dark">@language.Keys["Role"]</MudNavLink>
+        <MudNavLink Href="/user" Icon="@Icons.Filled.SupervisedUserCircle" IconColor="Color.Dark">@language.Keys["User"]</MudNavLink>
+    </MudNavGroup>
 </MudNavMenu>

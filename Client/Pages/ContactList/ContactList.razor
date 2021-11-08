@@ -14,7 +14,7 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@ListOfContacts" Filter="new Func<ContactModel, bool>(Search)">
+        <MudTable Items="@ListOfContacts" Filter="new Func<ContactModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Contact List</MudText>
                 <MudSpacer />
@@ -23,9 +23,9 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Reference Id</MudTh>
-                <MudTh><MudTableSortLabel SortLabel="firstName" T="ContactModel">First Name</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="lastName" T="ContactModel">Last Name</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="email" T="ContactModel">Email</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.FirstName)" T="ContactModel">First Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.LastName)" SortLabel="lastName" T="ContactModel">Last Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.Email)" SortLabel="email" T="ContactModel">Email</MudTableSortLabel></MudTh>
                 <MudTh>Phone Number</MudTh>
                 <MudTh>Notes</MudTh>
                 <MudTh>Actions</MudTh>
@@ -45,7 +45,7 @@
                 </MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
             </PagerContent>
         </MudTable>
     </MudContainer>
@@ -57,6 +57,8 @@
     private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
 
     private IEnumerable<ContactModel> ListOfContacts = new List<ContactModel>();
+
+    private bool Search(ContactModel model) => SearchFunc(model, searchString);
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,8 +73,24 @@
         }
     }
 
-    private bool Search(ContactModel model)
+    private bool SearchFunc(ContactModel model, string searchString)
     {
-        return true;
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (model.ReferenceId.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.PhoneNumber.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (model.Notes.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{model.ReferenceId} {model.FirstName} {model.LastName} {model.Email} {model.PhoneNumber} {model.Notes}".Contains(searchString))
+            return true;
+        return false;
     }
 }

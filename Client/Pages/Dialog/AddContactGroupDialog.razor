@@ -1,5 +1,6 @@
 ﻿@using SMSGateway.Client.Models
 @using System.ComponentModel.DataAnnotations
+@using System.Linq
 
 @inject IDialogService DialogService
 @inject HttpClient _httpClient
@@ -16,7 +17,7 @@
     <DialogContent>
         <MudGrid>
             <MudItem xs="12" md="12">
-                <MudSelect Label="Select group" @bind-Value="groupValue" HelperText="Contact group"
+                <MudSelect Label="Contact group" @bind-Value="groupValue" HelperText="Select group"
                            OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
                     @foreach (var item in groupList)
                     {
@@ -52,24 +53,31 @@
     [Parameter] public ContactGroupModel contactGroup { get; set; } = new ContactGroupModel();
 
     private IEnumerable<ContactModel> ListOfContacts = new List<ContactModel>();
+    private IEnumerable<ContactGroupModel> ListOfContactGroups = new List<ContactGroupModel>();
     private IEnumerable<GroupModel> groupList = new List<GroupModel>();
 
-    private string contactValue { get; set; } = "";
-    private string groupValue { get; set; } = "";
+    private string contactValue { get; set; }
+    private string groupValue { get; set; }
 
     private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
-
 
     protected async override void OnInitialized()
     {
         groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
         ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
-        ListOfContacts = ListOfContacts.Where(x => x.ContactGroupId == 0);
+        ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup");
     }
 
     private void Cancel()
     {
         MudDialog.Cancel();
+    }
+
+    private async void CheckContact(string groupValue)
+    {
+        var contactGroup = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup?groupName=" + groupValue);
+        ListOfContacts = ListOfContacts.Where(x => contactGroup.Any(x2 => x2.PhoneNumber != x.PhoneNumber));
+        StateHasChanged();
     }
 
     private void CreateContactGroup(ContactGroupModel model)
