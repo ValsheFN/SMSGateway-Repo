@@ -1,5 +1,70 @@
-﻿<h3>EditUserDialog</h3>
+﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+
+@using Newtonsoft.Json
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Update user
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.Id" Label="Id" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.Email" Label="Email"/>
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.UserName" Label="User Name" RequiredError="User name is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.CostPerSms" Label="Cost per SMS" RequiredError="Cost per SMS is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.SmsCredit" Label="SMS Credit" RequiredError="SMS credit is required!" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>UpdateUser(@user) )">Update User</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
+    [Parameter] public UserModel user { get; set; } = new UserModel();
+
+    private IEnumerable<UserModel> ListOfUsers = new List<UserModel>();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    protected async override void OnInitialized()
+    {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        ListOfUsers = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user");
+    }
+
+    private async void UpdateUser(UserModel model)
+    {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _httpClient.PutAsJsonAsync<UserModel>("/api/user", model);
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<RoleModel>>(responseBody);
+
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Error);
+        }
+    }
 }

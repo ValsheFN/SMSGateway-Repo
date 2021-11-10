@@ -1,5 +1,7 @@
 ﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
 
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
 @inject IDialogService DialogService

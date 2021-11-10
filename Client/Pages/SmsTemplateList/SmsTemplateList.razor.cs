@@ -5,6 +5,7 @@ using MudBlazor;
 using SMSGateway.Client.Models;
 using SMSGateway.Client.Pages.Dialog;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -21,7 +22,10 @@ namespace SMSGateway.Client.Pages.SmsTemplateList
         {
             var dialog = DialogService.Show<AddSmsTemplateDialog>("Add Sms Template");
             var result = await dialog.Result;
-            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate?createdByUserId=" + userId);
             StateHasChanged();
         }
 
@@ -31,7 +35,10 @@ namespace SMSGateway.Client.Pages.SmsTemplateList
 
             var dialog = DialogService.Show<DeleteSmsTemplateDialog>("Delete Sms Template", parameters);
             var result = await dialog.Result;
-            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate?createdByUserId=" + userId);
             StateHasChanged();
         }
 
@@ -41,7 +48,10 @@ namespace SMSGateway.Client.Pages.SmsTemplateList
 
             var dialog = DialogService.Show<EditSmsTemplateDialog>("Edit Sms Template", parameters);
             var result = await dialog.Result;
-            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate?createdByUserId=" + userId);
             StateHasChanged();
         }
     }

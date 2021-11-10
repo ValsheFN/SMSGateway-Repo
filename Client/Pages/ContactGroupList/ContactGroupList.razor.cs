@@ -5,6 +5,7 @@ using MudBlazor;
 using SMSGateway.Client.Models;
 using SMSGateway.Client.Pages.Dialog;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -21,7 +22,10 @@ namespace SMSGateway.Client.Pages.ContactGroupList
         {
             var dialog = DialogService.Show<AddContactGroupDialog>("Add Contact Group");
             var result = await dialog.Result;
-            ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup?createdByUserId=" + userId);
             StateHasChanged();
         }
 
@@ -31,6 +35,10 @@ namespace SMSGateway.Client.Pages.ContactGroupList
 
             var dialog = DialogService.Show<DeleteContactDialog>("Delete Contact", parameters);
             var result = await dialog.Result;
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup?createdByUserId=" + userId);
             StateHasChanged();
         }
 
@@ -40,6 +48,10 @@ namespace SMSGateway.Client.Pages.ContactGroupList
 
             var dialog = DialogService.Show<EditContactDialog>("Edit Contact", parameters);
             var result = await dialog.Result;
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup?createdByUserId=" + userId);
             StateHasChanged();
         }
     }

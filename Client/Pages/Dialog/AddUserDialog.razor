@@ -1,5 +1,7 @@
 ﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
 
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject IDialogService DialogService
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
@@ -16,10 +18,11 @@
     </TitleContent>
     <DialogContent>
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.UserName" Label="User Name" Required="true" RequiredError="User Name is required!" />
-        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.Email" Label="User Name" Required="true" RequiredError="Email is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.Email" Label="Email" Required="true" RequiredError="Email is required!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.Password" Label="Password" Required="true" RequiredError="Password is required!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.ConfirmPassword" Label="Confirm Password" Required="true" RequiredError="Please confirm your password!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.CostPerSms" Label="Cost per SMS" Required="true" RequiredError="Cost per SMS value is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@user.SmsCredit" Label="SMS Credit" Required="true" RequiredError="SMS credit is required!" />
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
@@ -39,6 +42,8 @@
 
     private async void CreateGroup(UserModel model)
     {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _httpClient.PostAsJsonAsync("api/auth/register", model);
         var responseBody = await response.Content.ReadAsStringAsync();
         var result = JsonConvert.DeserializeObject<OperationResponse<RoleModel>>(responseBody);

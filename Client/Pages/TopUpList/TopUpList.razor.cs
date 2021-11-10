@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 
 namespace SMSGateway.Client.Pages.TopUpList
 {
@@ -23,7 +24,10 @@ namespace SMSGateway.Client.Pages.TopUpList
         {
             var dialog = DialogService.Show<AddTopUpDialog>("Add Top Up");
             var result = await dialog.Result;
-            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup?createdByUserId=" + userId);
             StateHasChanged();
         }
 
@@ -33,6 +37,10 @@ namespace SMSGateway.Client.Pages.TopUpList
 
             var dialog = DialogService.Show<DeleteGroupDialog>("Delete Group", parameters);
             var result = await dialog.Result;
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup?createdByUserId=" + userId);
             StateHasChanged();*/
             _navigation.NavigateTo("/topUp");
         }
@@ -43,6 +51,10 @@ namespace SMSGateway.Client.Pages.TopUpList
 
             var dialog = DialogService.Show<EditGroupDialog>("Edit Group", parameters);
             var result = await dialog.Result;
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup?createdByUserId=" + userId);
             StateHasChanged();*/
             _navigation.NavigateTo("/topup");
         }

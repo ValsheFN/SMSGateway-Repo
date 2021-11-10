@@ -1,5 +1,7 @@
 ﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
 
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
@@ -28,13 +30,24 @@
 
     [Parameter] public RoleModel role { get; set; } = new RoleModel();
 
+    private IEnumerable<RoleModel> ListOfRoles = new List<RoleModel>();
+
     private void Cancel()
     {
         MudDialog.Cancel();
     }
 
+    protected async override void OnInitialized()
+    {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        ListOfRoles = await _httpClient.GetFromJsonAsync<List<RoleModel>>("/api/role");
+    }
+
     private async void UpdateRole(RoleModel model)
     {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _httpClient.PutAsJsonAsync<RoleModel>("/api/role", model);
 
         var responseBody = await response.Content.ReadAsStringAsync();

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http;
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
+using MudBlazor;
 
 namespace SMSGateway.Client.Components
 {
@@ -33,8 +34,7 @@ namespace SMSGateway.Client.Components
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
-
-                Navigation.NavigateTo("/login");
+                Navigation.NavigateTo("/");
             }
             else
             {

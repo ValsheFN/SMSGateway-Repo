@@ -27,6 +27,8 @@ namespace SMSGateway.Server.Services
         Task<UserManagerResponse> ForgetPasswordAsync(string email);
         Task<UserManagerResponse> ResetPasswordAsync(ResetPasswordViewModel model);
         List<User> ListUsers();
+        Task<OperationResponse<User>> UpdateUser(User model);
+        Task<OperationResponse<User>> DeleteUser(string userId);
     }
 
     public class UserService : IUserService
@@ -189,6 +191,7 @@ namespace SMSGateway.Server.Services
             return new UserManagerResponse
             {
                 Message = tokenAsString,
+                UserId = user.Id,
                 IsSuccess = true,
                 ExpiryDate = expireDate
             };
@@ -306,6 +309,8 @@ namespace SMSGateway.Server.Services
                                     Id = user.Id, 
                                     Email = user.Email,
                                     UserName = user.UserName,
+                                    SmsCredit = user.SmsCredit,
+                                    CostPerSms = user.CostPerSms,
                                     RoleId = role.Id,
                                     RoleName = role.Name 
                                 })
@@ -346,6 +351,7 @@ namespace SMSGateway.Server.Services
 
             user.UserName = model.UserName;
             user.CostPerSms = model.CostPerSms;
+            user.SmsCredit = model.SmsCredit;
 
             try
             {
@@ -360,13 +366,54 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-
-            
-
             return new OperationResponse<User>
             {
                 IsSuccess = true,
                 Message = "User is updated successfully"
+            };
+        }
+
+        public async Task<OperationResponse<User>> DeleteUser(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "User Id cannot be null",
+                    IsSuccess = false
+                };
+            }
+
+            try
+            {
+                var user = _db.Users.FirstOrDefault(u => u.Id == userId);
+                if (user != null)
+                {
+                    _db.Entry(user).State = EntityState.Deleted;
+                    _db.SaveChanges();
+                }
+                else
+                {
+                    return new OperationResponse<User>
+                    {
+                        IsSuccess = false,
+                        Message = "User cannot be found"
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                return new OperationResponse<User>
+                {
+                    IsSuccess = true,
+                    Message = e.Message
+                };
+            }
+
+            return new OperationResponse<User>
+            {
+                IsSuccess = true,
+                Message = "User is deleted successfully"
             };
         }
     }

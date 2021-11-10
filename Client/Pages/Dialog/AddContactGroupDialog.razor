@@ -1,7 +1,9 @@
 ﻿@using SMSGateway.Client.Models
 @using System.ComponentModel.DataAnnotations
 @using System.Linq
+@using System.Net.Http.Headers
 
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject IDialogService DialogService
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
@@ -63,6 +65,8 @@
 
     protected async override void OnInitialized()
     {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
         ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
         ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup");
@@ -75,6 +79,8 @@
 
     private async void CheckContact(string groupValue)
     {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var contactGroup = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup?groupName=" + groupValue);
         ListOfContacts = ListOfContacts.Where(x => contactGroup.Any(x2 => x2.PhoneNumber != x.PhoneNumber));
         StateHasChanged();
@@ -83,6 +89,8 @@
     private void CreateContactGroup(ContactGroupModel model)
     {
         // 1. Get contact group id
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = _httpClient.PostAsJsonAsync("/api/contactGroup/CreateContactGroup/", model);
 
         StateHasChanged();

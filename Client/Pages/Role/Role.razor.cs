@@ -7,6 +7,7 @@ using SMSGateway.Client.Models;
 using SMSGateway.Client.Pages.Dialog;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -33,6 +34,8 @@ namespace SMSGateway.Client.Pages.Role
             }
             else
             {
+                var token = _localStorage.GetItemAsString("access_token");
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 ListOfRole = await _httpClient.GetFromJsonAsync<List<RoleModel>>("/api/role");
             }
     }
@@ -41,6 +44,8 @@ namespace SMSGateway.Client.Pages.Role
         {
             var dialog = DialogService.Show<AddRoleDialog>("Add Role");
             var result = await dialog.Result;
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             ListOfRole = await _httpClient.GetFromJsonAsync<List<RoleModel>>("/api/role");
             StateHasChanged();
         }
@@ -51,6 +56,8 @@ namespace SMSGateway.Client.Pages.Role
 
             var dialog = DialogService.Show<DeleteRoleDialog>("Delete Role", parameters);
             var result = await dialog.Result;
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             ListOfRole = await _httpClient.GetFromJsonAsync<List<RoleModel>>("/api/role");
             StateHasChanged();
         }
@@ -61,6 +68,8 @@ namespace SMSGateway.Client.Pages.Role
 
             var dialog = DialogService.Show<EditRoleDialog>("Edit Role", parameters);
             var result = await dialog.Result;
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             ListOfRole = await _httpClient.GetFromJsonAsync<List<RoleModel>>("/api/role");
             StateHasChanged();
         }

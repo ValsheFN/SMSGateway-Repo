@@ -40,9 +40,10 @@ namespace SMSGateway.Client.Components
             {
                 var result = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
                 // Store it in local storage 
+                await Storage.SetItemAsStringAsync("user_id", result.UserId);
                 await Storage.SetItemAsStringAsync("access_token", result.Message);
                 await Storage.SetItemAsync<DateTime>("expiry_date", result.ExpiryDate);
-
+                
                 await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Message);
 

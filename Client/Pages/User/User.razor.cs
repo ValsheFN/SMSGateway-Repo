@@ -11,6 +11,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using SMSGateway.Client.Models;
+using System.Net.Http.Headers;
 
 namespace SMSGateway.Client.Pages.User
 {
@@ -34,6 +35,8 @@ namespace SMSGateway.Client.Pages.User
             }
             else
             {
+                var token = _localStorage.GetItemAsString("access_token");
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 UserList = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user");
             }
         }
@@ -42,6 +45,9 @@ namespace SMSGateway.Client.Pages.User
         {
             var dialog = DialogService.Show<AddUserDialog>("Add User");
             var result = await dialog.Result;
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            UserList = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user");
             StateHasChanged();
         }
 
@@ -51,6 +57,9 @@ namespace SMSGateway.Client.Pages.User
 
             var dialog = DialogService.Show<DeleteUserDialog>("Delete Role", parameters);
             var result = await dialog.Result;
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            UserList = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user");
             StateHasChanged();
         }
 
@@ -60,6 +69,9 @@ namespace SMSGateway.Client.Pages.User
 
             var dialog = DialogService.Show<EditUserDialog>("Edit User", parameters);
             var result = await dialog.Result;
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            UserList = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user");
             StateHasChanged();
         }
     }

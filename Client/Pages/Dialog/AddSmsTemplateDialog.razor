@@ -1,5 +1,7 @@
 ﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
 
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject IDialogService DialogService
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
@@ -36,6 +38,8 @@
 
     private async void CreateGroup(SmsTemplateModel model)
     {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _httpClient.PostAsJsonAsync("/api/smsTemplate/CreateSmsTemplate/", model);
         var responseBody = await response.Content.ReadAsStringAsync();
         var result = JsonConvert.DeserializeObject<OperationResponse<SmsTemplateModel>>(responseBody);

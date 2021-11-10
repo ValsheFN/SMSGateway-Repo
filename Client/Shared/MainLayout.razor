@@ -60,6 +60,7 @@
 
         await Storage.RemoveItemAsync("access_token");
         await Storage.RemoveItemAsync("expiry_date");
+        await Storage.RemoveItemAsync("user_id");
 
         await AuthenticationStateProvider.GetAuthenticationStateAsync();
         //_client.DefaultRequestHeaders.Authorization = null;

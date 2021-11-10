@@ -3,13 +3,16 @@
 @using SMSGateway.Client.Models
 @using System.Net.Http.Json
 @using System.Security.Claims
+@using System.Net.Http.Headers
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject NavigationManager _navigation
 @inject MudBlazor.ISnackbar _snackbar
 @inject HttpClient _httpClient
 @inject Blazored.LocalStorage.ISyncLocalStorageService localStorage
 @inject IDialogService DialogService
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Super User")]
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
@@ -22,7 +25,7 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Id</MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<RoleModel, object>(x=>x.FirstName)" T="RoleModel">Role Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<RoleModel, object>(x=>x.Name)" T="RoleModel">Role Name</MudTableSortLabel></MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>

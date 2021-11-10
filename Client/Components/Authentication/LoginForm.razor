@@ -20,8 +20,8 @@
             <ValidationSummary />
             @if (!string.IsNullOrWhiteSpace(_errorMessage))
             {
-                <MudItem md="4" xs="12">
-                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Square="true" Class="my-2">@_errorMessage</MudAlert>
+                <MudItem>
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Square="true">@_errorMessage</MudAlert>
                 </MudItem>
             }
 
@@ -41,7 +41,7 @@
 
 @code {
 
-    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> AuthStatus { get; set; }
 
     private void NavigateToRegisterComponent() { NavigationManager.NavigateTo("/register"); }
     private void NavigateToForgotPasswordComponent() { NavigationManager.NavigateTo("/forgotPassword"); }
@@ -68,18 +68,14 @@
         }
     }
 
-    private async Task checkLogin()
+    protected async override Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateTask;
+        base.OnInitialized();
+        var authState = await AuthStatus;
 
         if (authState?.User?.Identity is not null || authState.User.Identity.IsAuthenticated)
         {
-            Navigation.NavigateTo("/", true);
+            Navigation.NavigateTo("/");
         }
-    }
-
-    protected async override Task OnInitializedAsync()
-    {
-        await checkLogin();
     }
 }
