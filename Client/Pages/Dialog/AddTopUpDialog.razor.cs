@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 using SMSGateway.Shared;
+using System.Net.Http.Headers;
 
 namespace SMSGateway.Client.Pages.Dialog
 {
@@ -21,9 +22,12 @@ namespace SMSGateway.Client.Pages.Dialog
             MudDialog.Cancel();
         }
 
-        private async void CreateGroup(decimal topUpValue)
+        private async void CreateTopUp(decimal topUpValue)
         {
-            if(topUpValue <= 0)
+            var userId = _localStorage.GetItemAsString("user_id");
+            var token = _localStorage.GetItemAsString("access_token");
+
+            if (topUpValue <= 0)
             {
                 Snackbar.Add("Top up value cannot be equal to or below 0", Severity.Success);
             }
@@ -38,6 +42,7 @@ namespace SMSGateway.Client.Pages.Dialog
                     Requester = ""
                 };
 
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.PostAsJsonAsync("/api/topUp/CreateTopUp/", topUp);
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<OperationResponse<TopUpModel>>(responseBody);

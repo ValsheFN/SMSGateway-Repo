@@ -65,11 +65,12 @@
 
     protected async override void OnInitialized()
     {
+        var userId = _localStorage.GetItemAsString("user_id");
         var token = _localStorage.GetItemAsString("access_token");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
-        ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
-        ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup");
+        ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact?createdByUserId=" + userId);
+        ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup?createdByUserId=" + userId);
     }
 
     private void Cancel()

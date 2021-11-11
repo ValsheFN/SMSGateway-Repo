@@ -1,5 +1,61 @@
-﻿<h3>DeleteContactGroupDialog</h3>
+﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers;
+@using System.Net.Http.Headers
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+
+@using Newtonsoft.Json
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Delete contact group
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.ReferenceId" Label="Reference Id" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.GroupName" Label="Group Name" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.FirstName" Label="First Name" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.LastName" Label="Last Name" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.PhoneNumber" Label="Phone Number" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>DeleteContactGroup(@contactGroup.ReferenceId) )">Delete contact group</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
+    [Parameter] public ContactGroupModel contactGroup { get; set; } = new ContactGroupModel();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async void DeleteContactGroup(string referenceId)
+    {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _httpClient.DeleteAsync("/api/contactGroup/RemoveContactGroup?referenceId=" + referenceId);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<ContactGroupModel>>(responseBody);
+
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+        }
+    }
 }

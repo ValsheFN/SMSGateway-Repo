@@ -33,7 +33,7 @@ namespace SMSGateway.Client.Pages.ContactGroupList
         {
             var parameters = new DialogParameters { ["ContactGroup"] = contactGroup };
 
-            var dialog = DialogService.Show<DeleteContactDialog>("Delete Contact", parameters);
+            var dialog = DialogService.Show<DeleteContactGroupDialog>("Delete Contact Group", parameters);
             var result = await dialog.Result;
             var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
@@ -46,7 +46,7 @@ namespace SMSGateway.Client.Pages.ContactGroupList
         {
             var parameters = new DialogParameters { ["ContactGroup"] = contactGroup };
 
-            var dialog = DialogService.Show<EditContactDialog>("Edit Contact", parameters);
+            var dialog = DialogService.Show<EditContactGroupDialog>("Edit Contact Group", parameters);
             var result = await dialog.Result;
             var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");

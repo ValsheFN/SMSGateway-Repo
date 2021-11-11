@@ -122,6 +122,16 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<ContactGroup>> RemoveAsync(string referenceId)
         {
+            if (string.IsNullOrWhiteSpace(referenceId))
+            {
+                return new OperationResponse<ContactGroup>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Reference Id cannot be null!"
+                };
+            }
+
             var contactGroup = _db.ContactGroups.SingleOrDefault(x => x.ReferenceId == referenceId);
 
             if (contactGroup == null)
@@ -130,7 +140,7 @@ namespace SMSGateway.Server.Services
                 {
                     IsSuccess = false,
                     Data = null,
-                    Message = "Contact Group not found"
+                    Message = "Contact group not found!"
                 };
             }
 
@@ -140,7 +150,7 @@ namespace SMSGateway.Server.Services
             return new OperationResponse<ContactGroup>
             {
                 IsSuccess = true,
-                Message = "Contact Group has been deleted successfully"
+                Message = "Contact group has been deleted successfully!"
             };
         }
 

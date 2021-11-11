@@ -16,11 +16,11 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.ReferenceId" Label="Id" />
-        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.Recipients" Label="Recipients" />
-        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.Messages" Label="Messages"/>
-        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.Status" Label="Status"/>
-        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.TimeSent" Label="Time Sent"/>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@history.ReferenceId" Label="Id" />
+        <MudTextField Lines="5" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@history.Recipients" Label="Recipients" />
+        <MudTextField Lines="10" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@history.Messages" Label="Messages"/>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@history.Status" Label="Status"/>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@history.TimeSent" Label="Time Sent"/>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>

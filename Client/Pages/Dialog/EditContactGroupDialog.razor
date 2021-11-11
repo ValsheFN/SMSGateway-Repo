@@ -1,5 +1,81 @@
-﻿<h3>EditContactGroupDialog</h3>
+﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers;
+@using System.Net.Http.Headers
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+
+@using Newtonsoft.Json
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Update contact group
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.ReferenceId" Label="Reference Id" />
+        <MudSelect Label="Contact group" @bind-Value="@contactGroup.GroupName" HelperText="Select group"
+                   OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Required="true" RequiredError="Group name is required!">
+            @foreach (var item in groupList)
+            {
+                <MudSelectItem Value="item.GroupName">@item.GroupName</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.FirstName" Label="First Name" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.LastName" Label="Last Name" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@contactGroup.PhoneNumber" Label="Phone Number"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>UpdateContactGroup(@contactGroup) )">Update contact group</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
+    [Parameter] public ContactGroupModel contactGroup { get; set; } = new ContactGroupModel();
+
+    private IEnumerable<ContactGroupModel> ListOfContactGroups = new List<ContactGroupModel>();
+
+    private IEnumerable<GroupModel> groupList = new List<GroupModel>();
+
+    private string groupValue { get; set; }
+
+    protected async override void OnInitialized()
+    {
+        var userId = _localStorage.GetItemAsString("user_id");
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup?CreatedByUserId=" + userId);
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async void UpdateContactGroup(ContactGroupModel model)
+    {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _httpClient.PutAsJsonAsync("/api/contactGroup/UpdateContactGroup/", model);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<OperationResponse<ContactGroupModel>>(responseBody);
+
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+        }
+    }
 }
