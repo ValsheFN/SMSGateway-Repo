@@ -13,27 +13,27 @@ namespace SMSGateway.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class HistoryController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IHistoryService _historyService;
 
-        public UserController(IUserService userService)
+        public HistoryController(IHistoryService historyService)
         {
-            _userService = userService;
+            _historyService = historyService;
         }
 
         [HttpGet()]
-        public async Task<IActionResult> ListUsers(string userId)
+        public async Task<IActionResult> GetAllFiltered(string referenceId, string createdByUserId)
         {
-            return Ok(_userService.ListUsers(userId));
+            return Ok(_historyService.GetAllFiltered(referenceId, createdByUserId));
         }
 
-        [HttpPut()]
-        public async Task<IActionResult> UpdateUser([FromBody] User model)
-        { 
+        [HttpPost()]
+        public async Task<IActionResult> CreateAsync([FromBody]History model)
+        {
             if (ModelState.IsValid)
             {
-                var result = await _userService.UpdateUser(model);
+                var result = await _historyService.CreateAsync(model);
 
                 if (result.IsSuccess)
                 {
@@ -42,27 +42,17 @@ namespace SMSGateway.Server.Controllers
                 return BadRequest(result);
             }
             return BadRequest(
-            new OperationResponse<Contact>
+            new OperationResponse<ContactGroup>
             {
                 IsSuccess = false,
                 Message = "Internal server error"
             }); //400
         }
 
-        [HttpDelete()]
-        public async Task<IActionResult> DeleteUser(string userId)
+        [HttpPut()]
+        public async Task<IActionResult> UpdateAsync(string referenceId, string status)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                return BadRequest(
-                new OperationResponse<Contact>
-                {
-                    IsSuccess = false,
-                    Message = "User Id cannot be null"
-                });
-            }
-
-            var result = await _userService.DeleteUser(userId);
+            var result = await _historyService.UpdateAsync(referenceId, status);
 
             if (result.IsSuccess)
             {

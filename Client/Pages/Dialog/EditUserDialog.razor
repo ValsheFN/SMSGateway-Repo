@@ -16,8 +16,8 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.Id" Label="Id" />
-        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.Email" Label="Email"/>
+        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@user.Id" Label="Id" />
+        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@user.Email" Label="Email"/>
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.UserName" Label="User Name" RequiredError="User name is required!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.CostPerSms" Label="Cost per SMS" RequiredError="Cost per SMS is required!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.SmsCredit" Label="SMS Credit" RequiredError="SMS credit is required!" />
@@ -63,7 +63,6 @@
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(""));
             Snackbar.Add(result.Message, Severity.Error);
         }
     }

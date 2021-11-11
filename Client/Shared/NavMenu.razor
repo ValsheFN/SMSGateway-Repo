@@ -16,9 +16,10 @@
     </MudNavGroup>
     <MudNavLink Href="/smsTemplate" Icon="@Icons.Filled.Sms" IconColor="Color.Secondary">@language.Keys["SmsTemplate"]</MudNavLink>
     <MudNavLink Href="/topUp" Icon="@Icons.Filled.Money" IconColor="Color.Surface">@language.Keys["TopUp"]</MudNavLink>
-    <MudNavLink Href="/log" Icon="@Icons.Filled.Book" IconColor="Color.Tertiary">@language.Keys["Log"]</MudNavLink>
+    <MudNavLink Href="/history" Icon="@Icons.Filled.History" IconColor="Color.Surface">@language.Keys["History"]</MudNavLink>
     <AuthorizeView Roles="Super User">
         <MudNavLink Href="/role" Icon="@Icons.Filled.VerifiedUser" IconColor="Color.Dark">@language.Keys["Role"]</MudNavLink>
         <MudNavLink Href="/user" Icon="@Icons.Filled.SupervisedUserCircle" IconColor="Color.Dark">@language.Keys["User"]</MudNavLink>
+        <MudNavLink Href="/log" Icon="@Icons.Filled.Book" IconColor="Color.Tertiary">@language.Keys["Log"]</MudNavLink>
     </AuthorizeView>
 </MudNavMenu>

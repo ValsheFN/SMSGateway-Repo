@@ -46,12 +46,12 @@
 
         if (result.IsSuccess)
         {
-            MudDialog.Close(DialogResult.Ok(model.Name));
+            MudDialog.Close(DialogResult.Ok(""));
             Snackbar.Add(result.Message, Severity.Success);
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(model.Name));
+            MudDialog.Close(DialogResult.Ok(""));
             Snackbar.Add(result.Message, Severity.Error);
         }
     }

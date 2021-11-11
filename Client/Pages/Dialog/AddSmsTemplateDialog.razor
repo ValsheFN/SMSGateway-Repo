@@ -22,7 +22,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(@template) )">Create Group</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(@template) )">Create Template</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -51,7 +51,6 @@
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(model.SmsTemplateName));
             Snackbar.Add(result.Message, Severity.Error);
         }
     }

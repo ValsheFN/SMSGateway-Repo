@@ -129,32 +129,32 @@ namespace SMSGateway.Server.Services
         {
             var query = _db.Contact.ToList();
 
-            if (createdByUserId != "" && createdByUserId != null)
+            if (!string.IsNullOrWhiteSpace(createdByUserId))
             {
                 query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
             }
 
-            if (userId != "" && userId != null)
+            if (!string.IsNullOrWhiteSpace(userId))
             {
                 query = query.Where(x => x.Id == userId).ToList();
             }
 
-            if (referenceId != "" && referenceId != null)
+            if (!string.IsNullOrWhiteSpace(referenceId))
             {
                 query = query.Where(x => x.ReferenceId == referenceId).ToList();
             }
 
-            if (firstName != "" && firstName != null)
+            if (!string.IsNullOrWhiteSpace(firstName))
             {
                 query = query.Where(x => x.FirstName == firstName).ToList();
             }
 
-            if (lastName != "" && lastName != null)
+            if (!string.IsNullOrWhiteSpace(lastName))
             {
                 query = query.Where(x => x.LastName == lastName).ToList();
             }
 
-            if (contactGroupId != "" && contactGroupId != null)
+            if (!string.IsNullOrWhiteSpace(contactGroupId))
             {
                 query = query.Where(x => x.CreatedByUserId == contactGroupId).ToList();
             }

@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualBasic.CompilerServices;
 using Newtonsoft.Json.Linq;
+using SMSGateway.Server.Infrastructure;
 using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace SMSGateway.Server.Services
@@ -24,11 +26,13 @@ namespace SMSGateway.Server.Services
     {
         private readonly ApplicationDBContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IdentityOption _identity;
 
-        public TopUpService(ApplicationDBContext db, UserManager<ApplicationUser> userManager)
+        public TopUpService(ApplicationDBContext db, UserManager<ApplicationUser> userManager, IdentityOption identity)
         {
             _db = db;
             _userManager = userManager;
+            _identity = identity;
         }
         public async Task<OperationResponse<TopUp>> CreateAsync(TopUp model)
         {
@@ -41,7 +45,7 @@ namespace SMSGateway.Server.Services
             };
 
             await _db.TopUps.AddAsync(topUp);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(_identity.UserId);
 
             model.Id = topUp.Id;
 
@@ -131,7 +135,7 @@ namespace SMSGateway.Server.Services
                 topUpData.Status = "Success";
 
                 _db.TopUps.Update(topUpData);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(_identity.UserId);
 
                 return new OperationResponse<TopUp>
                 {

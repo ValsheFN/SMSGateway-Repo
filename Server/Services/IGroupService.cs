@@ -36,7 +36,7 @@ namespace SMSGateway.Server.Services
             };
 
             await _db.Groups.AddAsync(group);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(_identity.UserId);
 
             model.Id = group.Id;
 

@@ -7,6 +7,9 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using MudBlazor;
 using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using SMSGateway.Shared;
 
 namespace SMSGateway.Client.Pages.Sms
 {
@@ -29,29 +32,63 @@ namespace SMSGateway.Client.Pages.Sms
 
             else
             {
-                var basePath = "http://hwd.dyndns.org/";
-                var token = "aFygNaan7p4C1ofkY2FkIdtpOZvIb2ky";
-                var message = model.Content;
-                var sendTo = model.SendTo;
 
-                if (!string.IsNullOrWhiteSpace(contactValue))
+                //Get SMS content from either template or message
+                var content = "";
+                if (string.IsNullOrWhiteSpace(templateValue))
                 {
-                  sendTo += $",{contactValue}";
+                    content = model.Content;
+                }
+                else
+                {
+                    var templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+                    var selectedTemplate = templateList.Where(x => x.ReferenceId == templateValue).SingleOrDefault();
+                    content = selectedTemplate.Content;
                 }
 
-                if (!string.IsNullOrWhiteSpace(groupValue))
+                //Get recipients from either phone number or contact
+                var phoneNumber = "";
+                var userId = _localStorage.GetItemAsString("user_id");
+                var token = _localStorage.GetItemAsString("access_token");
+
+                if (string.IsNullOrWhiteSpace(model.SendTo))
                 {
-                    var groups = groupValue.Split(',').ToList<string>();
-                    foreach(var group in groups)
+                    phoneNumber = contactValue;
+
+                    List<string> collection = new List<string>(groupValue.Split(new string[] { "," }, StringSplitOptions.None));
+
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var contactGroupList = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup?createdByUserId=" + userId);
+                    var list = contactGroupList.Where(x => x.GroupName.Any(y => collection.Contains(y.ToString())));
+
+                    int iteration = 0;
+                    foreach (var item in list)
                     {
-                        var phoneList = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contactGroup/GetContact");
+                        iteration++;
+                        if (iteration == list.Count())
+                        {
+                            phoneNumber += item.PhoneNumber;
+                        }
+                        else
+                        {
+                            phoneNumber += item.PhoneNumber + ",";
+                        }
                     }
                 }
-                
+                else
+                {
+                    phoneNumber = model.SendTo;
+                }
+
+                var basePath = "http://hwd.dyndns.org";
+                var smsToken = "aFygNaan7p4C1ofkY2FkIdtpOZvIb2ky";
+                var message = content;
+                var sendTo = phoneNumber;
+
                 /*var basePath = _configuration["SmsEagle:BasePath"];
                 var token = _configuration["SmsEagle:Token"];*/
-                
-                var response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={token}&to={sendTo}&message={message}&unicode=1");
+
+                /*var response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");
 
                 if (response.IsSuccessStatusCode == true)
                 {
@@ -66,29 +103,48 @@ namespace SMSGateway.Client.Pages.Sms
                     smsConfig.SendTo = "";
                     smsConfig.Content = "";
                     StateHasChanged();
-                }
+                }*/
+
+                //Send to log
+
+                Clear();
+
+                var userData = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user?userId=" + userId);
+                
+                var timeSent = DateTime.Now;
+
+                var logData = new LogModel
+                {
+                    From = userData.FirstOrDefault().UserName,
+                    SendTo = phoneNumber,
+                    Messages = message,
+                    TimeSent = timeSent
+                };
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                await _httpClient.PostAsJsonAsync<LogModel>("/api/log/CreateLog", logData);
+
+                //Send to history
+
+                var historyData = new HistoryModel
+                {
+                    Recipients = phoneNumber,
+                    Messages = message,
+                    Status = "Pending",
+                    TimeSent = timeSent
+                };
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                await _httpClient.PostAsJsonAsync<HistoryModel>("/api/history", historyData);
             }
-
-        }
-
-        private async void SetContent(ChangeEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(e.Value.ToString()))
-            {
-                var referenceId = e.Value.ToString();
-                var templateContent = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate?referenceId" + referenceId);
-                smsConfig.Content = templateContent.Select(x => x.Content).ToString();
-                StateHasChanged();
-            }
-
         }
 
         private void Clear()
         {
-            smsConfig.Subject = "";
-            smsConfig.Content = "";
-            groupValue = "";
-            contactValue = "";
+            RemovePhoneNumber();
+            RemoveTemplate();
+            RemoveMessage();
+            RemoveContact();
             StateHasChanged();
         }
     }

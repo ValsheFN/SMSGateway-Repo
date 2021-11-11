@@ -13,47 +13,65 @@
 @inject IConfiguration _configuration
 @inject ISnackbar _snackbar
 
-
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
         <MudCard>
             <MudCardContent>
-                <MudPaper Class="pa-4 justify-center my-4 mud-text-align-center">
-                    <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">SMS</MudText>
-                </MudPaper>
                 <MudForm>
                     <MudGrid>
                         <MudItem xs="12" md="12">
-                            <MudSelect Label="Contacts" HelperText="Select contacts"
-                                       MultiSelection="true" OffsetY="true" DelimitedStringSeparator="^" SelectAll="true" SelectAllText="Select all contacts"
-                                       @bind-Value="contactValue" @bind-SelectedValues="contactOptions" AdornmentIcon="@Icons.Material.Filled.Search">
-                                @foreach (var contact in contactList)
-                                {
-                                    <MudSelectItem Value="@contact.PhoneNumber">@contact.FirstName @contact.LastName (@contact.PhoneNumber)</MudSelectItem>
-                                }
-                            </MudSelect>
+                            <MudTabs Elevation="4" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6" Color="@Color.Primary">
+                                <MudTabPanel OnClick="@RemoveContact" Text="Send to Phone Number">
+                                    <MudItem xs="12" md="12">
+                                        <MudTextField Lines="1" @bind-Value="@smsConfig.SendTo" Variant="Variant.Outlined" T="string" Label="Phone Numbers" />
+                                    </MudItem>
+                                </MudTabPanel>
+                                <MudTabPanel OnClick="@RemovePhoneNumber" Text="Send to Contact Book">
+                                    <MudItem xs="12" md="12">
+                                        <MudSelect Label="Contacts" HelperText="Select contacts"
+                                                    MultiSelection="true" OffsetY="true" SelectAll="true" SelectAllText="Select all contacts"
+                                                    @bind-Value="contactValue" @bind-SelectedValues="contactOptions" AdornmentIcon="@Icons.Material.Filled.Search">
+                                            @foreach (var contact in contactList)
+                                            {
+                                                <MudSelectItem Value="@contact.PhoneNumber">@contact.FirstName @contact.LastName (@contact.PhoneNumber)</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                    <MudItem xs="12" md="12">
+                                        <MudSelect Label="Contact Groups" HelperText="Select contact groups"
+                                                    MultiSelection="true" OffsetY="true" SelectAll="true" SelectAllText="Select all contact groups"
+                                                    @bind-Value="groupValue" @bind-SelectedValues="groupOptions" AdornmentIcon="@Icons.Material.Filled.Search">
+                                            @foreach (var group in groupList)
+                                            {
+                                                <MudSelectItem Value="@group.GroupName">@group.GroupName</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                </MudTabPanel>
+                            </MudTabs>
                         </MudItem>
+
                         <MudItem xs="12" md="12">
-                            <MudSelect Label="Contact Groups" HelperText="Select contact groups"
-                                       MultiSelection="true" OffsetY="true" DelimitedStringSeparator="^" SelectAll="true" SelectAllText="Select all contact groups"
-                                       @bind-Value="groupValue" @bind-SelectedValues="groupOptions" AdornmentIcon="@Icons.Material.Filled.Search">
-                                @foreach (var group in groupList)
-                                {
-                                    <MudSelectItem Value="@group.ReferenceId">@group.GroupName</MudSelectItem>
-                                }
-                            </MudSelect>
+                            <MudTabs Elevation="4" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6" Color="@Color.Primary">
+                                <MudTabPanel OnClick="@RemoveTemplate" Text="Write Message">
+                                    <MudItem xs="12" md="12">
+                                        <MudTextField Lines="10" @bind-Value="@smsConfig.Content" Variant="Variant.Outlined" T="string" Label="Messages" />
+                                    </MudItem>
+                                </MudTabPanel>
+                                <MudTabPanel OnClick="@RemoveMessage" Text="Use Template">
+                                    <MudItem xs="12" md="12">
+                                        <MudSelect Label="Template" @bind-Value="templateValue" HelperText="Select template"
+                                                    OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
+                                            @foreach (var item in templateList)
+                                            {
+                                                <MudSelectItem Value="item.ReferenceId">@item.SmsTemplateName</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                </MudTabPanel>
+                            </MudTabs>
                         </MudItem>
-                        <MudItem xs="12" md="12">
-                            <MudSelect Label="Template" @onchange="SetContent" @bind-Value="templateValue" HelperText="Select template"
-                                       OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
-                                @foreach (var item in templateList)
-                                {
-                                    <MudSelectItem Value="item.ReferenceId">@item.SmsTemplateName</MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                        <MudTextField Lines="6" @bind-Value="@smsConfig.SendTo" Variant="Variant.Outlined" T="string" Label="Phone Numbers" />
-                        <MudTextField Lines="6" @bind-Value="@smsConfig.Content" Variant="Variant.Outlined" T="string" Label="Messages" />
+
                     </MudGrid>
                 </MudForm>
             </MudCardContent>
@@ -66,27 +84,48 @@
     </MudContainer>
 </MudPaper>
 
-@code {
+    @code {
 
-    //private IConfiguration _configuration;
-    public SmsModel smsConfig { get; set; } = new();
+        //private IConfiguration _configuration;
+        public SmsModel smsConfig { get; set; } = new();
 
-    private string contactValue { get; set; } = "";
-    private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
+        public string contactValue { get; set; } = "";
+        private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
 
-    private string groupValue { get; set; } = "";
-    private HashSet<string> groupOptions { get; set; } = new HashSet<string>() { };
+        public string groupValue { get; set; } = "";
+        private HashSet<string> groupOptions { get; set; } = new HashSet<string>() { };
 
-    private string templateValue { get; set; } = "";
+        private string templateValue { get; set; } = "";
 
-    private IEnumerable<ContactModel> contactList = new List<ContactModel>();
-    private IEnumerable<GroupModel> groupList = new List<GroupModel>();
-    private IEnumerable<SmsTemplateModel> templateList = new List<SmsTemplateModel>();
+        private IEnumerable<ContactModel> contactList = new List<ContactModel>();
+        private IEnumerable<GroupModel> groupList = new List<GroupModel>();
+        private IEnumerable<SmsTemplateModel> templateList = new List<SmsTemplateModel>();
 
-    protected async override Task OnInitializedAsync()
-    {
-        contactList = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
-        groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
-        templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+        protected async override Task OnInitializedAsync()
+        {
+            contactList = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
+            groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
+            templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+        }
+
+        private void RemovePhoneNumber()
+        {
+            smsConfig.SendTo = "";
+        }
+
+        private void RemoveContact()
+        {
+            contactOptions.Clear();
+            groupOptions.Clear();
+        }
+
+        private void RemoveMessage()
+        {
+            smsConfig.Content = "";
+        }
+
+        private void RemoveTemplate()
+        {
+            templateValue = "";
+        }
     }
-}

@@ -97,6 +97,7 @@ namespace SMSGateway.Server
             services.AddScoped<ITopUpService, TopUpService>();
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IHistoryService, HistoryService>();
             services.AddHttpContextAccessor();
 
             services.AddScoped(sp => 

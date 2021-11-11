@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Principal;
+using Microsoft.Exchange.WebServices.Data;
 
 namespace SMSGateway.Server.Services
 {
@@ -26,7 +27,7 @@ namespace SMSGateway.Server.Services
         Task<UserManagerResponse> ConfirmEmailAsync(string userId, string token);
         Task<UserManagerResponse> ForgetPasswordAsync(string email);
         Task<UserManagerResponse> ResetPasswordAsync(ResetPasswordViewModel model);
-        List<User> ListUsers();
+        List<User> ListUsers(string userId);
         Task<OperationResponse<User>> UpdateUser(User model);
         Task<OperationResponse<User>> DeleteUser(string userId);
     }
@@ -299,25 +300,31 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public List<User> ListUsers()
+        public List<User> ListUsers(string userId)
         {
-
             var users = (from user in _db.Users
-                                join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
-                                join role in _db.Roles on userRoles.RoleId equals role.Id
-                                select new User { 
-                                    Id = user.Id, 
-                                    Email = user.Email,
-                                    UserName = user.UserName,
-                                    SmsCredit = user.SmsCredit,
-                                    CostPerSms = user.CostPerSms,
-                                    RoleId = role.Id,
-                                    RoleName = role.Name 
-                                })
-                        .ToListAsync();
+                            join userRoles in _db.UserRoles on user.Id equals userRoles.UserId
+                            join role in _db.Roles on userRoles.RoleId equals role.Id
+                            select new User
+                            {
+                                Id = user.Id,
+                                Email = user.Email,
+                                UserName = user.UserName,
+                                SmsCredit = user.SmsCredit,
+                                CostPerSms = user.CostPerSms,
+                                RoleId = role.Id,
+                                RoleName = role.Name
+                            })
+                    .ToListAsync();
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                var data = users.Result.Where(x => x.Id == userId).ToList();
+                return data;
+            }
+
             return users.Result;
         }
-
         public async Task<OperationResponse<User>> UpdateUser(User model)
         {
             if (string.IsNullOrWhiteSpace(model.Id))

@@ -1,0 +1,41 @@
+﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+
+@using Newtonsoft.Json
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            History details
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.ReferenceId" Label="Id" />
+        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.Recipients" Label="Recipients" />
+        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.Messages" Label="Messages"/>
+        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.Status" Label="Status"/>
+        <MudTextField Variant="Variant.Outlined" Disabled="true" ReadOnly="true" @bind-Value="@history.TimeSent" Label="Time Sent"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public HistoryModel history { get; set; } = new HistoryModel();
+
+    private IEnumerable<HistoryModel> ListOfUsers = new List<HistoryModel>();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

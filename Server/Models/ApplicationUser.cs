@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using SMSGateway.Server.Models;
 
 namespace SMSGateway.Server.Models
 {
@@ -25,6 +19,8 @@ namespace SMSGateway.Server.Models
             UpdatedSmsTemplate = new List<SmsTemplate>();
             CreatedTopUp = new List<TopUp>();
             UpdatedTopUp = new List<TopUp>();
+            CreatedHistory = new List<History>();
+            UpdatedHistory = new List<History>();
         }
 
         [Column(TypeName = "decimal(18,2)")]
@@ -42,6 +38,8 @@ namespace SMSGateway.Server.Models
         public virtual List<SmsTemplate> UpdatedSmsTemplate { get; set; }
         public virtual List<TopUp> CreatedTopUp { get; set; }
         public virtual List<TopUp> UpdatedTopUp { get; set; }
+        public virtual List<History> CreatedHistory { get; set; }
+        public virtual List<History> UpdatedHistory { get; set; }
 
     }
 }

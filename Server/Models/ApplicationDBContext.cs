@@ -21,6 +21,7 @@ namespace SMSGateway.Server.Models
         public DbSet<Log> Logs { get; set; }
         public DbSet<SmsTemplate> SmsTemplates { get; set; }
         public DbSet<TopUp> TopUps { get; set; }
+        public DbSet<History> History { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -86,6 +87,16 @@ namespace SMSGateway.Server.Models
 
             builder.Entity<ApplicationUser>()
                 .HasMany(p => p.UpdatedTopUp)
+                .WithOne(p => p.UpdatedByUser)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(p => p.CreatedHistory)
+                .WithOne(p => p.CreatedByUser)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(p => p.UpdatedHistory)
                 .WithOne(p => p.UpdatedByUser)
                 .OnDelete(DeleteBehavior.NoAction);
 

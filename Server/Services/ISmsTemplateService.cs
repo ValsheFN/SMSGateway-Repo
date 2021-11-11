@@ -29,6 +29,19 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<SmsTemplate>> CreateAsync(SmsTemplate model)
         {
+            var query = _db.SmsTemplates.ToList();
+            query = query.Where(x => x.SmsTemplateName == model.SmsTemplateName).ToList();
+
+            if(query.Count > 0)
+            {
+                return new OperationResponse<SmsTemplate>
+                {
+                    Message = "Please use different template name!",
+                    IsSuccess = false
+                };
+            }
+
+
             var smsTemplate = new SmsTemplate
             {
                 SmsTemplateName = model.SmsTemplateName,
@@ -42,7 +55,7 @@ namespace SMSGateway.Server.Services
 
             return new OperationResponse<SmsTemplate>
             {
-                Message = "Contact created successfully!",
+                Message = "Sms template created successfully!",
                 IsSuccess = true,
                 Data = model
             };
@@ -58,7 +71,19 @@ namespace SMSGateway.Server.Services
                 {
                     IsSuccess = false,
                     Data = null,
-                    Message = "Group not found"
+                    Message = "Sms template not found"
+                };
+            }
+
+            var query = _db.SmsTemplates.ToList();
+            query = query.Where(x => x.SmsTemplateName == model.SmsTemplateName).ToList();
+
+            if (query.Count > 0)
+            {
+                return new OperationResponse<SmsTemplate>
+                {
+                    Message = "Please use different template name!",
+                    IsSuccess = false
                 };
             }
 
@@ -70,7 +95,7 @@ namespace SMSGateway.Server.Services
 
             return new OperationResponse<SmsTemplate>
             {
-                Message = "Template updated successfully!",
+                Message = "Sms template updated successfully!",
                 IsSuccess = true,
                 Data = smsTemplate
             };
@@ -86,7 +111,7 @@ namespace SMSGateway.Server.Services
                 {
                     IsSuccess = false,
                     Data = null,
-                    Message = "Template not found"
+                    Message = "Sms template not found"
                 };
             }
 
@@ -96,7 +121,7 @@ namespace SMSGateway.Server.Services
             return new OperationResponse<SmsTemplate>
             {
                 IsSuccess = true,
-                Message = "Template has been deleted successfully"
+                Message = "Sms template has been deleted successfully"
             };
         }
 
