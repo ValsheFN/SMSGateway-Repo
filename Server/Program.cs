@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MudBlazor.Services;
+using System.IO;
 
 namespace SMSGateway.Server
 {
@@ -21,6 +22,12 @@ namespace SMSGateway.Server
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    /*webBuilder
+                       .UseKestrel()
+                       .UseContentRoot(Directory.GetCurrentDirectory())
+                       .UseIISIntegration()
+                       .UseStartup<Startup>()
+                       .Build();*/
                     webBuilder.UseStartup<Startup>();
                 });
     }

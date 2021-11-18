@@ -13,6 +13,8 @@
 @inject IConfiguration _configuration
 @inject ISnackbar _snackbar
 
+@attribute [Authorize]
+
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
         <MudCard>
@@ -29,8 +31,8 @@
                                 <MudTabPanel OnClick="@RemovePhoneNumber" Text="Send to Contact Book">
                                     <MudItem xs="12" md="12">
                                         <MudSelect Label="Contacts" HelperText="Select contacts"
-                                                    MultiSelection="true" OffsetY="true" SelectAll="true" SelectAllText="Select all contacts"
-                                                    @bind-Value="contactValue" @bind-SelectedValues="contactOptions" AdornmentIcon="@Icons.Material.Filled.Search">
+                                                   MultiSelection="true" OffsetY="true" SelectAll="true" SelectAllText="Select all contacts"
+                                                   @bind-Value="contactValue" @bind-SelectedValues="contactOptions" AdornmentIcon="@Icons.Material.Filled.Search">
                                             @foreach (var contact in contactList)
                                             {
                                                 <MudSelectItem Value="@contact.PhoneNumber">@contact.FirstName @contact.LastName (@contact.PhoneNumber)</MudSelectItem>
@@ -39,8 +41,8 @@
                                     </MudItem>
                                     <MudItem xs="12" md="12">
                                         <MudSelect Label="Contact Groups" HelperText="Select contact groups"
-                                                    MultiSelection="true" OffsetY="true" SelectAll="true" SelectAllText="Select all contact groups"
-                                                    @bind-Value="groupValue" @bind-SelectedValues="groupOptions" AdornmentIcon="@Icons.Material.Filled.Search">
+                                                   MultiSelection="true" OffsetY="true" SelectAll="true" SelectAllText="Select all contact groups"
+                                                   @bind-Value="groupValue" @bind-SelectedValues="groupOptions" AdornmentIcon="@Icons.Material.Filled.Search">
                                             @foreach (var group in groupList)
                                             {
                                                 <MudSelectItem Value="@group.GroupName">@group.GroupName</MudSelectItem>
@@ -61,7 +63,7 @@
                                 <MudTabPanel OnClick="@RemoveMessage" Text="Use Template">
                                     <MudItem xs="12" md="12">
                                         <MudSelect Label="Template" @bind-Value="templateValue" HelperText="Select template"
-                                                    OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
+                                                   OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
                                             @foreach (var item in templateList)
                                             {
                                                 <MudSelectItem Value="item.ReferenceId">@item.SmsTemplateName</MudSelectItem>
@@ -84,48 +86,52 @@
     </MudContainer>
 </MudPaper>
 
-    @code {
+@code {
 
-        //private IConfiguration _configuration;
-        public SmsModel smsConfig { get; set; } = new();
+    //private IConfiguration _configuration;
+    public SmsModel smsConfig { get; set; } = new();
 
-        public string contactValue { get; set; } = "";
-        private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
+    public string contactValue { get; set; } = "";
+    private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
 
-        public string groupValue { get; set; } = "";
-        private HashSet<string> groupOptions { get; set; } = new HashSet<string>() { };
+    public string groupValue { get; set; } = "";
+    private HashSet<string> groupOptions { get; set; } = new HashSet<string>() { };
 
-        private string templateValue { get; set; } = "";
+    private string templateValue { get; set; } = "";
 
-        private IEnumerable<ContactModel> contactList = new List<ContactModel>();
-        private IEnumerable<GroupModel> groupList = new List<GroupModel>();
-        private IEnumerable<SmsTemplateModel> templateList = new List<SmsTemplateModel>();
+    private IEnumerable<ContactModel> contactList = new List<ContactModel>();
+    private IEnumerable<GroupModel> groupList = new List<GroupModel>();
+    private IEnumerable<SmsTemplateModel> templateList = new List<SmsTemplateModel>();
 
-        protected async override Task OnInitializedAsync()
-        {
-            contactList = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
-            groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
-            templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
-        }
-
-        private void RemovePhoneNumber()
-        {
-            smsConfig.SendTo = "";
-        }
-
-        private void RemoveContact()
-        {
-            contactOptions.Clear();
-            groupOptions.Clear();
-        }
-
-        private void RemoveMessage()
-        {
-            smsConfig.Content = "";
-        }
-
-        private void RemoveTemplate()
-        {
-            templateValue = "";
-        }
+    protected async override Task OnInitializedAsync()
+    {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        contactList = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        templateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
     }
+
+    private void RemovePhoneNumber()
+    {
+        smsConfig.SendTo = "";
+    }
+
+    private void RemoveContact()
+    {
+        contactOptions.Clear();
+        groupOptions.Clear();
+    }
+
+    private void RemoveMessage()
+    {
+        smsConfig.Content = "";
+    }
+
+    private void RemoveTemplate()
+    {
+        templateValue = "";
+    }
+}

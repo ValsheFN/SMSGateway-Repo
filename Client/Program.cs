@@ -23,6 +23,7 @@ namespace SMSGateway.Client
     {
         public static async Task Main(string[] args)
         {
+
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
@@ -53,6 +54,8 @@ namespace SMSGateway.Client
             builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly());
             builder.Services.AddMudServices();
             builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+
+            
             await builder.Build().RunAsync();
         }
     }

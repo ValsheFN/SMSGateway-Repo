@@ -21,6 +21,8 @@ namespace SMSGateway.Server.Models
         [Required]
         public string GroupName { get; set; }
         [Required]
+        public string ContactId { get; set; }
+        [Required]
         public string FirstName { get; set; }
         public string LastName { get; set; }
         [Required]

@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SMSGateway.Shared;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using SMSGateway.Client.Models;
+using System.Collections.Generic;
+using MudBlazor;
 
 namespace SMSGateway.Client.Components
 {
@@ -26,7 +28,10 @@ namespace SMSGateway.Client.Components
         [Inject]
         public ILocalStorageService Storage { get; set; }
 
+        private readonly UserManager<UserModel> _userManager;
+
         private LoginViewModel _model = new LoginViewModel();
+        //private UserModel user = new UserMode();
         private bool _isBusy = false;
         private string _errorMessage = string.Empty;
 
@@ -35,27 +40,41 @@ namespace SMSGateway.Client.Components
             _isBusy = true;
             _errorMessage = string.Empty;
 
-            var response = await HttpClient.PostAsJsonAsync("/api/auth/login", _model);
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
-                // Store it in local storage 
-                await Storage.SetItemAsStringAsync("user_id", result.UserId);
-                await Storage.SetItemAsStringAsync("access_token", result.Message);
-                await Storage.SetItemAsync<DateTime>("expiry_date", result.ExpiryDate);
-                
-                await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Message);
+            var token = _localStorage.GetItemAsString("access_token");
 
-                Navigation.NavigateTo("/");
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                Snackbar.Add("You are currently logged in", Severity.Error);
+                _navigation.NavigateTo("/");
             }
             else
             {
-                var errorResult = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
-                _errorMessage = errorResult.Message;
-            }
+                var response = await HttpClient.PostAsJsonAsync("/api/auth/login", _model);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
+                    //Get user information
 
-            _isBusy = false;
+                    var user = await HttpClient.GetFromJsonAsync<List<UserModel>>("/api/user?userId=" + result.UserId);
+                    // Store it in local storage 
+                    await Storage.SetItemAsStringAsync("user_id", result.UserId);
+                    await Storage.SetItemAsync("user_info", user);
+                    await Storage.SetItemAsStringAsync("access_token", result.Message);
+                    await Storage.SetItemAsync<DateTime>("expiry_date", result.ExpiryDate);
+
+                    await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                    HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Message);
+
+                    Navigation.NavigateTo("/");
+                }
+                else
+                {
+                    var errorResult = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
+                    _errorMessage = errorResult.Message;
+                }
+
+                _isBusy = false;
+            }
         }
 
     }

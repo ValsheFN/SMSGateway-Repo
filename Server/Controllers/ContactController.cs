@@ -23,9 +23,9 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpGet("GetContact")]
-        public async Task<IActionResult> GetContactFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId, string contactGroupId)
+        public async Task<IActionResult> GetContactFiltered(string userId, string referenceId, string firstName, string lastName, string contactGroupId)
         {
-            return Ok(_contactService.GetAllFiltered(userId, referenceId, firstName, lastName, createdByUserId, contactGroupId));
+            return Ok(_contactService.GetAllFiltered(userId, referenceId, firstName, lastName, contactGroupId));
         }
 
         [HttpPost("CreateContact")]

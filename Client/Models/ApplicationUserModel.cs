@@ -2,20 +2,14 @@
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SMSGateway.Client.Models
 {
-    public class UserModel : IdentityUser
+    public class ApplicationUserModel :IdentityUser
     {
-        [StringLength(60, MinimumLength = 6)]
-        public string Password { get; set; }
-        [StringLength(60, MinimumLength = 6)]
-        [Compare(nameof(Password))]
-        public string ConfirmPassword { get; set; }
         public string RoleId { get; set; }
         public string RoleName { get; set; }
         [Column(TypeName = "decimal(18,2)")]

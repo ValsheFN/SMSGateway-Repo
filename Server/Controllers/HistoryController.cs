@@ -23,9 +23,9 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpGet()]
-        public async Task<IActionResult> GetAllFiltered(string referenceId, string createdByUserId)
+        public async Task<IActionResult> GetAllFiltered(string referenceId)
         {
-            return Ok(_historyService.GetAllFiltered(referenceId, createdByUserId));
+            return Ok(_historyService.GetAllFiltered(referenceId));
         }
 
         [HttpPost()]

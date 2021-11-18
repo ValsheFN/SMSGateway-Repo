@@ -23,9 +23,9 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpGet("GetGroup")]
-        public async Task<IActionResult> GetGroupFiltered(string referenceId, string groupName, string createdByUserId)
+        public async Task<IActionResult> GetGroupFiltered(string referenceId, string groupName)
         {
-            return Ok(_groupService.GetAllFiltered(referenceId, groupName, createdByUserId));
+            return Ok(_groupService.GetAllFiltered(referenceId, groupName));
         }
 
         [HttpPost("CreateGroup")]

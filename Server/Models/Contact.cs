@@ -26,6 +26,5 @@ namespace SMSGateway.Server.Models
         [Required]
         public string PhoneNumber { get; set; }
         public string Notes { get; set; }
-        public int ContactGroupId { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SMSGateway.Server.Models;
+﻿using SMSGateway.Server.Infrastructure;
+using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,12 @@ namespace SMSGateway.Server.Services
     public class LogService : ILogService
     {
         private readonly ApplicationDBContext _db;
+        private readonly IdentityOption _identity;
 
-        public LogService(ApplicationDBContext db)
+        public LogService(ApplicationDBContext db, IdentityOption identity)
         {
             _db = db;
+            _identity = identity;
         }
         public async Task<OperationResponse<Log>> CreateAsync(Log model)
         {
@@ -32,7 +35,7 @@ namespace SMSGateway.Server.Services
             };
 
             await _db.Logs.AddAsync(log);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(_identity.UserId);
 
             model.Id = log.Id;
 

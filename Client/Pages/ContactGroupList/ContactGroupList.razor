@@ -24,7 +24,7 @@
                 <MudFab aria-label="Create new contact group" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Reference Id</MudTh>
+                <MudTh Style="display: none">Reference Id</MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactGroupModel, object>(x=>x.GroupName)" T="ContactGroupModel">Group Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactGroupModel, object>(x=>x.FirstName)" T="ContactGroupModel">First Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactGroupModel, object>(x=>x.LastName)" T="ContactGroupModel">Last Name</MudTableSortLabel></MudTh>
@@ -32,7 +32,7 @@
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd Style="display: none" DataLabel="referenceId">@context.ReferenceId</MudTd>
                 <MudTd DataLabel="groupName">@context.GroupName</MudTd>
                 <MudTd DataLabel="firstName">@context.FirstName</MudTd>
                 <MudTd DataLabel="lastName">@context.LastName</MudTd>
@@ -61,7 +61,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated != true)
+        {
+            _navigation.NavigateTo("/login");
+        }
+        else
+        {
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactgroup/GetContactGroup");
+        }
     }
 
     private bool SearchFunc(ContactGroupModel model, string searchString)

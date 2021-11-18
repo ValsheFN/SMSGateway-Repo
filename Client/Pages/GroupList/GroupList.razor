@@ -22,12 +22,12 @@
                 <MudFab aria-label="Create new group" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Reference Id</MudTh>
+                <MudTh Style="display: none">Reference Id</MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<GroupModel, object>(x=>x.GroupName)" T="GroupModel">Group Name</MudTableSortLabel></MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd Style="display: none" DataLabel="referenceId">@context.ReferenceId</MudTd>
                 <MudTd DataLabel="firstName">@context.GroupName</MudTd>
                 <MudTd DataLabel="">
                     <MudFab aria-label="Edit group" @onclick="@(()=>Edit(@context))" Color="Color.Primary"

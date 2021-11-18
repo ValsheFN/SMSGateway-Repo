@@ -22,6 +22,7 @@ namespace SMSGateway.Server.Models
         public DbSet<SmsTemplate> SmsTemplates { get; set; }
         public DbSet<TopUp> TopUps { get; set; }
         public DbSet<History> History { get; set; }
+        public DbSet<SubAccount> SubAccount { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -100,6 +101,16 @@ namespace SMSGateway.Server.Models
                 .WithOne(p => p.UpdatedByUser)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.Entity<ApplicationUser>()
+                .HasMany(p => p.CreatedSubAccount)
+                .WithOne(p => p.CreatedByUser)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(p => p.UpdatedSubAccount)
+                .WithOne(p => p.UpdatedByUser)
+                .OnDelete(DeleteBehavior.NoAction);
+
             base.OnModelCreating(builder);
         }
 
@@ -140,7 +151,6 @@ namespace SMSGateway.Server.Models
                     }
                 }
             }
-
             return await base.SaveChangesAsync(cancellationToken);
         }
     }

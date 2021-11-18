@@ -16,7 +16,7 @@ namespace SMSGateway.Server.Services
         Task<OperationResponse<Group>> CreateAsync(Group model);
         Task<OperationResponse<Group>> UpdateAsync(Group model);
         Task<OperationResponse<Group>> RemoveAsync(string referenceId);
-        List<Group> GetAllFiltered(string referenceId, string groupName, string createdByUserId);
+        List<Group> GetAllFiltered(string referenceId, string groupName);
     }
 
     public class GroupService : IGroupService
@@ -50,7 +50,7 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<Group>> UpdateAsync(Group model)
         {
-            var group = _db.Groups.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var group = _db.Groups.SingleOrDefault(x => x.ReferenceId == model.ReferenceId && x.CreatedByUserId == _identity.UserId);
 
             if (group == null)
             {
@@ -76,7 +76,7 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<Group>> RemoveAsync(string referenceId)
         {
-            var group = _db.Groups.SingleOrDefault(x => x.ReferenceId == referenceId);
+            var group = _db.Groups.SingleOrDefault(x => x.ReferenceId == referenceId && x.CreatedByUserId == _identity.UserId);
 
             if (group == null)
             {
@@ -98,14 +98,11 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public List<Group> GetAllFiltered(string referenceId, string groupName, string createdByUserId)
+        public List<Group> GetAllFiltered(string referenceId, string groupName)
 {
             var query = _db.Groups.ToList();
 
-            if (createdByUserId != "" && createdByUserId != null)
-            {
-                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
-            }
+            query = query.Where(x => x.CreatedByUserId == _identity.UserId).ToList();
 
             if(referenceId != "" && referenceId != null)
             {

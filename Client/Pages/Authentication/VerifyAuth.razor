@@ -1,4 +1,7 @@
 ﻿@page "/verifyauth"
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+
 <h3>VerifyAuth</h3>
 
 @if (isAuthenticated)
@@ -8,6 +11,9 @@
         <li>Access to Super User Role : @isSuperUser</li>
         <li>Access to Admin Role : @isAdmin</li>
         <li>Access to User Role : @isUser</li>
+        <li>User Id : @userId</li>
+        <li>Token : @userToken</li>
+        <li>User : @userInfo</li>
     </ul>
 }
 else
@@ -24,9 +30,16 @@ else
     private bool isSuperUser = false;
     private bool isAdmin = false;
     private bool isUser = false;
+    private string userId;
+    private string userToken;
+    private string userInfo;
 
     protected override async Task OnInitializedAsync()
     {
+        var id = _localStorage.GetItemAsString("user_id");
+        var token = _localStorage.GetItemAsString("access_token");
+        var info = _localStorage.GetItemAsString("user_info");
+
         var authState = await AuthState;
 
         if (authState.User.Identity.IsAuthenticated)
@@ -38,6 +51,10 @@ else
             isSuperUser = authState.User.IsInRole("Super User");
             isAdmin = authState.User.IsInRole("Admin");
             isUser = authState.User.IsInRole("User");
+
+            userId = id;
+            userToken = token;
+            userInfo = info;
         }
     }
 }

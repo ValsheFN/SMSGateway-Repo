@@ -2,6 +2,8 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Linq
 @using System.Net.Http.Headers
+@using Newtonsoft.Json
+@using CSharpVitamins;
 
 @inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject IDialogService DialogService
@@ -19,27 +21,24 @@
     <DialogContent>
         <MudGrid>
             <MudItem xs="12" md="12">
-                <MudSelect Label="Contact group" @bind-Value="groupValue" HelperText="Select group"
+                <MudSelect Label="Contact group" @bind-Value="@groupValue" HelperText="Select group"
                            OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
                     @foreach (var item in groupList)
                     {
-                        <MudSelectItem Value="item.ReferenceId">@item.GroupName</MudSelectItem>
+                        <MudSelectItem Value="item.GroupName">@item.GroupName</MudSelectItem>
                     }
 
                 </MudSelect>
             </MudItem>
             <MudItem xs="12" md="12">
                 <MudSelect Label="Contacts" HelperText="Select contacts"
-                           MultiSelection="true" OffsetY="true" DelimitedStringSeparator="^" SelectAll="true" SelectAllText="Select all contacts"
-                           @bind-Value="contactValue" @bind-SelectedValues="contactOptions" AdornmentIcon="@Icons.Material.Filled.Search">
+                           MultiSelection="true" OffsetY="true" SelectAll="true" SelectAllText="Select all contacts"
+                           @bind-Value="@contactValue" AdornmentIcon="@Icons.Material.Filled.Search">
                     @foreach (var contact in ListOfContacts)
                     {
-                        <MudSelectItem Value="@contact.PhoneNumber">@contact.FirstName @contact.LastName (@contact.PhoneNumber) </MudSelectItem>
+                        <MudSelectItem Value="@contact.ReferenceId">@contact.FirstName @contact.LastName (@contact.PhoneNumber) </MudSelectItem>
                     }
                 </MudSelect>
-            </MudItem>
-            <MudItem xs="12" md="6">
-                <MudText Typo="Typo.body2">MudSelect.Value: "@contactValue"</MudText>
             </MudItem>
         </MudGrid>
     </DialogContent>
@@ -55,22 +54,23 @@
     [Parameter] public ContactGroupModel contactGroup { get; set; } = new ContactGroupModel();
 
     private IEnumerable<ContactModel> ListOfContacts = new List<ContactModel>();
+    private IEnumerable<ContactModel> SelectedContact = new List<ContactModel>();
     private IEnumerable<ContactGroupModel> ListOfContactGroups = new List<ContactGroupModel>();
     private IEnumerable<GroupModel> groupList = new List<GroupModel>();
 
     private string contactValue { get; set; }
-    private string groupValue { get; set; }
 
-    private HashSet<string> contactOptions { get; set; } = new HashSet<string>() { };
+    private string groupValue { get; set; }
 
     protected async override void OnInitialized()
     {
-        var userId = _localStorage.GetItemAsString("user_id");
         var token = _localStorage.GetItemAsString("access_token");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         groupList = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
-        ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact?createdByUserId=" + userId);
-        ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup?createdByUserId=" + userId);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        ListOfContactGroups = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup");
     }
 
     private void Cancel()
@@ -78,26 +78,64 @@
         MudDialog.Cancel();
     }
 
-    private async void CheckContact(string groupValue)
+    private async void CheckContact()
     {
-        var token = _localStorage.GetItemAsString("access_token");
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var contactGroup = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup?groupName=" + groupValue);
-        ListOfContacts = ListOfContacts.Where(x => contactGroup.Any(x2 => x2.PhoneNumber != x.PhoneNumber));
-        StateHasChanged();
+        if (!string.IsNullOrWhiteSpace(groupValue))
+        {
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var contactGroup = await _httpClient.GetFromJsonAsync<List<ContactGroupModel>>("/api/contactGroup/GetContactGroup?groupName=" + groupValue);
+            ListOfContacts = ListOfContacts.Where(x => contactGroup.Any(x2 => x2.PhoneNumber != x.PhoneNumber));
+            StateHasChanged();
+        }
     }
 
-    private void CreateContactGroup(ContactGroupModel model)
+    private async void CreateContactGroup(ContactGroupModel model)
     {
-        // 1. Get contact group id
+        var contactGroupsList = new List<ContactGroupModel>();
+        var userId = _localStorage.GetItemAsString("user_id");
         var token = _localStorage.GetItemAsString("access_token");
+
+        List<string> collection = new List<string>(contactValue.Split(new string[] { ", " }, StringSplitOptions.None));
+
+
+        foreach (var item in collection)
+        {
+            //var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var contactDetails = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact?referenceId=" + item);
+
+            if (!(contactDetails.Count == 0))
+            {
+                var contactDetail = contactDetails.FirstOrDefault();
+                ShortGuid guid = Guid.NewGuid().ToString();
+                var referenceId = guid;
+
+                contactGroupsList.Add(new ContactGroupModel
+                {
+                    ReferenceId = referenceId,
+                    GroupName = groupValue,
+                    ContactId = contactDetail.Id,
+                    FirstName = contactDetail.FirstName,
+                    LastName = contactDetail.LastName,
+                    PhoneNumber = contactDetail.PhoneNumber
+                });
+            }
+
+        }
+
+        var json = JsonConvert.SerializeObject(contactGroupsList);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var response = _httpClient.PostAsJsonAsync("/api/contactGroup/CreateContactGroup/", model);
+        var response = await _httpClient.PostAsJsonAsync("/api/contactGroup/ImportContactGroup/", contactGroupsList);
 
-        StateHasChanged();
-        _navigation.NavigateTo("/contactGroup");
-
-        Snackbar.Add("Contact Group Created", Severity.Success);
-        MudDialog.Close(DialogResult.Ok(model.GroupName));
+        if (response.IsSuccessStatusCode)
+        {
+            MudDialog.Close(DialogResult.Ok(model.PhoneNumber));
+            Snackbar.Add("Contact group created", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Fail to create contact group", Severity.Error);
+        }
     }
 }

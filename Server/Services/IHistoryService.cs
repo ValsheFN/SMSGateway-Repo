@@ -15,7 +15,7 @@ namespace SMSGateway.Server.Services
     {
         Task<OperationResponse<History>> CreateAsync(History model);
         Task<OperationResponse<History>> UpdateAsync(string referenceId, string status);
-        List<History> GetAllFiltered(string referenceId, string createdByUserId);
+        List<History> GetAllFiltered(string referenceId);
     }
 
     public class HistoryService : IHistoryService
@@ -101,18 +101,15 @@ namespace SMSGateway.Server.Services
             }
             
         }
-        public List<History> GetAllFiltered(string referenceId, string createdByUserId)
+        public List<History> GetAllFiltered(string referenceId)
         {
             var query = _db.History.ToList();
+
+            query = query.Where(x => x.CreatedByUserId == _identity.UserId).ToList();
 
             if (!string.IsNullOrWhiteSpace(referenceId))
             {
                 query = query.Where(x => x.ReferenceId == referenceId).ToList();
-            }
-
-            if (!string.IsNullOrEmpty(createdByUserId))
-            {
-                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
             }
 
             return query;

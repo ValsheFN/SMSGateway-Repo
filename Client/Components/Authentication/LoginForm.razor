@@ -1,7 +1,9 @@
 ﻿@namespace SMSGateway.Client.Components
 
-@inject NavigationManager NavigationManager
+@inject NavigationManager _navigation
 @inject AuthenticationStateProvider authStateProvider
+@inject ISnackbar Snackbar
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 
 <EditForm Model="_model" OnValidSubmit="LoginUserAsync">
     <DataAnnotationsValidator></DataAnnotationsValidator>
@@ -28,13 +30,13 @@
         </MudCardContent>
 
         <MudCardActions>
-            <MudButton FullWidth="true" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="_isBusy">Login</MudButton>
+            <MudButton FullWidth="true" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" Disabled="_isBusy">Sign In</MudButton>
         </MudCardActions>
         <MudCardActions>
-            <MudButton FullWidth="true" @onclick="NavigateToRegisterComponent" Variant="Variant.Outlined" Color="Color.Success" Disabled="_isBusy">Sign Up</MudButton>
+            <MudButton FullWidth="true" @onclick="NavigateToRegisterComponent" Variant="Variant.Filled" Color="Color.Primary" Disabled="_isBusy">Sign Up</MudButton>
         </MudCardActions>
         <MudCardActions>
-            <MudButton FullWidth="true" @onclick="NavigateToForgotPasswordComponent" Variant="Variant.Outlined" Color="Color.Error" Disabled="_isBusy">Forgot Password</MudButton>
+            <MudButton FullWidth="true" @onclick="NavigateToForgotPasswordComponent" Variant="Variant.Filled" Color="Color.Error" Disabled="_isBusy">Forgot Password</MudButton>
         </MudCardActions>
     </MudCard>
 </EditForm>
@@ -43,8 +45,8 @@
 
     [CascadingParameter] private Task<AuthenticationState> AuthStatus { get; set; }
 
-    private void NavigateToRegisterComponent() { NavigationManager.NavigateTo("/register"); }
-    private void NavigateToForgotPasswordComponent() { NavigationManager.NavigateTo("/forgotPassword"); }
+    private void NavigateToRegisterComponent() { _navigation.NavigateTo("/register"); }
+    private void NavigateToForgotPasswordComponent() { _navigation.NavigateTo("/forgotPassword"); }
 
     string Password { get; set; } = "";
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -70,12 +72,12 @@
 
     protected async override Task OnInitializedAsync()
     {
-        base.OnInitialized();
-        var authState = await AuthStatus;
+        @*base.OnInitialized();
+            var authState = await AuthStatus;
 
-        if (authState?.User?.Identity is not null || authState.User.Identity.IsAuthenticated)
-        {
-            Navigation.NavigateTo("/");
-        }
+            if (authState?.User?.Identity is not null || authState.User.Identity.IsAuthenticated)
+            {
+                Navigation.NavigateTo("/");
+            }*@
     }
 }

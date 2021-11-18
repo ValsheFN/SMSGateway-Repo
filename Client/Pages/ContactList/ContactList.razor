@@ -26,7 +26,7 @@
                 <MudFab aria-label="Create new contact" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Reference Id</MudTh>
+                <MudTh Style="display: none">Reference Id</MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.FirstName)" T="ContactModel">First Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.LastName)" SortLabel="lastName" T="ContactModel">Last Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.Email)" SortLabel="email" T="ContactModel">Email</MudTableSortLabel></MudTh>
@@ -35,7 +35,7 @@
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd Style="display: none" DataLabel="referenceId">@context.ReferenceId</MudTd>
                 <MudTd DataLabel="firstName">@context.FirstName</MudTd>
                 <MudTd DataLabel="lastName">@context.LastName</MudTd>
                 <MudTd DataLabel="email">@context.Email</MudTd>

@@ -33,20 +33,19 @@ namespace SMSGateway.Client.Pages.GroupList
             }
             else
             {
-                var userId = _localStorage.GetItemAsString("user_id");
                 var token = _localStorage.GetItemAsString("access_token");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup?createdByUserId=" + userId);
+                ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
             }
+                
         }
         private async void Create()
         {
             var dialog = DialogService.Show<AddGroupDialog>("Add Group");
             var result = await dialog.Result;
-            var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup?createdByUserId=" + userId);
+            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
             StateHasChanged();
         }
 
@@ -56,10 +55,9 @@ namespace SMSGateway.Client.Pages.GroupList
 
             var dialog = DialogService.Show<DeleteGroupDialog>("Delete Group", parameters);
             var result = await dialog.Result;
-            var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup?createdByUserId" + userId);
+            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
             StateHasChanged();
         }
 
@@ -69,10 +67,9 @@ namespace SMSGateway.Client.Pages.GroupList
 
             var dialog = DialogService.Show<EditGroupDialog>("Edit Group", parameters);
             var result = await dialog.Result;
-            var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup?createdByUserId" + userId);
+            ListOfGroups = await _httpClient.GetFromJsonAsync<List<GroupModel>>("/api/group/GetGroup");
             StateHasChanged();
         }
     }

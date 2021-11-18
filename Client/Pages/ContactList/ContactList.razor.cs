@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SMSGateway.Client.Pages.User;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace SMSGateway.Client.Pages.ContactList
 {
@@ -38,21 +39,20 @@ namespace SMSGateway.Client.Pages.ContactList
             }
             else
             {
-                var userId = _localStorage.GetItemAsString("user_id");
                 var token = _localStorage.GetItemAsString("access_token");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact?createdByUserId=" + userId);                                                                
+                ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             }
+                                                                               
         }
 
         private async void Create()
         {
             var dialog = DialogService.Show<AddContactDialog>("Add Contact");
             var result = await dialog.Result;
-            var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact?createdByUserId=" + userId);
+            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             StateHasChanged();
         }
 
@@ -62,10 +62,9 @@ namespace SMSGateway.Client.Pages.ContactList
 
             var dialog = DialogService.Show<DeleteContactDialog>("Delete Contact", parameters);
             var result = await dialog.Result;
-            var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact?createdByUserId=" + userId);
+            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             StateHasChanged();
         }
 
@@ -75,10 +74,9 @@ namespace SMSGateway.Client.Pages.ContactList
 
             var dialog = DialogService.Show<EditContactDialog>("Edit Contact", parameters);
             var result = await dialog.Result;
-            var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact?createdByUserId=" + userId);
+            ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             StateHasChanged();
         }
     }

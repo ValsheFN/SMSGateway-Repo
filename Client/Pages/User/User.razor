@@ -23,20 +23,24 @@
                 <MudFab aria-label="Create new sms template" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Id</MudTh>
+                <MudTh Style="display: none">Id</MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<UserModel, object>(x=>x.UserName)" T="UserModel">User Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<UserModel, object>(x=>x.Email)" T="UserModel">Email</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<UserModel, object>(x=>x.SmsCredit)" T="UserModel">SMS Credit</MudTableSortLabel></MudTh>
-                <MudTh>Cost Per SMS</MudTh>
+                <MudTh>Cost per SMS</MudTh>
+                <MudTh Style="display: none">Role Id</MudTh>
+                <MudTh>Role Name</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.Id</MudTd>
-                <MudTd DataLabel="requester">@context.UserName</MudTd>
-                <MudTd DataLabel="requester">@context.Email</MudTd>
-                <MudTd DataLabel="requester">@context.SmsCredit</MudTd>
-                <MudTd DataLabel="requester">@context.CostPerSms</MudTd>
-                <MudTd DataLabel="">
+                <MudTd Style="display: none" DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="User Name">@context.UserName</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="SMS Credit">@context.SmsCredit</MudTd>
+                <MudTd DataLabel="Cost per SMS">@context.CostPerSms</MudTd>
+                <MudTd Style="display: none" DataLabel="Role">@context.RoleId</MudTd>
+                <MudTd DataLabel="Role">@context.RoleName</MudTd>
+                <MudTd>
                     <MudFab aria-label="Edit sms template" @onclick="@(()=>Edit(@context))" Color="Color.Primary"
                             Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
                     <MudFab aria-label="Delete sms template" @onclick="@(()=>Delete(@context))" Color="Color.Secondary"
@@ -44,7 +48,7 @@
                 </MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }" />
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
             </PagerContent>
         </MudTable>
     </MudContainer>

@@ -398,6 +398,12 @@ namespace SMSGateway.Server.Services
                 {
                     _db.Entry(user).State = EntityState.Deleted;
                     _db.SaveChanges();
+
+                    return new OperationResponse<User>
+                    {
+                        IsSuccess = true,
+                        Message = "User is deleted successfully"
+                    };
                 }
                 else
                 {
@@ -416,12 +422,6 @@ namespace SMSGateway.Server.Services
                     Message = e.Message
                 };
             }
-
-            return new OperationResponse<User>
-            {
-                IsSuccess = true,
-                Message = "User is deleted successfully"
-            };
         }
     }
 }

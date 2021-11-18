@@ -24,12 +24,12 @@
                 <MudFab aria-label="Create new role" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Id</MudTh>
+                <MudTh Style="display: none">Id</MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<RoleModel, object>(x=>x.Name)" T="RoleModel">Role Name</MudTableSortLabel></MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.Id</MudTd>
+                <MudTd Style="display: none" DataLabel="referenceId">@context.Id</MudTd>
                 <MudTd DataLabel="requester">@context.Name</MudTd>
                 <MudTd DataLabel="">
                     <MudFab aria-label="Edit sms template" @onclick="@(()=>Edit(@context))" Color="Color.Primary"

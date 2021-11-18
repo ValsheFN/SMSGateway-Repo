@@ -34,10 +34,9 @@ namespace SMSGateway.Client.Pages.History
             }
             else
             {
-                var userId = _localStorage.GetItemAsString("user_id");
                 var token = _localStorage.GetItemAsString("access_token");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                ListOfHistory = await _httpClient.GetFromJsonAsync<List<HistoryModel>>("/api/history?createdByUserId=" + userId);
+                ListOfHistory = await _httpClient.GetFromJsonAsync<List<HistoryModel>>("/api/history");
             }
         }
         private async void ShowDetails(HistoryModel history)
@@ -46,10 +45,9 @@ namespace SMSGateway.Client.Pages.History
 
             var dialog = DialogService.Show<ShowHistoryDialog>("Show History Details", parameters);
             var result = await dialog.Result;
-            var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfHistory = await _httpClient.GetFromJsonAsync<List<HistoryModel>>("/api/history?createdByUserId=" + userId);
+            ListOfHistory = await _httpClient.GetFromJsonAsync<List<HistoryModel>>("/api/history");
             StateHasChanged();
         }
     }

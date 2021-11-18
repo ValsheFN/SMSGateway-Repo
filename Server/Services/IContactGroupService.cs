@@ -16,8 +16,7 @@ namespace SMSGateway.Server.Services
         Task<OperationResponse<ContactGroup>> UpdateAsync(ContactGroup model);
         Task<OperationResponse<ContactGroup>> RemoveAsync(string referenceId);
         List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName,
-                                          string firstName, string lastName, string phoneNumber,
-                                          string createdByUserId);
+                                          string firstName, string lastName, string phoneNumber);
     }
 
     public class ContactGroupService : IContactGroupService
@@ -44,21 +43,10 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            var phoneNumber = _db.Contact.Where(x => x.PhoneNumber == model.PhoneNumber).ToList();
-
-            if(phoneNumber == null)
-            {
-                return new OperationResponse<ContactGroup>
-                {
-                    Message = "Contact does not exist",
-                    IsSuccess = false
-
-                };
-            }
-
             //var userId = User.Identity.GetUserId();
             var contactGroup = new ContactGroup
             {
+                ContactId = model.ContactId,
                 GroupName = model.GroupName,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -66,7 +54,7 @@ namespace SMSGateway.Server.Services
             };
 
             await _db.ContactGroups.AddAsync(contactGroup);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(_identity.UserId);
 
             model.Id = contactGroup.Id;
 
@@ -81,7 +69,7 @@ namespace SMSGateway.Server.Services
         public async Task<OperationResponse<ContactGroup>> ImportAsync(List<ContactGroup> model)
         {
             _db.ContactGroups.AddRange(model);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(_identity.UserId);
 
             return new OperationResponse<ContactGroup>
             {
@@ -104,10 +92,7 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            contactGroup.FirstName = model.FirstName;
-            contactGroup.LastName = model.LastName;
             contactGroup.GroupName = model.GroupName;
-            contactGroup.PhoneNumber = model.PhoneNumber;
 
             _db.ContactGroups.Update(contactGroup);
             await _db.SaveChangesAsync(_identity.UserId);
@@ -155,19 +140,13 @@ namespace SMSGateway.Server.Services
         }
 
         public List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName, 
-                                                string firstName, string lastName, string phoneNumber,
-                                                string createdByUserId)
+                                                string firstName, string lastName, string phoneNumber)
         {
-            var createdBy = _identity.UserId;
-
             var query = _db.ContactGroups.ToList();
 
-            if (createdByUserId != "" && createdByUserId != null)
-            {
-                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
-            }
+            query = query.Where(x => x.CreatedByUserId == _identity.UserId).ToList();
 
-            if(userId != "" && userId != null)
+            if (userId != "" && userId != null)
             {
                 query = query.Where(x => x.Id == userId).ToList();
             }

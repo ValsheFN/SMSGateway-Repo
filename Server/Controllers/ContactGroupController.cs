@@ -25,10 +25,9 @@ namespace SMSGateway.Server.Controllers
 
         [HttpGet("GetContactGroup")]
         public async Task<IActionResult> GetAllFiltered(string userId, string referenceId, string groupName,
-                                                        string firstName, string lastName, string phoneNumber,
-                                                        string createdByUserId)
+                                                        string firstName, string lastName, string phoneNumber)
         {
-            return Ok(_contactGroupService.GetAllFiltered(userId, referenceId, groupName, firstName, lastName, phoneNumber, createdByUserId));
+            return Ok(_contactGroupService.GetAllFiltered(userId, referenceId, groupName, firstName, lastName, phoneNumber));
         }
 
         [HttpPost("CreateContactGroup")]

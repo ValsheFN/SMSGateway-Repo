@@ -8,6 +8,7 @@ using SMSGateway.Server.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Data.Services.Client;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace SMSGateway.Server.Services
 {
@@ -16,7 +17,7 @@ namespace SMSGateway.Server.Services
         Task<OperationResponse<Contact>> CreateAsync(Contact model);
         Task<OperationResponse<Contact>> UpdateAsync(Contact model);
         Task<OperationResponse<Contact>> RemoveAsync(string referenceId);
-        List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId, string contactGroupId);
+        List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string contactGroupId);
         Task CommitChangesAsync(string userId);
     }
 
@@ -38,7 +39,7 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<Contact>> CreateAsync(Contact model)
 {
-            var userPhoneNumber = _db.Contact.Where(x => x.PhoneNumber == model.PhoneNumber).ToList();
+            var userPhoneNumber = _db.Contact.Where(x => x.PhoneNumber == model.PhoneNumber && x.CreatedByUserId == _identity.UserId).ToList();
             if(userPhoneNumber.Count != 0)
             {
                 return new OperationResponse<Contact>
@@ -73,7 +74,7 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<Contact>> UpdateAsync(Contact model)
         {
-            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == model.ReferenceId && x.CreatedByUserId == _identity.UserId);
 
             if(contact == null)
             {
@@ -103,7 +104,7 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<Contact>> RemoveAsync(string referenceId)
         {
-            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == referenceId);
+            var contact = _db.Contact.SingleOrDefault(x => x.ReferenceId == referenceId && x.CreatedByUserId == _identity.UserId);
 
             if (contact == null)
             {
@@ -125,14 +126,11 @@ namespace SMSGateway.Server.Services
             };
         }
 
-        public List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string createdByUserId, string contactGroupId)
+        public List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string contactGroupId)
         {
             var query = _db.Contact.ToList();
 
-            if (!string.IsNullOrWhiteSpace(createdByUserId))
-            {
-                query = query.Where(x => x.CreatedByUserId == createdByUserId).ToList();
-            }
+            query = query.Where(x => x.CreatedByUserId == _identity.UserId).ToList();
 
             if (!string.IsNullOrWhiteSpace(userId))
             {

@@ -1,7 +1,7 @@
 ﻿@page "/"
 
-@inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authStateProvider
 @inject ILanguageContainerService language
 @attribute [Authorize]
 
@@ -32,14 +32,12 @@
 </MudPaper>
 
 @code{
-    protected async override Task OnInitializedAsync()
+    @*protected async override Task OnInitializedAsync()
     {
-        var authState = await authStateProvider.GetAuthenticationStateAsync();
-        if (!authState.User.Identity.IsAuthenticated)
+        var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated != true)
         {
-            StateHasChanged();
-            NavigationManager.NavigateTo("/login");
-
+            _navigation.NavigateTo("/login");
         }
-    }
+    }*@
 }

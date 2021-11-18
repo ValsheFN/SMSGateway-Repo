@@ -1,0 +1,53 @@
+﻿@page "/profile"
+
+@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject IDialogService DialogService
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject ILanguageContainerService language
+@inject NavigationManager _navigation
+
+@using Newtonsoft.Json
+
+<MudPaper Height="100%" Width="100%">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudGrid>
+            <MudItem>
+                <MudCard>
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-5">@language["Profile"]</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @*<MudTextField Variant="Variant.Outlined" @bind-Value="@UserData.Email" Label="Email" />
+                            <MudTextField Variant="Variant.Outlined" @bind-Value="@UserData.UserName" Label="User Name" />
+                            <MudTextField Variant="Variant.Outlined" @bind-Value="@UserData.RoleName" Label="Role" />
+                            <MudTextField Variant="Variant.Outlined" @bind-Value="@UserData.SmsCredit" Label="SMS Credit" />*@
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</MudPaper>
+
+@code {
+
+    public ApplicationUserModel UserData { get; set; } = new ApplicationUserModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = _localStorage.GetItemAsString("user_id");
+        var token = _localStorage.GetItemAsString("access_token");
+        @*var userProfile = _localStorage.GetItem<ApplicationUserModel>("user_info");
+
+            UserData = new ApplicationUserModel
+            {
+                Email = userProfile.Email,
+                UserName = userProfile.UserName,
+                RoleName = userProfile.RoleName,
+                SmsCredit = userProfile.SmsCredit
+            };*@
+    }
+}

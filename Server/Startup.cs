@@ -45,6 +45,14 @@ namespace SMSGateway.Server
                 });
             });
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader());
+            });
+
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -129,6 +137,10 @@ namespace SMSGateway.Server
                 Issuer = Configuration["AuthSettings:Issuer"],
                 Key = Configuration["AuthSettings:Key"]
             });
+
+            services.Configure<IISOptions>(options => {
+                
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -157,12 +169,15 @@ namespace SMSGateway.Server
 
             app.UseRouting();
 
+            app.UseCors();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("index.html");
             });

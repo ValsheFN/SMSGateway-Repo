@@ -51,7 +51,7 @@ namespace SMSGateway.Server.Services
 
             return new OperationResponse<TopUp>
             {
-                Message = "Contact created successfully!",
+                Message = "Top up created successfully!",
                 IsSuccess = true,
                 Data = model
             };
@@ -64,20 +64,23 @@ namespace SMSGateway.Server.Services
         {
             var query = _db.TopUps.ToList();
 
-            if(referenceId != "" && referenceId != null)
+            query = query.Where(x => x.CreatedByUserId == _identity.UserId).ToList();
+
+            if (!string.IsNullOrWhiteSpace(referenceId))
             {
                 query = query.Where(x => x.ReferenceId == referenceId).ToList();
             }
 
-            if (requester != "" && requester != null)
+            if (!string.IsNullOrWhiteSpace(requester))
             {
                 query = query.Where(x => x.Requester == requester).ToList();
             }
 
-            if (status != "" && status != null)
+            if (!string.IsNullOrWhiteSpace(status))
             {
                 query = query.Where(x => x.Status == status).ToList();
-}
+            }
+
             if (requestDateStart != DateTime.MinValue)
             {
                 query = query.Where(x => x.RequestDate >= requestDateStart).ToList();
@@ -103,7 +106,8 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<TopUp>> UpdateTopUp(string referenceId, string action)
         {
-            var topUpData = _db.TopUps.FirstOrDefault(x => x.ReferenceId == referenceId);
+            var topUpData = _db.TopUps.FirstOrDefault(x => x.ReferenceId == referenceId && x.CreatedByUserId == _identity.UserId);
+
             var topUpRequester = topUpData.Requester;
             if(topUpData == null)
             {
@@ -148,7 +152,7 @@ namespace SMSGateway.Server.Services
             {
                 topUpData.Status = "Rejected";
                 _db.TopUps.Update(topUpData);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(_identity.UserId);
 
                 return new OperationResponse<TopUp>
                 {

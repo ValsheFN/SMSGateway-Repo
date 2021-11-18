@@ -21,6 +21,8 @@ namespace SMSGateway.Server.Models
             UpdatedTopUp = new List<TopUp>();
             CreatedHistory = new List<History>();
             UpdatedHistory = new List<History>();
+            CreatedSubAccount = new List<SubAccount>();
+            UpdatedSubAccount = new List<SubAccount>();
         }
 
         [Column(TypeName = "decimal(18,2)")]
@@ -40,6 +42,8 @@ namespace SMSGateway.Server.Models
         public virtual List<TopUp> UpdatedTopUp { get; set; }
         public virtual List<History> CreatedHistory { get; set; }
         public virtual List<History> UpdatedHistory { get; set; }
+        public virtual List<SubAccount> CreatedSubAccount { get; set; }
+        public virtual List<SubAccount> UpdatedSubAccount { get; set; }
 
     }
 }

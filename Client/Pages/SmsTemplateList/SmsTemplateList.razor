@@ -23,13 +23,13 @@
                 <MudFab aria-label="Create new sms template" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Reference Id</MudTh>
+                <MudTh Style="display: none">Reference Id</MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<SmsTemplateModel, object>(x=>x.SmsTemplateName)" T="SmsTemplateModel">Template Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<SmsTemplateModel, object>(x=>x.Content)" T="SmsTemplateModel">Content</MudTableSortLabel></MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd Style="display: none" DataLabel="referenceId">@context.ReferenceId</MudTd>
                 <MudTd DataLabel="requester">@context.SmsTemplateName</MudTd>
                 <MudTd DataLabel="topUpValue">@context.Content</MudTd>
                 <MudTd DataLabel="">
@@ -58,7 +58,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated != true)
+        {
+            _navigation.NavigateTo("/login");
+        }
+        else
+        {
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            TemplateList = await _httpClient.GetFromJsonAsync<List<SmsTemplateModel>>("/api/smsTemplate/GetSmsTemplate");
+        }
     }
 
     private bool SearchFunc(SmsTemplateModel model, string searchString)

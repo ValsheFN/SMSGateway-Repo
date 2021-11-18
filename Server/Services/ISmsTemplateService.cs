@@ -30,7 +30,7 @@ namespace SMSGateway.Server.Services
         public async Task<OperationResponse<SmsTemplate>> CreateAsync(SmsTemplate model)
         {
             var query = _db.SmsTemplates.ToList();
-            query = query.Where(x => x.SmsTemplateName == model.SmsTemplateName).ToList();
+            query = query.Where(x => x.SmsTemplateName == model.SmsTemplateName && x.CreatedByUserId == _identity.UserId).ToList();
 
             if(query.Count > 0)
             {
@@ -49,7 +49,7 @@ namespace SMSGateway.Server.Services
             };
 
             await _db.SmsTemplates.AddAsync(smsTemplate);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(_identity.UserId);
 
             model.Id = smsTemplate.Id;
 
@@ -63,7 +63,7 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<SmsTemplate>> UpdateAsync(SmsTemplate model)
         {
-            var smsTemplate = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == model.ReferenceId);
+            var smsTemplate = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == model.ReferenceId && x.CreatedByUserId == _identity.UserId);
 
             if (smsTemplate == null)
             {
@@ -72,18 +72,6 @@ namespace SMSGateway.Server.Services
                     IsSuccess = false,
                     Data = null,
                     Message = "Sms template not found"
-                };
-            }
-
-            var query = _db.SmsTemplates.ToList();
-            query = query.Where(x => x.SmsTemplateName == model.SmsTemplateName).ToList();
-
-            if (query.Count > 0)
-            {
-                return new OperationResponse<SmsTemplate>
-                {
-                    Message = "Please use different template name!",
-                    IsSuccess = false
                 };
             }
 
@@ -103,7 +91,7 @@ namespace SMSGateway.Server.Services
 
         public async Task<OperationResponse<SmsTemplate>> RemoveAsync(string referenceId)
         {
-            var template = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == referenceId);
+            var template = _db.SmsTemplates.SingleOrDefault(x => x.ReferenceId == referenceId && x.CreatedByUserId == _identity.UserId);
 
             if (template == null)
             {
@@ -129,16 +117,18 @@ namespace SMSGateway.Server.Services
         {
             var query = _db.SmsTemplates.ToList();
 
-            if (referenceId != "" && referenceId != null)
+            query = query.Where(x => x.CreatedByUserId == _identity.UserId).ToList();
+
+            if (!string.IsNullOrWhiteSpace(referenceId))
             {
                 query = query.Where(x => x.ReferenceId == referenceId).ToList();
             }
-            if (smsTemplateName != "" && smsTemplateName != null)
+            if (!string.IsNullOrWhiteSpace(smsTemplateName))
             {
                 query = query.Where(x => x.SmsTemplateName == smsTemplateName).ToList();
             }
 
-            if (content != "" && content != null)
+            if (!string.IsNullOrWhiteSpace(content))
             {
                 query = query.Where(x => x.Content.Contains(content)).ToList();
             }

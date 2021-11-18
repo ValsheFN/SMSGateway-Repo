@@ -10,6 +10,11 @@ using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using SMSGateway.Shared;
+using RestSharp;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
+using System.Net.Http;
+using static System.Net.WebRequestMethods;
 
 namespace SMSGateway.Client.Pages.Sms
 {
@@ -88,54 +93,64 @@ namespace SMSGateway.Client.Pages.Sms
                 /*var basePath = _configuration["SmsEagle:BasePath"];
                 var token = _configuration["SmsEagle:Token"];*/
 
-                /*var response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");
+                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
+                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                var response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");
 
-                if (response.IsSuccessStatusCode == true)
+                try
                 {
-                    _snackbar.Add("SMS Sent", Severity.Success);
-                    smsConfig.SendTo = "";
-                    smsConfig.Content = "";
+                Clear();
+                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
+                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                    response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");          
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        _snackbar.Add("SMS Sent", Severity.Success);
+                        StateHasChanged();
+
+                        var userData = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user?userId=" + userId);
+
+                        var timeSent = DateTime.Now;
+
+                        var logData = new LogModel
+                        {
+                            From = userData.FirstOrDefault().UserName,
+                            SendTo = phoneNumber,
+                            Messages = message,
+                            TimeSent = timeSent
+                        };
+
+                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                        await _httpClient.PostAsJsonAsync<LogModel>("/api/log/CreateLog", logData);
+
+                        //Send to history
+
+                        var historyData = new HistoryModel
+                        {
+                            Recipients = phoneNumber,
+                            Messages = message,
+                            Status = "Pending",
+                            TimeSent = timeSent
+                        };
+
+                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                        await _httpClient.PostAsJsonAsync<HistoryModel>("/api/history", historyData);
+                    }
+                    else
+                    {
+                        _snackbar.Add("SMS failed to be sent", Severity.Error);
+                        StateHasChanged();
+                    }
+                    
+                }
+                catch(Exception e)
+                {
+                    _snackbar.Add(e.Message, Severity.Error);
                     StateHasChanged();
                 }
-                else
-                {
-                    _snackbar.Add("SMS failed to be sent", Severity.Error);
-                    smsConfig.SendTo = "";
-                    smsConfig.Content = "";
-                    StateHasChanged();
-                }*/
-
-                //Send to log
-
-                Clear();
-
-                var userData = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user?userId=" + userId);
-                
-                var timeSent = DateTime.Now;
-
-                var logData = new LogModel
-                {
-                    From = userData.FirstOrDefault().UserName,
-                    SendTo = phoneNumber,
-                    Messages = message,
-                    TimeSent = timeSent
-                };
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                await _httpClient.PostAsJsonAsync<LogModel>("/api/log/CreateLog", logData);
-
-                //Send to history
-
-                var historyData = new HistoryModel
-                {
-                    Recipients = phoneNumber,
-                    Messages = message,
-                    Status = "Pending",
-                    TimeSent = timeSent
-                };
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                await _httpClient.PostAsJsonAsync<HistoryModel>("/api/history", historyData);
             }
         }
 

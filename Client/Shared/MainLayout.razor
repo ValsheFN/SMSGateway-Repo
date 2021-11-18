@@ -3,7 +3,7 @@
 @inject ILanguageContainerService language
 @inject Blazored.LocalStorage.ILocalStorageService Storage
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager Navigation
+@inject NavigationManager _navigation
 @attribute [Authorize]
 
 <MudLayout>
@@ -15,9 +15,9 @@
             <MudMenuItem @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"))'>EN</MudMenuItem>
             <MudMenuItem @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"))'>CN</MudMenuItem>
         </MudMenu>
-        <MudMenu Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
-            <MudMenuItem>Profile</MudMenuItem>
-            <MudMenuItem OnClick="LogOutAsync">Logout</MudMenuItem>
+        <MudMenu Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Direction="Direction.Right" OffsetY="true" Dense="true">
+            <MudNavLink Href="/profile">@language.Keys["Profile"]</MudNavLink>
+            <MudMenuItem OnClick="LogOutAsync">@language.Keys["Logout"]</MudMenuItem>
         </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -33,7 +33,7 @@
                    MaxWidth="MaxWidth.Small"
                    DisableBackdropClick="false"
                    NoHeader="false"
-                   Position="DialogPosition.Center"/>
+                   Position="DialogPosition.Center" />
 <MudSnackbarProvider />
 
 @code
@@ -45,25 +45,20 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    protected async override Task OnInitializedAsync()
+    public void RefreshPage()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (!authState.User.Identity.IsAuthenticated)
-        {
-            Navigation.NavigateTo("/login");
-
-        }
+        _navigation.NavigateTo("refresh");
     }
 
     private async Task LogOutAsync()
     {
-
         await Storage.RemoveItemAsync("access_token");
         await Storage.RemoveItemAsync("expiry_date");
         await Storage.RemoveItemAsync("user_id");
+        await Storage.RemoveItemAsync("user_info");
 
-        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        RefreshPage();
+        //await AuthenticationStateProvider.GetAuthenticationStateAsync();
         //_client.DefaultRequestHeaders.Authorization = null;
-        Navigation.NavigateTo("/login");
     }
 }

@@ -10,6 +10,7 @@ namespace SMSGateway.Client.Models
     {
         public string ReferenceId { get; set; }
         public string GroupName { get; set; }
+        public string ContactId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }

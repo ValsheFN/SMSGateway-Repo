@@ -12,12 +12,6 @@
 @inject IDialogService DialogService
 @attribute [Authorize]
 
-<AuthorizeView Roles="Super User">
-    <NotAuthorized>
-        <h4>The user is not authorized</h4>
-    </NotAuthorized>
-</AuthorizeView>
-
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
         <MudTable Items="@ListOfTopUps" Filter="new Func<TopUpModel, bool>(Search)" SortLabel="SortBy">
@@ -69,7 +63,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated != true)
+        {
+            _navigation.NavigateTo("/login");
+        }
+        else
+        {
+            var token = _localStorage.GetItemAsString("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
+        }
     }
 
     private bool SearchFunc(TopUpModel model, string searchString)
