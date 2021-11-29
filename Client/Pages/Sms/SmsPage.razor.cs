@@ -85,9 +85,7 @@ namespace SMSGateway.Client.Pages.Sms
                     phoneNumber = model.SendTo;
                 }
 
-                //var heroku = "https://cors-anywhere.herokuapp.com/";
-                //var basePath = "https://hwd.dyndns.org:443";
-                var basePath = "https://192.168.10.12:443";
+                var basePath = "http://hwd.dyndns.org";
                 var smsToken = "aFygNaan7p4C1ofkY2FkIdtpOZvIb2ky";
                 var message = content;
                 var sendTo = phoneNumber;
@@ -95,14 +93,20 @@ namespace SMSGateway.Client.Pages.Sms
                 /*var basePath = _configuration["SmsEagle:BasePath"];
                 var token = _configuration["SmsEagle:Token"];*/
 
+                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
+                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                var response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");
+
                 try
                 {
-                    Clear();
-                    _httpClient.DefaultRequestHeaders.Add("Accept", "*/*");
-                    var path = $"{basePath}/http_api/send_sms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1";
-                    var response = await _httpClient.GetAsync(path);
+                Clear();
+                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
+                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                    response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");          
 
-                    if (response.IsSuccessStatusCode)
+                    if (response.IsSuccessStatusCode == true)
                     {
                         _snackbar.Add("SMS Sent", Severity.Success);
                         StateHasChanged();

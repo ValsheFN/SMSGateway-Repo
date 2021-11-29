@@ -15,18 +15,15 @@ namespace SMSGateway.Server.Services
         public Task<OperationResponse<Role>> CreateAsync(Role model);
         public Task<OperationResponse<Role>> UpdateAsync(Role model);
         public Task<OperationResponse<Role>> DeleteAsync(string id);
-        public Task<OperationResponse<Role>> UpdateUserRole(string id, string newRole);
     }
 
     public class RoleService : IRoleService
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public RoleService(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public RoleService(RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
-            _userManager = userManager;
         }
 
         public List<IdentityRole> ListRoles()
@@ -167,60 +164,5 @@ namespace SMSGateway.Server.Services
             }            
         }
 
-        public async Task<OperationResponse<Role>> UpdateUserRole(string id, string newRole)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return new OperationResponse<Role>
-                {
-                    Message = "User id cannot be empty",
-                    IsSuccess = false,
-                    Data = null
-                };
-            }
-
-            if (string.IsNullOrWhiteSpace(newRole))
-            {
-                return new OperationResponse<Role>
-                {
-                    Message = "Role cannot be empty",
-                    IsSuccess = false,
-                    Data = null
-                };
-            }
-
-            try
-            {
-                var user = await _userManager.FindByIdAsync(id);
-                var oldRoles = await _userManager.GetRolesAsync(user);
-
-                if(oldRoles.FirstOrDefault() != newRole)
-                {
-                    var response = await _userManager.RemoveFromRolesAsync(user, oldRoles);
-                    response = await _userManager.AddToRoleAsync(user, newRole);
-
-                    return new OperationResponse<Role>
-                    {
-                        IsSuccess = true,
-                        Message = "Role updated"
-                    };
-                }
-
-                return new OperationResponse<Role>
-                {
-                    IsSuccess = true,
-                    Message = "New role is the same as old role"
-                };
-            }
-
-            catch(Exception e)
-            {
-                return new OperationResponse<Role>
-                {
-                    IsSuccess = false,
-                    Message = e.Message.ToString()
-                };
-            }
-        }
     }
 }

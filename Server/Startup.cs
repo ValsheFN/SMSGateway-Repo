@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,8 +37,6 @@ namespace SMSGateway.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
             services.AddDbContext<ApplicationDBContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
@@ -50,7 +47,7 @@ namespace SMSGateway.Server
 
             services.AddCors(options =>
             {
-                options.AddPolicy(name: MyAllowSpecificOrigins, builder =>
+                options.AddDefaultPolicy(builder =>
                 builder.AllowAnyOrigin()
                        .AllowAnyMethod()
                        .AllowAnyHeader());
@@ -172,7 +169,7 @@ namespace SMSGateway.Server
 
             app.UseRouting();
 
-            app.UseCors("_myAllowSpecificOrigins");
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
