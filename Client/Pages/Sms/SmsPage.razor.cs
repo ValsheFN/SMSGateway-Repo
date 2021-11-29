@@ -85,26 +85,26 @@ namespace SMSGateway.Client.Pages.Sms
                     phoneNumber = model.SendTo;
                 }
 
-                var basePath = "http://hwd.dyndns.org";
+                var basePath = "https://hwd.dyndns.org";
+                var path = "/http_api/send_sms";
                 var smsToken = "aFygNaan7p4C1ofkY2FkIdtpOZvIb2ky";
+                var login = "admin";
+                var pass = "password";
                 var message = content;
                 var sendTo = phoneNumber;
+
+                /*var fullPath = $"{basePath}{path}?login={login}&pass={pass}&to={sendTo}&message={message}&unicode=1";*/
+                
+                var fullPath = $"{basePath}{path}?access_token={smsToken}&to={sendTo}&message={message}&unicode=1";
 
                 /*var basePath = _configuration["SmsEagle:BasePath"];
                 var token = _configuration["SmsEagle:Token"];*/
 
-                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
-                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-                _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-                var response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");
-
                 try
                 {
                 Clear();
-                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
-                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-                    _httpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-                    response = await _httpClient.GetAsync($"{basePath}/http_api/sendsms?access_token={smsToken}&to={sendTo}&message={message}&unicode=1");          
+                    HttpClient httpClient = new HttpClient();
+                    var response = await httpClient.GetAsync(fullPath);          
 
                     if (response.IsSuccessStatusCode == true)
                     {

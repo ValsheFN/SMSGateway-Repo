@@ -127,7 +127,7 @@ namespace SMSGateway.Server.Services
 
                 var From = _configuration["EmailFrom"];
                 //Send email confirmation
-                await _mailService.SendEmailAsync(model.Email, From, "Confirm your email", "<h1>Welcome to SMS Gateway</h1>" +
+                await _mailService.SendEmailAsync(model.Email, From, "Confirm your email", "<h1>Welcome to SMS Teralink</h1>" +
                     $"<p>Please confirm your email by <a href='{url}'>Clicking here</a></p>");
 
                 return new UserManagerResponse

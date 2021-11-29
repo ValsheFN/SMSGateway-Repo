@@ -42,7 +42,7 @@ namespace SMSGateway.Client.Components
 
             var token = _localStorage.GetItemAsString("access_token");
 
-            if (string.IsNullOrWhiteSpace(token))
+            if (!string.IsNullOrWhiteSpace(token))
             {
                 Snackbar.Add("You are currently logged in", Severity.Error);
                 _navigation.NavigateTo("/");
