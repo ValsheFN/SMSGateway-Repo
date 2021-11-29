@@ -88,12 +88,8 @@ namespace SMSGateway.Client.Pages.Sms
                 var basePath = "https://hwd.dyndns.org";
                 var path = "/http_api/send_sms";
                 var smsToken = "aFygNaan7p4C1ofkY2FkIdtpOZvIb2ky";
-                var login = "admin";
-                var pass = "password";
                 var message = content;
                 var sendTo = phoneNumber;
-
-                /*var fullPath = $"{basePath}{path}?login={login}&pass={pass}&to={sendTo}&message={message}&unicode=1";*/
                 
                 var fullPath = $"{basePath}{path}?access_token={smsToken}&to={sendTo}&message={message}&unicode=1";
 
