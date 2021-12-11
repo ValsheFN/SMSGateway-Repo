@@ -56,5 +56,20 @@
             MudDialog.Close(DialogResult.Ok(""));
             Snackbar.Add(result.Message, Severity.Error);
         }
+
+        response = await _httpClient.DeleteAsync("/api/contactGroup/RemoveByUserIdAsync?contactId=" + contact.Id);
+        responseBody = await response.Content.ReadAsStringAsync();
+        result = JsonConvert.DeserializeObject<OperationResponse<ContactModel>>(responseBody);
+
+        if (result.IsSuccess)
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(""));
+            Snackbar.Add(result.Message, Severity.Error);
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace SMSGateway.Server.Services
         }
 
         public async Task<OperationResponse<Contact>> CreateAsync(Contact model)
-{
+        {
             var userPhoneNumber = _db.Contact.Where(x => x.PhoneNumber == model.PhoneNumber && x.CreatedByUserId == _identity.UserId).ToList();
             if(userPhoneNumber.Count != 0)
             {
@@ -46,7 +46,6 @@ namespace SMSGateway.Server.Services
                 {
                     Message = "Phone number is already exists",
                     IsSuccess = false
-
                 };
             }
             //var userId = User.Identity.GetUserId();
@@ -59,17 +58,32 @@ namespace SMSGateway.Server.Services
                 Notes = model.Notes
             };
 
-            await _db.Contact.AddAsync(contact);
-            await _db.SaveChangesAsync(_identity.UserId);
-
-            model.Id = contact.Id;
-
-            return new OperationResponse<Contact>
+            try
             {
-                Message = "Contact created successfully!",
-                IsSuccess = true,
-                Data = model
-            };
+                await _db.Contact.AddAsync(contact);
+                await _db.SaveChangesAsync(_identity.UserId);
+
+                model.Id = contact.Id;
+
+                return new OperationResponse<Contact>
+                {
+                    Message = "Contact created successfully!",
+                    IsSuccess = true,
+                    Data = model
+                };
+            }
+            catch(Exception e)
+            {
+                model.Id = contact.Id;
+
+                return new OperationResponse<Contact>
+                {
+                    Message = e.Message.ToString() + " " + e.InnerException.ToString(),
+                    IsSuccess = false,
+                    Data = model
+                };
+            }
+            
         }
 
         public async Task<OperationResponse<Contact>> UpdateAsync(Contact model)

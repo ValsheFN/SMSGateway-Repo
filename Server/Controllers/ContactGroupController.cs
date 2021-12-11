@@ -98,5 +98,17 @@ namespace SMSGateway.Server.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpDelete("RemoveByUserIdAsync")]
+        public async Task<IActionResult> RemoveByUserIdAsync(string contactId)
+        {
+            var result = await _contactGroupService.RemoveByUserIdAsync(contactId);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
     }
 }

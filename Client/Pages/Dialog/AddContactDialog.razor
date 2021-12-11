@@ -50,7 +50,7 @@
 
         if (result.IsSuccess)
         {
-            MudDialog.Close(DialogResult.Ok(model.PhoneNumber));
+            MudDialog.Close(DialogResult.Ok(""));
             Snackbar.Add(result.Message, Severity.Success);
         }
         else

@@ -23,15 +23,29 @@
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.ConfirmPassword" Label="Confirm Password" Required="true" RequiredError="Please confirm your password!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.CostPerSms" Label="Cost per SMS" Required="true" RequiredError="Cost per SMS value is required!" />
         <MudTextField Variant="Variant.Outlined" @bind-Value="@user.SmsCredit" Label="SMS Credit" Required="true" RequiredError="SMS credit is required!" />
+        <MudItem xs="12" md="12">
+            <MudSelect Label="Contact group" @bind-Value="@user.RoleName" HelperText="Select role"
+                       OpenIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
+                @foreach (var item in roleList)
+                {
+                    <MudSelectItem Value="item.Name">@item.Name</MudSelectItem>
+                }
+
+            </MudSelect>
+        </MudItem>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateGroup(@user) )">Create user</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateUser(@user) )">Create user</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private IEnumerable<RoleModel> roleList = new List<RoleModel>();
+
+    private string roleValue { get; set; }
 
     [Parameter] public UserModel user { get; set; } = new UserModel();
 
@@ -40,7 +54,14 @@
         MudDialog.Cancel();
     }
 
-    private async void CreateGroup(UserModel model)
+    protected async override Task OnInitializedAsync()
+    {
+        var token = _localStorage.GetItemAsString("access_token");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        roleList = await _httpClient.GetFromJsonAsync<List<RoleModel>>("/api/role");
+    }
+
+    private async void CreateUser(UserModel model)
     {
         var token = _localStorage.GetItemAsString("access_token");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -51,7 +72,7 @@
         if (result.IsSuccess)
         {
             response = await _httpClient.PutAsJsonAsync("api/user", model);
-            MudDialog.Close(DialogResult.Ok(model.UserName));
+            MudDialog.Close(DialogResult.Ok(""));
             Snackbar.Add(result.Message, Severity.Success);
         }
         else

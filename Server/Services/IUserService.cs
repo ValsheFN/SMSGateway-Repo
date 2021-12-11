@@ -357,6 +357,7 @@ namespace SMSGateway.Server.Services
             }
 
             user.UserName = model.UserName;
+            user.NormalizedUserName = model.UserName.ToUpper();
             user.CostPerSms = model.CostPerSms;
             user.SmsCredit = model.SmsCredit;
 

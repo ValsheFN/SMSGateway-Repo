@@ -166,7 +166,6 @@ namespace SMSGateway.Server
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
-
             app.UseRouting();
 
             app.UseCors();

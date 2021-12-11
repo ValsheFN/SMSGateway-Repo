@@ -61,16 +61,27 @@ namespace SMSGateway.Server.Controllers
             return BadRequest("Internal Server Error"); //400
         }
 
+        [HttpPut("UpdateUserRole")]
+        public async Task<IActionResult> UpdateUserRole(string id, string newRole)
+        {
+            var result = await _roleService.UpdateUserRole(id, newRole);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
         [HttpDelete()]
         public async Task<IActionResult> DeleteAsync(string id)
         {
-                var result = await _roleService.DeleteAsync(id);
+            var result = await _roleService.DeleteAsync(id);
 
-                if (result.IsSuccess)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
         }
     }
 }

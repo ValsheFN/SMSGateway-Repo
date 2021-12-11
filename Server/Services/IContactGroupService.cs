@@ -15,6 +15,7 @@ namespace SMSGateway.Server.Services
         Task<OperationResponse<ContactGroup>> ImportAsync(List<ContactGroup> model);
         Task<OperationResponse<ContactGroup>> UpdateAsync(ContactGroup model);
         Task<OperationResponse<ContactGroup>> RemoveAsync(string referenceId);
+        Task<OperationResponse<ContactGroup>> RemoveByUserIdAsync(string userId);
         List<ContactGroup> GetAllFiltered(string userId, string referenceId, string groupName,
                                           string firstName, string lastName, string phoneNumber);
     }
@@ -126,6 +127,40 @@ namespace SMSGateway.Server.Services
                     IsSuccess = false,
                     Data = null,
                     Message = "Contact group not found!"
+                };
+            }
+
+            _db.ContactGroups.Remove(contactGroup);
+            await _db.SaveChangesAsync(_identity.UserId);
+
+            return new OperationResponse<ContactGroup>
+            {
+                IsSuccess = true,
+                Message = "Contact group has been deleted successfully!"
+            };
+        }
+
+        public async Task<OperationResponse<ContactGroup>> RemoveByUserIdAsync(string contactId)
+        {
+            if (string.IsNullOrWhiteSpace(contactId))
+            {
+                return new OperationResponse<ContactGroup>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "ContactId Id cannot be null!"
+                };
+            }
+
+            var contactGroup = _db.ContactGroups.SingleOrDefault(x => x.ContactId == contactId);
+
+            if (contactGroup == null)
+            {
+                return new OperationResponse<ContactGroup>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Contact Id not found!"
                 };
             }
 
