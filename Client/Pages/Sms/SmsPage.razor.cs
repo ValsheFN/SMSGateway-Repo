@@ -98,9 +98,8 @@ namespace SMSGateway.Client.Pages.Sms
 
                 try
                 {
-                Clear();
                     HttpClient httpClient = new HttpClient();
-                    var response = await httpClient.GetAsync(fullPath);          
+                    var response = await httpClient.GetAsync(fullPath);
 
                     if (response.IsSuccessStatusCode == true)
                     {
@@ -134,6 +133,7 @@ namespace SMSGateway.Client.Pages.Sms
 
                         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                         await _httpClient.PostAsJsonAsync<HistoryModel>("/api/history", historyData);
+                        Clear();
                     }
                     else
                     {

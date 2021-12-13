@@ -127,7 +127,7 @@ namespace SMSGateway.Server.Services
 
                 var From = _configuration["EmailFrom"];
                 //Send email confirmation
-                await _mailService.SendEmailAsync(model.Email, From, "Confirm your email", "<h1>Welcome to SMS Teralink</h1>" +
+                _mailService.SendEmailAsync(model.Email, From, "Confirm your email", "<h1>Welcome to SMS Teralink</h1>" +
                     $"<p>Please confirm your email by <a href='{url}'>Clicking here</a></p>");
 
                 return new UserManagerResponse
@@ -210,10 +210,10 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            /*var decodedToken = WebEncoders.Base64UrlDecode(token);
-            string normalToken = Encoding.UTF8.GetString(decodedToken);*/
+            var decodedToken = WebEncoders.Base64UrlDecode(token);
+            string normalToken = Encoding.UTF8.GetString(decodedToken);
 
-            var result = await _userManager.ConfirmEmailAsync(user, token);
+            var result = await _userManager.ConfirmEmailAsync(user, normalToken);
 
             if (result.Succeeded)
             {
@@ -250,11 +250,11 @@ namespace SMSGateway.Server.Services
             /*var encodedToken = Encoding.UTF8.GetBytes(token);
             var validToken = WebEncoders.Base64UrlEncode(encodedToken);*/
 
-            string url = $"{_configuration["AppUrl"]}/ResetPassword?email={email}&token={token}";
+            string url = $"{_configuration["AppUrl"]}/changePassword?email={email}&token={token}";
 
             var From = _configuration["EmailFrom"];
 
-            await _mailService.SendEmailAsync(email, From, "Reset Password",
+            _mailService.SendEmailAsync(email, From, "Reset Password",
                                                 "<h1> Follow the instruction to reset your password </h1>" +
                                                 $"To reset your password, click here : {url}");
 
@@ -278,10 +278,12 @@ namespace SMSGateway.Server.Services
                 };
             }
 
+            var token = (model.Token).Replace(" ", "+");
+
             /*var decodedToken = WebEncoders.Base64UrlDecode(model.Token);
             string normalToken = Encoding.UTF8.GetString(decodedToken);*/
 
-            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
 
             if (result.Succeeded)
             {
@@ -294,7 +296,7 @@ namespace SMSGateway.Server.Services
 
             return new UserManagerResponse
             {
-                Message = "Failed to reset password",
+                Message = result.Errors.Select(e => e.Description).FirstOrDefault(),
                 IsSuccess = false,
                 Errors = result.Errors.Select(e => e.Description)
             };

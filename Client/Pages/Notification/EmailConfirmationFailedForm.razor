@@ -1,0 +1,25 @@
+﻿@inject NavigationManager _navigationManager
+
+<MudText Color="Color.Primary" Align="Align.Center" Typo="Typo.h3">Email Confirmation Failed</MudText>
+<MudText Color="Color.Primary" Align="Align.Center" Typo="Typo.h5">Redirecting to login page in 5 seconds</MudText>
+
+<MudThemeProvider />
+
+@code {
+    [Parameter] public int Time { get; set; } = 5;
+
+    public async void StartTimerAsync()
+    {
+        while (Time > 0)
+        {
+            Time--;
+            StateHasChanged();
+            await Task.Delay(1000);
+        }
+
+        _navigationManager.NavigateTo("/login");
+    }
+
+    protected override void OnInitialized()
+        => StartTimerAsync();
+}

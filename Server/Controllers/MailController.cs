@@ -25,7 +25,7 @@ namespace SMSGateway.Server.Controllers
         [HttpPost]
         public async Task<UserManagerResponse> SendEmailAsync([FromBody] Mail model)
         {
-            var response = await _mailService.SendEmailAsync(model.SendTo, model.From, model.Subject, model.Content);
+            var response = _mailService.SendEmailAsync(model.SendTo, model.From, model.Subject, model.Content);
 
             if(response != "Success")
             {

@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using MudBlazor;
+using Newtonsoft.Json;
+using SMSGateway.Client.Models;
 
 namespace SMSGateway.Client.Components
 {
@@ -31,15 +33,16 @@ namespace SMSGateway.Client.Components
             _errorMessage = string.Empty;
 
             var response = await HttpClient.PostAsJsonAsync("/api/auth/register", _model);
-            if (response.IsSuccessStatusCode)
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<OperationResponse<GroupModel>>(responseBody);
+
+            if (result.IsSuccess)
             {
-                var result = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
-                Navigation.NavigateTo("/");
+                NavigationManager.NavigateTo("/accountCreated");
             }
             else
             {
-                var errorResult = await response.Content.ReadFromJsonAsync<UserManagerResponse>();
-                _errorMessage = errorResult.Message;
+                _errorMessage = result.Message.ToString();
             }
 
             _isBusy = false;

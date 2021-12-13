@@ -81,22 +81,22 @@ namespace SMSGateway.Server.Controllers
 
             if (result.IsSuccess)
             {
-                return Redirect($"{_configuration["AppUrl"]}/ConfirmEmail.html");
+                return Redirect($"{_configuration["AppUrl"]}/EmailConfirmed");
             }
 
-            return BadRequest(result);
+            return Redirect($"{_configuration["AppUrl"]}/EmailConfirmationFailed");
         }
 
         // /api/auth/forgetpassword
-        [HttpGet("ForgetPassword")]
-        public async Task<IActionResult> ForgetPassword(string email)
+        [HttpPost("ForgetPassword")]
+        public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordViewModel model)
         {
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(model.Email))
             {
                 return NotFound();
             }
 
-            var result = await _userService.ForgetPasswordAsync(email);
+            var result = await _userService.ForgetPasswordAsync(model.Email);
 
             if (result.IsSuccess)
             {
@@ -108,7 +108,7 @@ namespace SMSGateway.Server.Controllers
 
         // /api/auth/resetpassword
         [HttpPost("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromForm]ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordViewModel model)
         {
             if (ModelState.IsValid)
             {

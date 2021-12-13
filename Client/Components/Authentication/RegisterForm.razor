@@ -1,6 +1,7 @@
 ﻿@namespace SMSGateway.Client.Components
 
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
 <EditForm Model="_model" OnValidSubmit="RegisterUserAsync">
     <DataAnnotationsValidator></DataAnnotationsValidator>

@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using MudBlazor;
+using Newtonsoft.Json;
+using SMSGateway.Client.Models;
 
 namespace SMSGateway.Client.Components
 {
@@ -33,14 +35,17 @@ namespace SMSGateway.Client.Components
 
         private async Task ForgotPasswordAsync(ForgetPasswordViewModel _model)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/auth/forgetpassword", _model);
-            if (response.IsSuccessStatusCode)
+            var response = await HttpClient.PostAsJsonAsync("api/auth/forgetpassword", _model);
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<OperationResponse<GroupModel>>(responseBody);
+
+            if (result.IsSuccess)
             {
-                _snackbar.Add("Reset password email is sent", Severity.Success);
+                NavigationManager.NavigateTo("/passwordResetSent");
             }
             else
             {
-                _snackbar.Add(response.ReasonPhrase, Severity.Error);
+                _errorMessage = result.Message.ToString();
             }
             
         }
