@@ -74,5 +74,24 @@ namespace SMSGateway.Client.Pages.User
             UserList = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user");
             StateHasChanged();
         }
+
+        private async Task Approve(UserModel user)
+        {
+            if (user.RoleName == "Super User")
+            {
+                _snackbar.Add("Super User's status cannot be changed", Severity.Error);
+            }
+            else
+            {
+                var parameters = new DialogParameters { ["User"] = user };
+
+                var dialog = DialogService.Show<ApproveUserDialog>("Approve User", parameters);
+                var result = await dialog.Result;
+                var token = _localStorage.GetItemAsString("access_token");
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                UserList = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user");
+                StateHasChanged();
+            }
+        }
     }
 }

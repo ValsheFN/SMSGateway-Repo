@@ -70,5 +70,47 @@ namespace SMSGateway.Server.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpPut("Approve")]
+        public async Task<IActionResult> ApproveUser([FromBody] User model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.ApproveUser(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            return BadRequest(
+            new OperationResponse<Contact>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
+        }
+
+        [HttpPut("Revoke")]
+        public async Task<IActionResult> RevokeUser([FromBody] User model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.RevokeUser(model);
+
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            return BadRequest(
+            new OperationResponse<Contact>
+            {
+                IsSuccess = false,
+                Message = "Internal server error"
+            }); //400
+        }
     }
 }

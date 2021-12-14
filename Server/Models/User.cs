@@ -13,5 +13,6 @@ namespace SMSGateway.Server.Models
         public string RoleName { get; set; }
         public int SmsCredit { get; set; }
         public decimal CostPerSms { get; set; }
+        public bool AdminApproval { get; set; }
     }
 }

@@ -1,0 +1,42 @@
+﻿@using SMSGateway.Client.Models
+@using System.Net.Http.Headers
+@using Microsoft.AspNetCore.Identity
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+
+@using Newtonsoft.Json
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Admin Approval
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.Id" Label="Id" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.Email" Label="Email" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.UserName" Label="User Name" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.CostPerSms" Label="Cost per SMS" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.SmsCredit" Label="SMS Credit" />
+        <MudTextField Variant="Variant.Outlined" ReadOnly="true" @bind-Value="@user.RoleName" Label="Role" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>ApproveUser(@user) )">Approve</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="@((e)=>RevokeUser(@user) )">Revoke</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public UserModel user { get; set; } = new UserModel();
+
+    private IEnumerable<UserModel> ListOfUsers = new List<UserModel>();
+
+
+}

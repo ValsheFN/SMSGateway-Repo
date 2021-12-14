@@ -30,6 +30,7 @@
                 <MudTh>Cost per SMS</MudTh>
                 <MudTh Style="display: none">Role Id</MudTh>
                 <MudTh>Role Name</MudTh>
+                <MudTh>Admin Approval</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -40,7 +41,10 @@
                 <MudTd DataLabel="Cost per SMS">@context.CostPerSms</MudTd>
                 <MudTd Style="display: none" DataLabel="Role">@context.RoleId</MudTd>
                 <MudTd DataLabel="Role">@context.RoleName</MudTd>
+                <MudTd DataLabel="Admin Approval">@context.AdminApproval</MudTd>
                 <MudTd>
+                    <MudFab aria-label="Approve User" @onclick="@(()=>Approve(@context))" Color="Color.Primary"
+                            Icon="@Icons.Material.Filled.Approval" Size="Size.Small" IconSize="Size.Small" />
                     <MudFab aria-label="Edit sms template" @onclick="@(()=>Edit(@context))" Color="Color.Primary"
                             Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
                     <MudFab aria-label="Delete sms template" @onclick="@(()=>Delete(@context))" Color="Color.Secondary"

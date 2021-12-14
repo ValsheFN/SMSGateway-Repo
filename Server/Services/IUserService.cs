@@ -30,6 +30,8 @@ namespace SMSGateway.Server.Services
         List<User> ListUsers(string userId);
         Task<OperationResponse<User>> UpdateUser(User model);
         Task<OperationResponse<User>> DeleteUser(string userId);
+        Task<OperationResponse<User>> ApproveUser(User model);
+        Task<OperationResponse<User>> RevokeUser(User model);
     }
 
     public class UserService : IUserService
@@ -154,6 +156,15 @@ namespace SMSGateway.Server.Services
                 return new UserManagerResponse
                 {
                     Message = "Email or password is invalid",
+                    IsSuccess = false
+                };
+            }
+
+            if(user.AdminApproval == false)
+            {
+                return new UserManagerResponse
+                {
+                    Message = "Your account is in approval process",
                     IsSuccess = false
                 };
             }
@@ -314,8 +325,10 @@ namespace SMSGateway.Server.Services
                                 UserName = user.UserName,
                                 SmsCredit = user.SmsCredit,
                                 CostPerSms = user.CostPerSms,
+                                AdminApproval = user.AdminApproval,
                                 RoleId = role.Id,
                                 RoleName = role.Name
+                                
                             })
                     .ToListAsync();
 
@@ -371,7 +384,7 @@ namespace SMSGateway.Server.Services
             {
                 return new OperationResponse<User>
                 {
-                    IsSuccess = true,
+                    IsSuccess = false,
                     Message = e.Message
                 };
             }
@@ -425,6 +438,130 @@ namespace SMSGateway.Server.Services
                     Message = e.Message
                 };
             }
+        }
+
+        public async Task<OperationResponse<User>> ApproveUser(User model)
+        {
+            if (model.AdminApproval == true)
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "User is already approved",
+                    IsSuccess = false
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Id))
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "User Id cannot be null",
+                    IsSuccess = false
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "Email cannot be null",
+                    IsSuccess = false
+                };
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "Email or password is invalid",
+                    IsSuccess = false
+                };
+            }
+
+            user.AdminApproval = true;
+
+            try
+            {
+                await _db.SaveChangesAsync(_identity.UserId);
+            }
+            catch (Exception e)
+            {
+                return new OperationResponse<User>
+                {
+                    IsSuccess = false,
+                    Message = e.Message
+                };
+            }
+
+            return new OperationResponse<User>
+            {
+                IsSuccess = true,
+                Message = "User is approved"
+            };
+        }
+
+        public async Task<OperationResponse<User>> RevokeUser(User model)
+        {
+            if (model.AdminApproval == false)
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "User is already revoked",
+                    IsSuccess = false
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Id))
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "User Id cannot be null",
+                    IsSuccess = false
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "Email cannot be null",
+                    IsSuccess = false
+                };
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                return new OperationResponse<User>
+                {
+                    Message = "Email or password is invalid",
+                    IsSuccess = false
+                };
+            }
+
+            user.AdminApproval = false;
+
+            try
+            {
+                await _db.SaveChangesAsync(_identity.UserId);
+            }
+            catch (Exception e)
+            {
+                return new OperationResponse<User>
+                {
+                    IsSuccess = false,
+                    Message = e.Message
+                };
+            }
+
+            return new OperationResponse<User>
+            {
+                IsSuccess = true,
+                Message = "User is revoked"
+            };
         }
     }
 }
