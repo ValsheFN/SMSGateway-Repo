@@ -1,12 +1,9 @@
 ﻿@using SMSGateway.Client.Models
-@using System.Net.Http.Headers
 
 @inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
-
-@using Newtonsoft.Json
 
 <MudDialog>
     <TitleContent>

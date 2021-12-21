@@ -14,7 +14,7 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@ListOfTopUps" Filter="new Func<TopUpModel, bool>(Search)" SortLabel="SortBy">
+        <MudTable FixedHeader="true" Items="@ListOfTopUps" Filter="new Func<TopUpModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Top Up</MudText>
                 <MudSpacer />

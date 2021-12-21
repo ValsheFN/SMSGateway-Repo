@@ -127,7 +127,7 @@ namespace SMSGateway.Client.Pages.Sms
                         {
                             Recipients = phoneNumber,
                             Messages = message,
-                            Status = "Pending",
+                            Status = "Sent",
                             TimeSent = timeSent
                         };
 

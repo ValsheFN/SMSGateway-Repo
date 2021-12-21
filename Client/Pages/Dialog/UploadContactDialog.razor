@@ -1,0 +1,52 @@
+﻿@using SMSGateway.Client.Models
+
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject HttpClient _httpClient
+@inject ISnackbar Snackbar
+@inject NavigationManager _navigation
+@inject IJSRuntime JSRuntime
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+            Upload Contact
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudButton @onclick="UploadContact" Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Medium" Class="ma-2">Upload</MudButton>
+        <MudButton @onclick="DownloadTemplate" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Class="ma-2">Download Template</MudButton>
+        @if (!string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            <MudItem>
+                <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Square="true">@_errorMessage</MudAlert>
+            </MudItem>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private string _errorMessage = string.Empty;
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void DownloadTemplate()
+    {
+        _navigation.NavigateTo("/ExcelTemplate/sample-contactUpload.xlsx", true);
+    }
+
+    private void UploadContact()
+    {
+        _errorMessage = string.Empty;
+        _errorMessage = "Feature coming soon";
+    }
+}
+

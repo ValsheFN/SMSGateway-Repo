@@ -74,7 +74,7 @@ namespace SMSGateway.Server.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
             {
-                return NotFound();
+                return Redirect($"{_configuration["AppUrl"]}/EmailConfirmationFailed");
             }
 
             var result = await _userService.ConfirmEmailAsync(userId, token);

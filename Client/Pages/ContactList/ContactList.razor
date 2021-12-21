@@ -18,11 +18,12 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@ListOfContacts" Filter="new Func<ContactModel, bool>(Search)" SortLabel="SortBy">
+        <MudTable FixedHeader="true" Items="@ListOfContacts" Filter="new Func<ContactModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Contact List</MudText>
                 <MudSpacer />
                 <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudFab @onclick="Upload" Color="Color.Primary" Icon="@Icons.Material.Filled.FileUpload" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
                 <MudFab aria-label="Create new contact" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>

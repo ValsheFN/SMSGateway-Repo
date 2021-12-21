@@ -15,12 +15,20 @@
 
 <MudPaper Height="100%" Width="100%">
 <MudContainer MaxWidth="MaxWidth.Large">
-    <MudTable Items="@ListOfHistory" Filter="new Func<HistoryModel, bool>(Search)" SortLabel="SortBy">
+    <MudTable FixedHeader="true" Items="@ListOfHistory" Filter="new Func<HistoryModel, bool>(Search)" SortLabel="SortBy">
         <ToolBarContent>
             <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">History</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
+        <ColGroup>
+            <col style="width: 12%;" />
+            <col style="width: 12%;" />
+            <col style="width: 40%;" />
+            <col style="width: 12%;" />
+            <col style="width: 12%;" />
+            <col style="width: 12%;" />
+        </ColGroup>
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.ReferenceId)" T="HistoryModel">Reference Id</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.Recipients)" T="HistoryModel">Recipients</MudTableSortLabel></MudTh>

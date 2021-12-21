@@ -79,5 +79,10 @@ namespace SMSGateway.Client.Pages.ContactList
             ListOfContacts = await _httpClient.GetFromJsonAsync<List<ContactModel>>("/api/contact/GetContact");
             StateHasChanged();
         }
+
+        private void Upload()
+        {
+            DialogService.Show<UploadContactDialog>("Upload Contact");
+        }
     }
 }

@@ -10,12 +10,18 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@Logs" Filter="new Func<LogModel, bool>(Search)" SortLabel="SortBy">
+        <MudTable FixedHeader="true" Items="@Logs" Filter="new Func<LogModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Log</MudText>
                 <MudSpacer />
                 <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
+            <ColGroup>
+                <col style="width: 60px;" />
+                <col style="width: 60px;" />
+                <col style="width: 200px;" />
+                <col style="width: 60px;" />
+            </ColGroup>
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.From)" T="LogModel">From</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.SendTo)" T="LogModel">Send To</MudTableSortLabel></MudTh>

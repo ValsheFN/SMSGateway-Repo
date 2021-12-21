@@ -14,7 +14,7 @@
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudTable Items="@ListOfGroups" Filter="new Func<GroupModel, bool>(Search)" SortLabel="SortBy">
+        <MudTable FixedHeader="true" Items="@ListOfGroups" Filter="new Func<GroupModel, bool>(Search)" SortLabel="SortBy">
             <ToolBarContent>
                 <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">Group List</MudText>
                 <MudSpacer />
