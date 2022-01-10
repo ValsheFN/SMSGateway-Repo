@@ -27,36 +27,34 @@ namespace SMSGateway.Client.Pages.TopUpList
             var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup?createdByUserId=" + userId);
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
             StateHasChanged();
         }
 
         private async Task Approve(TopUpModel topUp)
         {
-            /*var parameters = new DialogParameters { ["Top Up"] = topUp };
+            var parameters = new DialogParameters { ["TopUp"] = topUp };
 
-            var dialog = DialogService.Show<DeleteGroupDialog>("Delete Group", parameters);
+            var dialog = DialogService.Show<ApproveTopUpDialog>("Approve Top Up", parameters);
             var result = await dialog.Result;
             var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup?createdByUserId=" + userId);
-            StateHasChanged();*/
-            _navigation.NavigateTo("/topUp");
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
+            StateHasChanged();
         }
 
         private async Task Reject(TopUpModel topUp)
         {
-            /*var parameters = new DialogParameters { ["Top Up"] = topUp };
+            var parameters = new DialogParameters { ["TopUp"] = topUp };
 
-            var dialog = DialogService.Show<EditGroupDialog>("Edit Group", parameters);
+            var dialog = DialogService.Show<RejectTopUpDialog>("Reject Top Up", parameters);
             var result = await dialog.Result;
             var userId = _localStorage.GetItemAsString("user_id");
             var token = _localStorage.GetItemAsString("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup?createdByUserId=" + userId);
-            StateHasChanged();*/
-            _navigation.NavigateTo("/topup");
+            ListOfTopUps = await _httpClient.GetFromJsonAsync<List<TopUpModel>>("/api/topup/GetTopup");
+            StateHasChanged();
         }
     }
 }

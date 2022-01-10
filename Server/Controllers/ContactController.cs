@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using SMSGateway.Server.Models;
 using SMSGateway.Server.Services;
 using SMSGateway.Shared;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SMSGateway.Server.Controllers
@@ -89,6 +93,17 @@ namespace SMSGateway.Server.Controllers
                 IsSuccess = false,
                 Message = "Internal server error"
             }); //400
+        }
+
+        [HttpPost("Import")]
+        public async Task<IActionResult> Import(IFormFile formFile)
+        {
+            var result = await _contactService.ImportContactAsync(formFile);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
         }
     }
 }

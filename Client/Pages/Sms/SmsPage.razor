@@ -73,7 +73,56 @@
                                 </MudTabPanel>
                             </MudTabs>
                         </MudItem>
-
+                        <MudItem xs="12" md="12">
+                            <MudForm>
+                                <MudText Typo="Typo.body1" Color="Color.Primary">Time :</MudText>
+                                <MudRadioGroup @bind-SelectedOption="@SelectedTime">
+                                    <MudRadio Option="@("Now")" Color="Color.Primary">Now</MudRadio>
+                                    <MudRadio Option="@("At date and time")" Color="Color.Primary">At date and time</MudRadio>
+                                    <MudRadio Option="@("After a delay")" Color="Color.Primary">After a delay</MudRadio>
+                                    <MudRadio Option="@("Between hours")" Color="Color.Primary">Between hours</MudRadio>
+                                    <MudRadio Option="@("Priority")" Color="Color.Primary">Priority</MudRadio>
+                                </MudRadioGroup>
+                                <MudItem xs="12" sm="6" md="4">
+                                    @if (SelectedTime == "At date and time")
+                                    {
+                                        <div>
+                                            <MudDatePicker MinDate="sendDate" Label="Send Date" @bind-Date="sendDate" DateFormat="dd/MM/yyyy" />
+                                            <MudTimePicker Label="Send Time" @bind-Time="sendTime" />
+                                        </div>
+                                    }
+                                </MudItem>
+                                <MudItem xs="15" sm="8" md="4">
+                                    @if (SelectedTime == "After a delay")
+                                    {
+                                        <div>
+                                            <MudTimePicker Label="Send After" @bind-Time="sendAfter" />
+                                        </div>
+                                    }
+                                </MudItem>
+                                <MudItem xs="15" sm="8" md="4">
+                                    @if (SelectedTime == "Between hours")
+                                    {
+                                        <div>
+                                            <MudTimePicker Label="Start Time" @bind-Time="startTime" />
+                                            <MudText Typo="Typo.body1" Color="Color.Primary"> until </MudText>
+                                            <MudTimePicker Label="End Time" @bind-Time="endTime" />
+                                        </div>
+                                    }
+                                </MudItem>
+                            </MudForm>
+                        </MudItem>
+                        <MudDivider FlexItem="true" />
+                        <MudItem>
+                            <MudForm>
+                                <MudText Typo="Typo.body1" Color="Color.Primary">Message Type :</MudText>
+                                <MudRadioGroup @bind-SelectedOption="@SelectedType">
+                                    <MudRadio Option="@("SMS")" Color="Color.Primary">SMS</MudRadio>
+                                    <MudRadio Option="@("Flash SMS")" Color="Color.Primary">Flash SMS</MudRadio>
+                                    <MudRadio Option="@("WAP Push Link")" Color="Color.Primary">WAP Push Link</MudRadio>
+                                </MudRadioGroup>
+                            </MudForm>
+                        </MudItem>
                     </MudGrid>
                 </MudForm>
             </MudCardContent>
@@ -102,6 +151,20 @@
     private IEnumerable<ContactModel> contactList = new List<ContactModel>();
     private IEnumerable<GroupModel> groupList = new List<GroupModel>();
     private IEnumerable<SmsTemplateModel> templateList = new List<SmsTemplateModel>();
+
+    public string SelectedTime { get; set; } = "Now";
+    public string SelectedType { get; set; } = "SMS";
+
+    MudTimePicker _picker;
+    DateTime? sendDate = DateTime.Today;
+    TimeSpan? sendTime = new TimeSpan(00, 00, 00);
+
+    TimeSpan? sendAfter = new TimeSpan(00, 00, 00);
+
+    TimeSpan? startTime = new TimeSpan(00, 00, 00);
+    TimeSpan? endTime = new TimeSpan(00, 00, 00);
+    private bool autoClose;
+    private bool readOnly;
 
     protected async override Task OnInitializedAsync()
     {

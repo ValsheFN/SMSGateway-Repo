@@ -17,18 +17,18 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Variant="Variant.Outlined" @bind-Value="@topUp.TopUpValue" Label="Top Up Value" Required="true" RequiredError="Top up value is required!" />
+        <MudTextField Variant="Variant.Outlined" @bind-Value="@template.TopUpValue" Label="Top Up Value" Required="true" RequiredError="Top up value is required!" />
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateTopUp(topUp.TopUpValue) )">Request Top Up</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@((e)=>CreateTopUp(template) )">Request Top Up</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    [Parameter] public TopUpModel topUp { get; set; } = new TopUpModel();
+    [Parameter] public TopUpModel template { get; set; } = new TopUpModel();
 
 
 }

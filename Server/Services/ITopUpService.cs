@@ -19,7 +19,7 @@ namespace SMSGateway.Server.Services
                                           DateTime requestDateStart, DateTime requestDateEnd,
                                           DateTime grantDateStart, DateTime grantDateEnd,
                                           string grantedBy);
-        Task<OperationResponse<TopUp>> UpdateTopUp(string referenceId, string action);
+        Task<OperationResponse<TopUp>> UpdateTopUp(TopUp model);
     }
 
     public class TopUpService : ITopUpService
@@ -104,9 +104,18 @@ namespace SMSGateway.Server.Services
             return query;
         }
 
-        public async Task<OperationResponse<TopUp>> UpdateTopUp(string referenceId, string action)
+        public async Task<OperationResponse<TopUp>> UpdateTopUp(TopUp model)
         {
-            var topUpData = _db.TopUps.FirstOrDefault(x => x.ReferenceId == referenceId && x.CreatedByUserId == _identity.UserId);
+            if (_identity.Role != "Super User")
+            {
+                return new OperationResponse<TopUp>
+                {
+                    Message = "You don't have permission to approve/reject this transaction",
+                    IsSuccess = false
+                };
+            }
+
+            var topUpData = _db.TopUps.FirstOrDefault(x => x.ReferenceId == model.ReferenceId && x.CreatedByUserId == _identity.UserId);
 
             var topUpRequester = topUpData.Requester;
             if(topUpData == null)
@@ -118,9 +127,18 @@ namespace SMSGateway.Server.Services
                 };
             }
 
-            if(action == "Grant")
+            if(topUpData.Status == "Success" || topUpData.Status == "Rejected")
             {
-                var userData = await _userManager.FindByIdAsync(topUpRequester);
+                return new OperationResponse<TopUp>
+                {
+                    Message = "Cannot approve/reject processed top up",
+                    IsSuccess = false
+                };
+            }
+
+            if(model.Status == "Granted")
+            {
+                var userData = await _userManager.FindByNameAsync(topUpRequester);
                 if (userData == null)
                 {
                     return new OperationResponse<TopUp>
@@ -130,12 +148,14 @@ namespace SMSGateway.Server.Services
                     };
                 }
 
-                var totalCreditValue = (topUpData.TopUpValue/userData.CostPerSms) + userData.SmsCredit;
+                var totalCreditValue = topUpData.TopUpValue + userData.SmsCredit;
 
                 userData.SmsCredit = Convert.ToInt32(totalCreditValue);
 
                 var result = await _userManager.UpdateAsync(userData);
 
+                topUpData.GrantedBy = model.GrantedBy;
+                topUpData.GrantDate = DateTime.Now;
                 topUpData.Status = "Success";
 
                 _db.TopUps.Update(topUpData);
@@ -150,6 +170,8 @@ namespace SMSGateway.Server.Services
             }
             else
             {
+                topUpData.GrantedBy = model.GrantedBy;
+                topUpData.GrantDate = DateTime.Now;
                 topUpData.Status = "Rejected";
                 _db.TopUps.Update(topUpData);
                 await _db.SaveChangesAsync(_identity.UserId);

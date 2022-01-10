@@ -28,7 +28,7 @@
             </ToolBarContent>
             <HeaderContent>
                 <MudTh Style="display: none">Reference Id</MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.FirstName)" T="ContactModel">First Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ContactModel, object>(x=>x.FirstName)" T="ContactModel">First Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.LastName)" SortLabel="lastName" T="ContactModel">Last Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<ContactModel, object>(x=>x.Email)" SortLabel="email" T="ContactModel">Email</MudTableSortLabel></MudTh>
                 <MudTh>Phone Number</MudTh>

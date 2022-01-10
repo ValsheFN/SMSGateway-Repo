@@ -22,9 +22,14 @@
                 <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 <MudFab aria-label="Create new sms template" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
+            <ColGroup>
+                <col style="width: 20%" />
+                <col style="width: 70%" />
+                <col style="width: 10%" />
+            </ColGroup>
             <HeaderContent>
                 <MudTh Style="display: none">Reference Id</MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<SmsTemplateModel, object>(x=>x.SmsTemplateName)" T="SmsTemplateModel">Template Name</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SmsTemplateModel, object>(x=>x.SmsTemplateName)" T="SmsTemplateModel">Template Name</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<SmsTemplateModel, object>(x=>x.Content)" T="SmsTemplateModel">Content</MudTableSortLabel></MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>

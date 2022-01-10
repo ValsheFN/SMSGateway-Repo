@@ -1,20 +1,24 @@
 ﻿@page "/"
 
+@using SMSGateway.Client.Models
+
+@inject AuthenticationStateProvider _authenticationStateProvider
 @inject NavigationManager _navigation
-@inject AuthenticationStateProvider _authStateProvider
-@inject ILanguageContainerService language
-@attribute [Authorize]
+@inject MudBlazor.ISnackbar _snackbar
+@inject HttpClient _httpClient
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject IDialogService DialogService
 
 <MudPaper Height="100%" Width="100%">
     <MudContainer MaxWidth="MaxWidth.Large">
-        <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-5">@language["Dashboard"]</MudText>
+        <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-5">Dashboard</MudText>
         <MudGrid>
             <MudItem xs="12" sm="6" md="3">
                 <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
                     <MudIcon Icon="@Icons.Material.Filled.Sms" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                     <div>
                         <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">SMS Credit</MudText>
-                        <MudText Typo="Typo.h5">3,125,000</MudText>
+                        <MudText Typo="Typo.h5">@smsCredit</MudText>
                     </div>
                 </MudPaper>
             </MudItem>
@@ -33,11 +37,11 @@
 
 @code{
     @*protected async override Task OnInitializedAsync()
-    {
-        var authState = await _authStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity.IsAuthenticated != true)
         {
-            _navigation.NavigateTo("/login");
-        }
-    }*@
+            var authState = await _authStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity.IsAuthenticated != true)
+            {
+                _navigation.NavigateTo("/login");
+            }
+        }*@
 }

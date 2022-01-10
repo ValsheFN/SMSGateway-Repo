@@ -9,6 +9,7 @@ namespace SMSGateway.Server.Models
 {
     public class Log : Record
     {
+        public string MessageId { get; set; }
         [Required]
         public string From { get; set; }
         [Required]

@@ -26,7 +26,7 @@
                 <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.From)" T="LogModel">From</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.SendTo)" T="LogModel">Send To</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.Messages)" T="LogModel">Messages</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<LogModel, object>(x=>x.TimeSent)" T="LogModel">Time Sent</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<LogModel, object>(x=>x.TimeSent)" T="LogModel">Time Sent</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="from">@context.From</MudTd>

@@ -22,23 +22,22 @@
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <ColGroup>
-            <col style="width: 12%;" />
-            <col style="width: 12%;" />
+            <col style="width: 30%;" />
             <col style="width: 40%;" />
-            <col style="width: 12%;" />
-            <col style="width: 12%;" />
-            <col style="width: 12%;" />
+            <col style="width: 10%;" />
+            <col style="width: 10%;" />
+            <col style="width: 10%;" />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.ReferenceId)" T="HistoryModel">Reference Id</MudTableSortLabel></MudTh>
+            <MudTh Style="display: none"><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.ReferenceId)" T="HistoryModel">Reference Id</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.Recipients)" T="HistoryModel">Recipients</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.Messages)" T="HistoryModel">Messages</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.Status)" T="HistoryModel">Status</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<HistoryModel, object>(x=>x.TimeSent)" T="HistoryModel">Time Sent</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<HistoryModel, object>(x=>x.TimeSent)" T="HistoryModel">Time Sent</MudTableSortLabel></MudTh>
             <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+            <MudTd Style="display: none" DataLabel="referenceId">@context.ReferenceId</MudTd>
             <MudTd DataLabel="recipients">@context.Recipients</MudTd>
             <MudTd DataLabel="messages">@context.Messages</MudTd>
             <MudTd DataLabel="status">@context.Status</MudTd>

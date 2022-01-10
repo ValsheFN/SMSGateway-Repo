@@ -1,10 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 using MudBlazor;
 using SMSGateway.Client.Pages.Dialog;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;

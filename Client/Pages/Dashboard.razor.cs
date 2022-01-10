@@ -1,20 +1,17 @@
 ﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using MudBlazor;
-using SMSGateway.Client.Models;
-using SMSGateway.Client.Pages.Dialog;
+using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System;
+using SMSGateway.Client.Models;
+using System.Net.Http.Headers;
 
-namespace SMSGateway.Client.Pages.History
+namespace SMSGateway.Client.Pages
 {
-    public partial class History
+    public partial class Dashboard
     {
         [Inject]
         public ILocalStorageService Storage { get; set; }
@@ -23,8 +20,11 @@ namespace SMSGateway.Client.Pages.History
 
         private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
 
-        private IEnumerable<HistoryModel> ListOfHistory = new List<HistoryModel>();
+        private IEnumerable<UserModel> UserList = new List<UserModel>();
+        private IEnumerable<HistoryModel> HistoryList = new List<HistoryModel>();
 
+        private int smsCredit = 0;
+        private string totalSmsSent = "";
         protected override async Task OnInitializedAsync()
         {
             var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
@@ -34,21 +34,20 @@ namespace SMSGateway.Client.Pages.History
             }
             else
             {
+                var userId = _localStorage.GetItemAsString("userId");
                 var token = _localStorage.GetItemAsString("access_token");
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                ListOfHistory = await _httpClient.GetFromJsonAsync<List<HistoryModel>>("/api/history");
-            }
-        }
-        private async void ShowDetails(HistoryModel history)
-{
-            var parameters = new DialogParameters { ["History"] = history };
 
-            var dialog = DialogService.Show<ShowHistoryDialog>("Show History Details", parameters);
-            var result = await dialog.Result;
-            var token = _localStorage.GetItemAsString("access_token");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ListOfHistory = await _httpClient.GetFromJsonAsync<List<HistoryModel>>("/api/history");
-            StateHasChanged();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                UserList = await _httpClient.GetFromJsonAsync<List<UserModel>>("/api/user?userId=" + userId);
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                HistoryList = await _httpClient.GetFromJsonAsync<List<HistoryModel>>("/api/history");
+
+                smsCredit = UserList.FirstOrDefault().SmsCredit;
+                totalSmsSent = "";
+
+            }
+
         }
     }
 }

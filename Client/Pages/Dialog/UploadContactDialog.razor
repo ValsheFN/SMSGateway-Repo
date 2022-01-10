@@ -4,7 +4,6 @@
 @inject HttpClient _httpClient
 @inject ISnackbar Snackbar
 @inject NavigationManager _navigation
-@inject IJSRuntime JSRuntime
 
 <MudDialog>
     <TitleContent>
@@ -14,9 +13,17 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudButton @onclick="UploadContact" Variant="Variant.Filled" Color="Color.Tertiary" Size="Size.Medium" Class="ma-2">Upload</MudButton>
-        <MudButton @onclick="DownloadTemplate" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Class="ma-2">Download Template</MudButton>
-        @if (!string.IsNullOrWhiteSpace(_errorMessage))
+        <InputFile id="fileInput" OnChange="UploadContact" hidden accept=".xlsx" />
+        <MudButton HtmlTag="label"
+                   Variant="Variant.Filled"
+                   Color="Color.Tertiary"
+                   StartIcon="@Icons.Filled.CloudUpload"
+                   for="fileInput">
+            Upload Contact
+        </MudButton>
+        @*<MudButton @onclick="UploadContact(e)" Variant="Variant.Filled" StartIcon="@Icons.Filled.CloudUpload" Color="Color.Tertiary" Size="Size.Medium" Class="ma-2">Upload</MudButton>
+        *@<MudButton @onclick="DownloadTemplate" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Filled.CloudDownload" Size="Size.Medium" Class="ma-2">Download Template</MudButton>
+        @if (_errorMessage.Count>0)
         {
             <MudItem>
                 <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Square="true">@_errorMessage</MudAlert>
@@ -31,22 +38,11 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    private string _errorMessage = string.Empty;
+    private List<string> _errorMessage = new List<string>();
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 15;
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
 
-    private void Cancel()
-    {
-        MudDialog.Cancel();
-    }
-
-    private void DownloadTemplate()
-    {
-        _navigation.NavigateTo("/ExcelTemplate/sample-contactUpload.xlsx", true);
-    }
-
-    private void UploadContact()
-    {
-        _errorMessage = string.Empty;
-        _errorMessage = "Feature coming soon";
-    }
 }
 

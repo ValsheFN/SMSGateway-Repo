@@ -15,7 +15,8 @@ namespace SMSGateway.Server.Services
     {
         Task<OperationResponse<History>> CreateAsync(History model);
         Task<OperationResponse<History>> UpdateAsync(string referenceId, string status);
-        List<History> GetAllFiltered(string referenceId);
+        Task<OperationResponse<History>> BulkUpdateAsync(List<History> model);
+        List<History> GetAllFiltered(string referenceId, string status, bool hasMessageId);
     }
 
     public class HistoryService : IHistoryService
@@ -33,6 +34,7 @@ namespace SMSGateway.Server.Services
         {
             var history = new History
             {
+                MessageId = model.MessageId,
                 Recipients = model.Recipients,
                 Messages = model.Messages,
                 TimeSent = model.TimeSent,
@@ -101,18 +103,67 @@ namespace SMSGateway.Server.Services
             }
             
         }
-        public List<History> GetAllFiltered(string referenceId)
+        public List<History> GetAllFiltered(string referenceId, string status, bool hasMessageId)
         {
             var query = _db.History.ToList();
-
-            query = query.Where(x => x.CreatedByUserId == _identity.UserId).ToList();
 
             if (!string.IsNullOrWhiteSpace(referenceId))
             {
                 query = query.Where(x => x.ReferenceId == referenceId).ToList();
             }
 
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(x => x.Status == status).ToList();
+            }
+
+            if (hasMessageId)
+            {
+                query = query.Where(x => x.MessageId != null).ToList();
+            }
+
             return query;
+        }
+
+        public async Task<OperationResponse<History>> BulkUpdateAsync(List<History> model)
+        {
+            var count = model.Count();
+
+            if(count <= 0)
+            {
+                return new OperationResponse<History>
+                {
+                    Message = "No data found",
+                    IsSuccess = false
+                };
+            }
+
+            foreach(var data in model)
+            {
+                await _db.History.AddAsync(data);
+            }
+
+            try
+            {
+                await _db.SaveChangesAsync();
+
+                return new OperationResponse<History>
+                {
+                    Message = "SMS history updated",
+                    IsSuccess = true
+                };
+            }
+            catch (Exception e)
+            {
+                return new OperationResponse<History>
+                {
+                    Message = $"Error - {e.InnerException.ToString()}",
+                    IsSuccess = false
+                };
+            }
+
+            
+
         }
     }
 }

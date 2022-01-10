@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
+using SMSGateway.Server.Models;
 
 namespace SMSGateway.Server.Controllers
 {
@@ -14,14 +15,16 @@ namespace SMSGateway.Server.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-        /*private readonly IWebHostEnvironment env;
-        private readonly ILogger<FilesaveController> logger;
-
-        public FilesaveController(IWebHostEnvironment env,
-            ILogger<FilesaveController> logger)
+        // /api/file/importcontact
+        [HttpPost("ImportContact")]
+        public async Task<IActionResult> ImportContact(IFormFile file)
         {
-            this.env = env;
-            this.logger = logger;
-        }*/
+            using (var stream = file.OpenReadStream())
+            {
+                
+            }
+
+            return Ok();
+        }
     }
 }

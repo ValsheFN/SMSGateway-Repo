@@ -23,9 +23,9 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpGet()]
-        public async Task<IActionResult> GetAllFiltered(string referenceId)
+        public async Task<IActionResult> GetAllFiltered(string referenceId, string status, bool hasMessageId)
         {
-            return Ok(_historyService.GetAllFiltered(referenceId));
+            return Ok(_historyService.GetAllFiltered(referenceId, status, hasMessageId));
         }
 
         [HttpPost()]
@@ -53,6 +53,18 @@ namespace SMSGateway.Server.Controllers
         public async Task<IActionResult> UpdateAsync(string referenceId, string status)
         {
             var result = await _historyService.UpdateAsync(referenceId, status);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
+        [HttpPost("/Import")]
+        public async Task<IActionResult> BulkUpdateAsync([FromBody] List<History> model)
+        {
+            var result = await _historyService.BulkUpdateAsync(model);
 
             if (result.IsSuccess)
             {

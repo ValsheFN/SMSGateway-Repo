@@ -8,6 +8,7 @@ namespace SMSGateway.Client.Models
 {
     public class LogModel
     {
+        public string MessageId { get; set; }
         public string From { get; set; }
         public string SendTo { get; set; }
         public string Messages { get; set; }

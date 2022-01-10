@@ -23,7 +23,10 @@
     <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="5.2.0" />
     <PackageReference Include="Blazored.FluentValidation" Version="2.0.1" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
+    <PackageReference Include="ClosedXML" Version="0.95.4" />
     <PackageReference Include="CSharpVitamins.ShortGuid" Version="2.0.0" />
+    <PackageReference Include="EPPlus" Version="5.8.4" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="Google.Cloud.Translation.V2" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.10" />

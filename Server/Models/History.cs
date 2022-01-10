@@ -16,6 +16,7 @@ namespace SMSGateway.Server.Models
         }
 
         public string ReferenceId { get; set; }
+        public string MessageId { get; set; }
         [Required]
         public string Recipients { get; set; }
         [Required]

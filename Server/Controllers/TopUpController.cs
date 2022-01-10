@@ -36,7 +36,7 @@ namespace SMSGateway.Server.Controllers
         }
 
         [HttpPost("CreateTopUp")]
-        public async Task<IActionResult> CreateAsync([FromForm] TopUp model)
+        public async Task<IActionResult> CreateAsync([FromBody] TopUp model)
         {
             if (ModelState.IsValid)
             {
@@ -58,15 +58,15 @@ namespace SMSGateway.Server.Controllers
             }); //400
         }
 
-        [HttpGet("UpdateTopUp")]
-        public async Task<IActionResult> UpdateAsync(string referenceId, string action)
+        [HttpPut("UpdateTopUp")]
+        public async Task<IActionResult> UpdateAsync([FromBody] TopUp model)
         {
-            if (string.IsNullOrWhiteSpace(referenceId) || string.IsNullOrWhiteSpace(action))
+            if (string.IsNullOrWhiteSpace(model.ReferenceId) || string.IsNullOrWhiteSpace(model.Status))
             {
                 return NotFound();
             }
 
-            var result = await _topUpService.UpdateTopUp(referenceId, action);
+            var result = await _topUpService.UpdateTopUp(model);
 
             if (result.IsSuccess)
             {
@@ -77,8 +77,8 @@ namespace SMSGateway.Server.Controllers
             new OperationResponse<TopUp>
             {
                 IsSuccess = false,
-                Message = "Internal server error"
-            }); //400
+                Message = result.Message
+            }) ; //400
         }
     }
 }

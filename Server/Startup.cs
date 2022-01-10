@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.Console;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
@@ -44,6 +46,19 @@ namespace SMSGateway.Server
                     sqlOptions.MigrationsAssembly("SMSGateway.Server");
                 });
             });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "HangfireApplication", Version = "v1" });
+            });
+
+            services.AddHangfire(options =>
+            {
+                options.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseConsole();
+            });
+
+            services.AddHangfireServer();
 
             services.AddCors(options =>
             {
@@ -106,6 +121,7 @@ namespace SMSGateway.Server
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IHistoryService, HistoryService>();
+            services.AddScoped<ISchedulerService, SchedulerService>();
             services.AddHttpContextAccessor();
 
             services.AddScoped(sp => 
@@ -166,6 +182,8 @@ namespace SMSGateway.Server
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
+            app.UseHangfireDashboard();
+
             app.UseRouting();
 
             app.UseCors();
@@ -178,6 +196,7 @@ namespace SMSGateway.Server
                 endpoints.MapRazorPages();
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
                 endpoints.MapFallbackToFile("index.html");
             });
         }

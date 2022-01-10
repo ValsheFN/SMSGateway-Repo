@@ -22,12 +22,9 @@ namespace SMSGateway.Client.Pages.Dialog
             MudDialog.Cancel();
         }
 
-        private async void CreateTopUp(decimal topUpValue)
+        private async void CreateTopUp(TopUpModel model)
         {
-            var userId = _localStorage.GetItemAsString("user_id");
-            var token = _localStorage.GetItemAsString("access_token");
-
-            if (topUpValue <= 0)
+            if (model.TopUpValue <= 0)
             {
                 Snackbar.Add("Top up value cannot be equal to or below 0", Severity.Success);
             }
@@ -36,14 +33,15 @@ namespace SMSGateway.Client.Pages.Dialog
                 var authState = _authenticationStateProvider.GetAuthenticationStateAsync();
                 //var email = authState.User.FindFirst("sub")?.Value;
 
-                var topUp = new TopUpModel
-                {
-                    TopUpValue = topUpValue,
-                    Requester = ""
-                };
+                var token = _localStorage.GetItemAsString("access_token");
 
+                var userName = _localStorage.GetItemAsString("user_info").Split("\"UserName\":\"")[1]
+                                                                 .Split('"')[0]
+                                                                 .Trim();
+
+                model.Requester = userName;
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.PostAsJsonAsync("/api/topUp/CreateTopUp/", topUp);
+                var response = await _httpClient.PostAsJsonAsync("/api/topUp/CreateTopUp/", model);
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<OperationResponse<TopUpModel>>(responseBody);
 

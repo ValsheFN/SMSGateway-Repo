@@ -5,10 +5,9 @@ using SMSGateway.Server.Models;
 using SMSGateway.Shared;
 using System.Threading.Tasks;
 using SMSGateway.Server.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using System.Data.Services.Client;
-using static Google.Apis.Requests.BatchRequest;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+using System.IO;
 
 namespace SMSGateway.Server.Services
 {
@@ -18,6 +17,7 @@ namespace SMSGateway.Server.Services
         Task<OperationResponse<Contact>> UpdateAsync(Contact model);
         Task<OperationResponse<Contact>> RemoveAsync(string referenceId);
         List<Contact> GetAllFiltered(string userId, string referenceId, string firstName, string lastName, string contactGroupId);
+        Task<ExcelImportResponse<Contact>> ImportContactAsync(IFormFile formFile);
         Task CommitChangesAsync(string userId);
     }
 
@@ -172,6 +172,141 @@ namespace SMSGateway.Server.Services
             }
 
             return query;
+        }
+
+        public async Task<ExcelImportResponse<Contact>> ImportContactAsync(IFormFile formFile)
+        {
+            if (formFile == null || formFile.Length <= 0)
+            {
+                return new ExcelImportResponse<Contact>
+                {
+                    IsSuccess = false,
+                    Message = "File is empty"
+                };
+            }
+
+            if (!Path.GetExtension(formFile.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                return new ExcelImportResponse<Contact>
+                {
+                    IsSuccess = false,
+                    Message = "File extension should be '.xlsx'"
+                };
+            }
+
+            var list = new List<Contact>();
+            var errorList = new List<string>();
+            var errorMessage = string.Empty;
+            var dataCount = 0;
+            var successCount = 0;
+            var errorCount = 0;
+
+            using (var stream = new MemoryStream())
+            {
+                await formFile.CopyToAsync(stream);
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using (var package = new ExcelPackage(stream))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    var rowCount = worksheet.Dimension.Rows;
+                    dataCount = rowCount-1;
+
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        var FirstName = worksheet.Cells[row, 1].Text == null || worksheet.Cells[row, 1].Text == "" ?
+                                        "" :
+                                        worksheet.Cells[row, 1].Value.ToString();
+                        var LastName = worksheet.Cells[row, 2].Text == null || worksheet.Cells[row, 2].Text == "" ? 
+                                       "" :
+                                       worksheet.Cells[row, 2].Value.ToString();
+                        var Email = worksheet.Cells[row, 3].Text == null || worksheet.Cells[row, 3].Text == "" ?
+                                    "" :
+                                    worksheet.Cells[row, 3].Value.ToString();
+                        var PhoneNumber = worksheet.Cells[row, 4].Text == null || worksheet.Cells[row, 4].Text == "" ?
+                                          "" :
+                                          worksheet.Cells[row, 4].Value.ToString();
+                        var Notes = worksheet.Cells[row, 5].Text == null || worksheet.Cells[row, 5].Text == "" ?
+                                    "" :
+                                    worksheet.Cells[row, 5].Value.ToString();
+
+                        //Check if data is valid
+                        if (string.IsNullOrEmpty(PhoneNumber))
+                        {
+                            errorMessage = $"Error at row {row} : No phone number found";
+                            errorList.Add(errorMessage);
+                            continue;
+                        }
+
+                        var userPhoneNumber = _db.Contact.Where(x => x.PhoneNumber == PhoneNumber.Trim() && x.CreatedByUserId == _identity.UserId).ToList();
+                        if (userPhoneNumber.Count != 0)
+                        {
+                            errorMessage = $"Error at row {row} : Phone number already exist";
+                            errorList.Add(errorMessage);
+                            continue;
+                        }
+
+                        var contact = new Contact
+                        {
+                            FirstName = FirstName != "" ? FirstName : PhoneNumber.Trim(),
+                            LastName = LastName,
+                            Email = Email.Trim(),
+                            PhoneNumber = PhoneNumber.Trim(),
+                            Notes = Notes
+                        };
+
+                        await _db.Contact.AddAsync(contact);
+                        successCount++;
+                    }
+
+                    try
+                    {
+                        await _db.SaveChangesAsync(_identity.UserId);
+                    }
+                    catch (Exception e)
+                    {
+                        return new ExcelImportResponse<Contact>
+                        {
+                            Message = e.Message.ToString() + " " + e.InnerException.ToString(),
+                            IsSuccess = false
+                        };
+                    }
+
+
+                }
+            }
+
+            errorCount = errorList.Count();
+
+            if(successCount > 0)
+            {
+                return new ExcelImportResponse<Contact>
+                {
+                    IsSuccess = true,
+                    Message = $"{successCount} contact(s) out of {dataCount} imported successfully with {errorCount} errors",
+                    Error = errorList
+                };
+            }
+            else if(dataCount == 0)
+            {
+                return new ExcelImportResponse<Contact>
+                {
+                    IsSuccess = false,
+                    Message = "No data found in the spreadsheet",
+                    Error = errorList
+                };
+            }
+            else
+            {
+                return new ExcelImportResponse<Contact>
+                {
+                    IsSuccess = false,
+                    Message = $"{successCount} contact(s) out of {dataCount} imported successfully with {errorCount} errors",
+                    Error = errorList
+                };
+            }
+
+            
         }
     }
 }

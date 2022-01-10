@@ -2,7 +2,7 @@
 
 @using SMSGateway.Client.Models
 @using System.Net.Http.Json
-@using System.Security.Claims@using System.Net.Http.Headers
+@using System.Net.Http.Headers
 
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject NavigationManager _navigation
@@ -22,29 +22,35 @@
                 <MudFab aria-label="Request top up" @onclick="(e => Create())" Color="Color.Tertiary" Icon="@Icons.Material.Filled.Add" Size="Size.Small" IconSize="Size.Small" Class="ma-2" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>Reference Id</MudTh>
+                <MudTh Style="display: none">Reference Id</MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.Requester)" T="TopUpModel">Requester</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.TopUpValue)" T="TopUpModel">Top Up Value</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.Status)" T="TopUpModel">Status</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.RequestDate)" T="TopUpModel">Request Date</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.GrantDate)" T="TopUpModel">Granted Date</MudTableSortLabel></MudTh>
-                <MudTh>Granted By</MudTh>
-                <MudTh>Actions</MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<TopUpModel, object>(x=>x.RequestDate)" T="TopUpModel">Request Date</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TopUpModel, object>(x=>x.GrantDate)" T="TopUpModel">Processed Date</MudTableSortLabel></MudTh>
+                <MudTh>Processed By</MudTh>
+                @if (superUserRole)
+                {
+                    <MudTh>Actions</MudTh>
+                }
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="referenceId">@context.ReferenceId</MudTd>
+                <MudTd Style="display: none" DataLabel="referenceId">@context.ReferenceId</MudTd>
                 <MudTd DataLabel="requester">@context.Requester</MudTd>
                 <MudTd DataLabel="topUpValue">@context.TopUpValue</MudTd>
                 <MudTd DataLabel="status">@context.Status</MudTd>
                 <MudTd DataLabel="requestDate">@context.RequestDate</MudTd>
                 <MudTd DataLabel="grantDate">@context.GrantDate</MudTd>
                 <MudTd DataLabel="grantedBy">@context.GrantedBy</MudTd>
-                <MudTd DataLabel="">
-                    <MudFab aria-label="Approve top up" @onclick="@(()=>Approve(@context))" Color="Color.Primary"
-                            Icon="@Icons.Material.Filled.Approval" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab aria-label="Reject top up" @onclick="@(()=>Reject(@context))" Color="Color.Secondary"
-                            Icon="@Icons.Material.Filled.Block" Size="Size.Small" IconSize="Size.Small" />
-                </MudTd>
+                @if (superUserRole)
+                {
+                    <MudTd DataLabel="">
+                        <MudFab aria-label="Approve top up" @onclick="@(()=>Approve(@context))" Color="Color.Primary"
+                                Icon="@Icons.Material.Filled.Approval" Size="Size.Small" IconSize="Size.Small" />
+                        <MudFab aria-label="Reject top up" @onclick="@(()=>Reject(@context))" Color="Color.Secondary"
+                                Icon="@Icons.Material.Filled.Block" Size="Size.Small" IconSize="Size.Small" />
+                    </MudTd>
+                }
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
@@ -56,6 +62,7 @@
 @code {
 
     private string searchString = "";
+    public bool superUserRole { get; set; } = false;
 
     private IEnumerable<TopUpModel> ListOfTopUps = new List<TopUpModel>();
 
@@ -64,6 +71,8 @@
     protected override async Task OnInitializedAsync()
     {
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        superUserRole = authState.User.IsInRole("Super User");
+
         if (authState.User.Identity.IsAuthenticated != true)
         {
             _navigation.NavigateTo("/login");

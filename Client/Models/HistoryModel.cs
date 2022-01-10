@@ -8,6 +8,7 @@ namespace SMSGateway.Client.Models
 {
     public class HistoryModel
     {
+        public string MessageId { get; set; }
         public string ReferenceId { get; set; }
         public string Recipients { get; set; }
         public string Messages { get; set; }
